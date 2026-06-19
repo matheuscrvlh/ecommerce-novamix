@@ -1,7 +1,0 @@
-import express from 'express';
-
-const app = express();
-
-app.listen(3003, () => {
-    console.log('Servidor rodando 3003')
-})
