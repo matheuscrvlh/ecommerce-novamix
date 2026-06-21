@@ -1,6 +1,7 @@
 import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify'
 import { db } from '../database/database.ts'
 import { hashPassword } from '../utils/hash.js'
+import { authenticate, checkAdmin } from '../middlewares/auth.middleware.js'
 
 type CreateUserBody = {
     nome: string
@@ -27,6 +28,6 @@ async function createUser(req: FastifyRequest<{Body: CreateUserBody}>, res: Fast
 }
 
 export async function usersRoutes(fastify: FastifyInstance) {
-    fastify.post('/usuarios', createUser)
+    fastify.post('/usuarios', { preHandler: [authenticate, checkAdmin] }, createUser)
 }
 

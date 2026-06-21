@@ -1,6 +1,7 @@
 import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify'
 import { db } from '../database/database.ts'
-import { comparePassword } from '../utils/hash.js'
+import { comparePassword } from '../utils/hash.ts'
+import { generateToken, verifyToken } from '../utils/jwt.ts'
 
 type LoginBody = {
     login: string,
@@ -26,9 +27,12 @@ async function login(req: FastifyRequest<{Body: LoginBody}>, res:FastifyReply) {
             return res.code(401).send({ error: 'Senha inválida'})
         }
 
-        // gerar jwt
-        // retornar token
+        const token = generateToken(
+            searchPasswordUser.rows[0].id, 
+            searchPasswordUser.rows[0].role
+        )
 
+        return res.code(200).send({ token })
 
     } catch {
         res.code(401).send({ error: 'Erro ao efetuar login.'})

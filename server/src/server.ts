@@ -1,14 +1,19 @@
 import 'dotenv/config'
 import Fastify from 'fastify'
-
-// DB
 import { db } from './database/database.ts' 
-
-// ROUTES
 import { usersRoutes } from './routes/users.routes.ts'
 import { authRoutes } from './routes/auth.routes.ts'
 
 const app = Fastify()
+
+// Provisório - valida o env ao iniciar
+if(!process.env.SERVER_PORT) {
+    throw new Error('Erro ao achar SERVER_PORT no env.')
+} else if (!process.env.DATABASE_URL) {
+    throw new Error('Erro ao achar DATABASE_URL no env.')
+} else if (!process.env.JWT_SECRET) {
+    throw new Error('Erro ao achar JWT_SECRET no env.')
+}
 
 app.register(usersRoutes)
 app.register(authRoutes)

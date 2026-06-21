@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.0.0",
     "@types/pg": "^8.20.0",
     "typescript": "^6.0.3"
@@ -19,6 +20,7 @@
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "fastify": "^5.8.5",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.22.0"
   }
 }

@@ -4,9 +4,6 @@ export async function hashPassword(password: string) {
     try {
         const hashedPassword = await hash(password, 10);
 
-        console.log(password);
-        console.log(hashedPassword);
-
         return hashedPassword
     } catch {
         throw new Error('Erro ao hashear senha.')
