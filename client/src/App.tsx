@@ -1,11 +1,9 @@
-import { useState } from 'react'
+import AppRoutes from "./routes/AppRoutes"
 
 function App() {
-  const [a,aa] = useState()
+
   return (
-    <>
-    <div className='bg-amber-50'></div>
-    </>
+    <AppRoutes />
   )
 }
 
