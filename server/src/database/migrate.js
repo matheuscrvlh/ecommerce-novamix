@@ -23,6 +23,15 @@ async function createTables() {
             )
         `)
 
+        const createTableOrders = await db.query(`
+            CREATE TABLE pedidos (
+                id SERIAL PRIMARY KEY,
+                codigo_pedido VARCHAR (100) UNIQUE NOT NULL,
+                operador_id INTEGER REFERENCES usuarios(id),
+                bipado_em TIMESTAMP
+            )
+        `)
+
         console.log('Tabelas Criadas!')
 
         return
