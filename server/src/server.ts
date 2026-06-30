@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import Fastify from 'fastify'
 import { db } from './database/database.ts' 
+import { cissDb } from './database/ciss.database.js'
 import { usersRoutes } from './routes/users.routes.ts'
 import { authRoutes } from './routes/auth.routes.ts'
 import { ordersRoutes } from './routes/orders.routes.ts'
@@ -14,6 +15,8 @@ if(!process.env.SERVER_PORT) {
     throw new Error('Erro ao achar DATABASE_URL no env.')
 } else if (!process.env.JWT_SECRET) {
     throw new Error('Erro ao achar JWT_SECRET no env.')
+} else if (!process.env.CISS_DATABASE_URL) {
+    throw new Error('Erro ao achar CISS_DATABASE_URL no env.')
 }
 
 app.register(usersRoutes)
@@ -26,6 +29,11 @@ async function start() {
 
     await db.query('SELECT NOW()')
     console.log('Supabase Conectado')
+
+    const connectionCiss = await cissDb()
+    await connectionCiss.query('SELECT 1 FROM SYSIBM.SYSDUMMY1')
+    console.log('CISS Conectado.')
+    await connectionCiss.close()
 }
 
 start()
