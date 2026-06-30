@@ -5,6 +5,7 @@ import { cissDb } from './database/ciss.database.js'
 import { usersRoutes } from './routes/users.routes.ts'
 import { authRoutes } from './routes/auth.routes.ts'
 import { ordersRoutes } from './routes/orders.routes.ts'
+import { syncRoutes } from './routes/sync.routes.ts'
 
 const app = Fastify()
 
@@ -22,6 +23,7 @@ if(!process.env.SERVER_PORT) {
 app.register(usersRoutes)
 app.register(authRoutes)
 app.register(ordersRoutes)
+app.register(syncRoutes)
 
 async function start() {
     await app.listen({ port: process.env.SERVER_PORT }, () => {})
