@@ -1,11 +1,11 @@
 import ibmdb from 'ibm_db'
 
-const URL_DB = process.env.CISS_DATABASE_URL
+const connStr = process.env.CISS_DATABASE_URL
 
-export async function cissDb() {
+export async function connCiss() {
     try {
-        const result = await ibmdb.open(URL_DB);
-        return result
+        const conn = await ibmdb.open(connStr);
+        return conn
     } catch (error) {
         console.log(error)
         throw new Error('Erro ao conectar no banco CISS')

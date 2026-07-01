@@ -1,22 +1,30 @@
 const BASE_URL = import.meta.env.VITE_API_URL
 
-const 
+type ClientParams = {
+    url: string,
+    token: string | null,
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    data: unknown
+}
 
-export default async function Client(url, method, data) {
+export default async function client({ url, token, method, data }: ClientParams) {
     try {
-        const res = await fetch(`BASE_URL${url}`, {
+        const res = await fetch(`${BASE_URL}${url}`, {
             method: method,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json' 
+            },
             body: JSON.stringify(data)
         });
 
         if(!res.ok) {
-            throw new Error('Erro ao conectar com servidor.')
+            throw new Error(`HTTP error! Status: ${res.status}`)
         };
 
-        const data = await res.json();
-        return data
+        return res.json()
     } catch (error) {
-        console.log(`Erro ao efetuar o fetch do(a) ${url}.`, error)
+        console.error('Fetch error', error);
+        throw new Error(`Erro ao efetuar o fetch do(a) ${url}.`)
     }
 }

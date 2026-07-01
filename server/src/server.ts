@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import Fastify from 'fastify'
 import { db } from './database/database.ts' 
-import { cissDb } from './database/ciss.database.js'
+import { connCiss } from './database/ciss.database.js'
 import { usersRoutes } from './routes/users.routes.ts'
 import { authRoutes } from './routes/auth.routes.ts'
 import { ordersRoutes } from './routes/orders.routes.ts'
@@ -32,10 +32,10 @@ async function start() {
     await db.query('SELECT NOW()')
     console.log('Supabase Conectado')
 
-    const connectionCiss = await cissDb()
-    await connectionCiss.query('SELECT 1 FROM SYSIBM.SYSDUMMY1')
+    const conn = await connCiss()
+    await conn.query('SELECT 1 FROM SYSIBM.SYSDUMMY1')
     console.log('CISS Conectado.')
-    await connectionCiss.close()
+    await conn.close()
 }
 
 start()
