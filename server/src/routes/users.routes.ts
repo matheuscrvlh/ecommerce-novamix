@@ -31,7 +31,7 @@ async function createUser(req: FastifyRequest<{Body: CreateUserBody}>, res: Fast
 
 async function getUsers(req:FastifyRequest, res:FastifyReply) {
     const result = await db.query(
-        'SELECT * FROM usuarios'
+        'SELECT id, nome, login, role, status, criado_em FROM usuarios'
     );
 
     return res.code(200).send(result.rows)
@@ -47,7 +47,7 @@ async function putUser(req:FastifyRequest<{Body: CreateUserBody}>, res:FastifyRe
         [nome, login, passwordHashed, role, status, id]
     );
 
-    if(!result) {
+    if(result.rowCount === 0) {
         throw new Error('Nenhum usuário encontrado.')
     }
 

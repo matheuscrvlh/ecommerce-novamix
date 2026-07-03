@@ -1,11 +1,10 @@
 import 'dotenv/config'
 import Fastify from 'fastify'
 import { db } from './database/database.ts' 
-import { connCiss } from './database/ciss.database.js'
+import { connCiss } from './database/ciss.database.ts'
 import { usersRoutes } from './routes/users.routes.ts'
 import { authRoutes } from './routes/auth.routes.ts'
 import { ordersRoutes } from './routes/orders.routes.ts'
-import { syncRoutes } from './routes/sync.routes.ts'
 
 const app = Fastify()
 
@@ -23,7 +22,6 @@ if(!process.env.SERVER_PORT) {
 app.register(usersRoutes)
 app.register(authRoutes)
 app.register(ordersRoutes)
-app.register(syncRoutes)
 
 async function start() {
     await app.listen({ port: process.env.SERVER_PORT }, () => {})
@@ -32,10 +30,10 @@ async function start() {
     await db.query('SELECT NOW()')
     console.log('Supabase Conectado')
 
-    const conn = await connCiss()
-    await conn.query('SELECT 1 FROM SYSIBM.SYSDUMMY1')
-    console.log('CISS Conectado.')
-    await conn.close()
+    //const conn = await connCiss()
+    //await conn.query('SELECT 1 FROM SYSIBM.SYSDUMMY1')
+    //console.log('CISS Conectado.')
+    //await conn.close()
 }
 
 start()
