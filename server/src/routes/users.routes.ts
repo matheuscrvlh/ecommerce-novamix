@@ -62,7 +62,7 @@ async function deleteUser(req:FastifyRequest<{Body: CreateUserBody}>, res:Fastif
         [id]
     );
 
-    if(!result) {
+    if(result.rowCount === 0) {
         return res.code(401).send({ error: 'Erro ao deletar usuário.'})
     };
 
