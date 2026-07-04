@@ -1,0 +1,105 @@
+type IconProps = { className?: string }
+
+export function DashboardIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <rect x='3' y='3' width='7' height='9' rx='1.5' />
+            <rect x='14' y='3' width='7' height='5' rx='1.5' />
+            <rect x='14' y='12' width='7' height='9' rx='1.5' />
+            <rect x='3' y='16' width='7' height='5' rx='1.5' />
+        </svg>
+    )
+}
+
+export function UsersIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <circle cx='9' cy='8' r='3' />
+            <path d='M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6' />
+            <circle cx='17' cy='8' r='2.5' />
+            <path d='M15.5 14.2c2.5.4 4.5 2.6 4.5 5.8' />
+        </svg>
+    )
+}
+
+export function LogoutIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <path d='M9 4H5a1 1 0 00-1 1v14a1 1 0 001 1h4' />
+            <path d='M16 17l5-5-5-5' />
+            <path d='M21 12H9' />
+        </svg>
+    )
+}
+
+export function PackageIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <path d='M21 8l-9-5-9 5 9 5 9-5z' />
+            <path d='M3 8v8l9 5 9-5V8' />
+            <path d='M12 13v8' />
+        </svg>
+    )
+}
+
+export function CheckCircleIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <circle cx='12' cy='12' r='9' />
+            <path d='M8.5 12.5l2.5 2.5 4.5-5' />
+        </svg>
+    )
+}
+
+export function MenuIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <path d='M3 6h18M3 12h18M3 18h18' />
+        </svg>
+    )
+}
+
+export function CloseIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <path d='M6 6l12 12M18 6L6 18' />
+        </svg>
+    )
+}
+
+export function EditIcon({ className = 'h-4 w-4' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <path d='M12 20h9' />
+            <path d='M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z' />
+        </svg>
+    )
+}
+
+export function TrashIcon({ className = 'h-4 w-4' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <path d='M3 6h18' />
+            <path d='M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2' />
+            <path d='M19 6l-1 14a1 1 0 01-1 1H7a1 1 0 01-1-1L5 6' />
+        </svg>
+    )
+}
+
+export function PlusIcon({ className = 'h-4 w-4' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={2} className={className}>
+            <path d='M12 5v14M5 12h14' />
+        </svg>
+    )
+}
+
+export function BadgeIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <rect x='4' y='3' width='16' height='18' rx='2' />
+            <circle cx='12' cy='9' r='2.5' />
+            <path d='M8 17c0-2.2 1.8-4 4-4s4 1.8 4 4' />
+        </svg>
+    )
+}

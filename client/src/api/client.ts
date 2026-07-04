@@ -4,27 +4,24 @@ type ClientParams = {
     url: string,
     token: string | null,
     method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-    data: unknown
+    data?: unknown
 }
 
 export default async function client({ url, token, method, data }: ClientParams) {
-    try {
-        const res = await fetch(`${BASE_URL}${url}`, {
-            method: method,
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json' 
-            },
-            body: JSON.stringify(data)
-        });
+    const res = await fetch(`${BASE_URL}${url}`, {
+        method,
+        headers: {
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+            ...(data !== undefined ? { 'Content-Type': 'application/json' } : {})
+        },
+        body: data !== undefined ? JSON.stringify(data) : undefined
+    });
 
-        if(!res.ok) {
-            throw new Error(`HTTP error! Status: ${res.status}`)
-        };
+    const body = res.status === 204 ? null : await res.json().catch(() => null)
 
-        return res.json()
-    } catch (error) {
-        console.error('Fetch error', error);
-        throw new Error(`Erro ao efetuar o fetch do(a) ${url}.`)
+    if (!res.ok) {
+        throw new Error(body?.error ?? `Erro ao efetuar o fetch do(a) ${url}.`)
     }
+
+    return body
 }

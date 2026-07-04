@@ -1,29 +1,30 @@
-import { createContext, useState} from 'react'
+import { useState} from 'react'
 import { jwtDecode } from 'jwt-decode'
+import { AuthContext } from './auth-context'
 
-type AuthContextType = {
-    token: string | null
-    role: string | null
-    login: (token: string) => void
-    logout: () => void
+function decodeRole(token: string) {
+    try {
+        return jwtDecode<{ role: string }>(token).role
+    } catch {
+        return null
+    }
 }
-
-export const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
 
-    const [ token, setToken ] = useState<string | null>(null);
-    const [ role, setRole ] = useState<string | null>(null);
+    const storedToken = localStorage.getItem('token')
+
+    const [ token, setToken ] = useState<string | null>(storedToken);
+    const [ role, setRole ] = useState<string | null>(storedToken ? decodeRole(storedToken) : null);
 
     function login(token: string) {
-        const decodedPayload = jwtDecode<{role: string}>(token);
-        const decodedRole = decodedPayload.role
-
+        localStorage.setItem('token', token)
         setToken(token);
-        setRole(decodedRole);
-    }; 
+        setRole(decodeRole(token));
+    };
 
     function logout() {
+        localStorage.removeItem('token')
         setToken(null);
         setRole(null);
     };

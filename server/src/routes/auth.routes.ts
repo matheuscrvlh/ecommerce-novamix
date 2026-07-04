@@ -36,7 +36,6 @@ async function login(req: FastifyRequest<{Body: LoginBody}>, res:FastifyReply) {
 
     } catch {
         res.code(401).send({ error: 'Erro ao efetuar login.'})
-        throw new Error('Erro ao efetuar login.')
     }
 }
 

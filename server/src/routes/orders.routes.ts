@@ -4,22 +4,36 @@ import { authenticate, checkAdmin } from '../middlewares/auth.middleware.ts'
 
 type CreateOrderBody = {
     codigo_pedido: string
+    cracha: string
 }
 
 async function postOrder(req: FastifyRequest<{Body: CreateOrderBody}>, res: FastifyReply) {
-    const { codigo_pedido } = req.body
-    const operador_id = req.user.sub
-    
+    const { codigo_pedido, cracha } = req.body
+
     try {
+        let usuario_id = req.user.sub
+
+        if(cracha) {
+            const operador = await db.query(
+                'SELECT id FROM usuarios WHERE cracha = $1 AND status = true',
+                [cracha]
+            )
+
+            if(operador.rows.length === 0) {
+                return res.code(400).send({ error: 'Crachá não encontrado.' })
+            }
+
+            usuario_id = operador.rows[0].id
+        }
         // consulta se ja existe o pedido
         const search = await db.query(
-            'SELECT operador_id, bipado_em FROM pedidos WHERE codigo_pedido = $1',
+            'SELECT usuario_id, bipado_em FROM pedidos WHERE codigo_pedido = $1',
             [codigo_pedido]
         );
 
         if(search.rows.length > 0) {
             const date = search.rows[0].bipado_em
-            const idUser = search.rows[0].operador_id
+            const idUser = search.rows[0].usuario_id
 
             const user = await db.query(
                 'SELECT nome FROM usuarios WHERE id = $1',
@@ -33,8 +47,8 @@ async function postOrder(req: FastifyRequest<{Body: CreateOrderBody}>, res: Fast
 
         // caso nao exista
         await db.query(
-            'INSERT INTO pedidos (codigo_pedido, operador_id, bipado_em) VALUES ($1, $2, NOW())',
-            [codigo_pedido, operador_id]
+            'INSERT INTO pedidos (codigo_pedido, usuario_id, bipado_em) VALUES ($1, $2, NOW())',
+            [codigo_pedido, usuario_id]
         );
 
         return res.code(201).send({ success: 'Pedido adicionado.'})
