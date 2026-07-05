@@ -7,7 +7,8 @@ import Button from '../../components/Button'
 import Input from '../../components/Input'
 import Logo from '../../components/Logo'
 import Alert from '../../components/Alert'
-import { DashboardIcon, LogoutIcon } from '../../components/icons'
+import BarcodeScannerModal from '../../components/BarcodeScannerModal'
+import { DashboardIcon, LogoutIcon, CameraIcon } from '../../components/icons'
 
 const SEGUNDOS_SESSAO = 15
 
@@ -28,6 +29,8 @@ export default function ColetaCracha() {
     const [restante, setRestante] = useState(SEGUNDOS_SESSAO)
     const [pedidoInput, setPedidoInput] = useState('')
     const [feed, setFeed] = useState<ItemFeed[]>([])
+    const [scannerCrachaAberto, setScannerCrachaAberto] = useState(false)
+    const [scannerPedidoAberto, setScannerPedidoAberto] = useState(false)
 
     useEffect(() => {
         if (!sessao) return
@@ -46,15 +49,14 @@ export default function ColetaCracha() {
         return () => clearInterval(interval)
     }, [sessao])
 
-    async function handleCrachaSubmit(event: SubmitEvent) {
-        event.preventDefault()
+    async function verificarCracha(cracha: string) {
         setErroCracha('')
         setBuscando(true)
 
         try {
             const usuarios = await getUsuarios(token!)
             const encontrado = usuarios.find(
-                (usuario) => usuario.cracha === crachaInput.trim() && usuario.status
+                (usuario) => usuario.cracha === cracha.trim() && usuario.status
             )
 
             if (!encontrado) {
@@ -71,12 +73,20 @@ export default function ColetaCracha() {
         }
     }
 
-    async function handlePedidoSubmit(event: SubmitEvent) {
+    async function handleCrachaSubmit(event: SubmitEvent) {
         event.preventDefault()
+        await verificarCracha(crachaInput)
+    }
+
+    function handleCrachaScan(cracha: string) {
+        setScannerCrachaAberto(false)
+        verificarCracha(cracha)
+    }
+
+    async function biparPedido(codigo: string) {
         if (!sessao) return
 
         setRestante(SEGUNDOS_SESSAO)
-        const codigo = pedidoInput
         setPedidoInput('')
 
         try {
@@ -90,19 +100,29 @@ export default function ColetaCracha() {
         }
     }
 
+    async function handlePedidoSubmit(event: SubmitEvent) {
+        event.preventDefault()
+        await biparPedido(pedidoInput)
+    }
+
+    function handlePedidoScan(codigo: string) {
+        setScannerPedidoAberto(false)
+        biparPedido(codigo)
+    }
+
     return (
-        <div className='relative flex min-h-screen flex-col items-center justify-center gap-6 bg-linear-to-br from-orange-50 via-white to-teal-50 p-4'>
+        <div className='relative flex min-h-screen flex-col items-center justify-center gap-6 bg-linear-to-br from-orange-base/10 via-white to-gray-base/10 p-4'>
             <div className='absolute top-4 right-4 flex items-center gap-4'>
                 <Link
                     to='/dashboard'
-                    className='flex items-center gap-1 text-sm text-gray-500 transition hover:text-gray-700'
+                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text'
                 >
                     <DashboardIcon className='h-4 w-4' />
                     Voltar ao Dashboard
                 </Link>
                 <button
                     onClick={logout}
-                    className='flex items-center gap-1 text-sm text-gray-500 transition hover:text-gray-700'
+                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text'
                 >
                     <LogoutIcon className='h-4 w-4' />
                     Sair
@@ -115,18 +135,29 @@ export default function ColetaCracha() {
 
             {!sessao && (
                 <form onSubmit={handleCrachaSubmit} className='w-full max-w-sm space-y-4 rounded-lg bg-white p-8 shadow-sm'>
-                    <h1 className='text-center text-lg font-semibold text-gray-800'>Coleta por Crachá</h1>
-                    <p className='text-center text-sm text-gray-400'>
+                    <h1 className='text-center text-lg font-semibold text-gray-text'>Coleta por Crachá</h1>
+                    <p className='text-center text-sm text-gray-dark'>
                         Bipe ou digite seu crachá pra começar a conferir pedidos
                     </p>
 
-                    <Input
-                        autoFocus
-                        placeholder='Crachá'
-                        value={crachaInput}
-                        onChange={(e) => setCrachaInput(e.target.value)}
-                        required
-                    />
+                    <div className='flex gap-2'>
+                        <Input
+                            autoFocus
+                            placeholder='Crachá'
+                            value={crachaInput}
+                            onChange={(e) => setCrachaInput(e.target.value)}
+                            className='flex-1'
+                            required
+                        />
+                        <button
+                            type='button'
+                            onClick={() => setScannerCrachaAberto(true)}
+                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base'
+                            title='Escanear com a câmera'
+                        >
+                            <CameraIcon />
+                        </button>
+                    </div>
 
                     {erroCracha && <Alert>{erroCracha}</Alert>}
 
@@ -139,28 +170,37 @@ export default function ColetaCracha() {
             {sessao && (
                 <div className='w-full max-w-sm space-y-4 rounded-lg bg-white p-8 shadow-sm'>
                     <div className='text-center'>
-                        <h1 className='text-lg font-semibold text-gray-800'>Olá, {sessao.nome}!</h1>
-                        <p className='text-sm text-gray-400'>Bipe os pedidos que quiser conferir</p>
+                        <h1 className='text-lg font-semibold text-gray-text'>Olá, {sessao.nome}!</h1>
+                        <p className='text-sm text-gray-dark'>Bipe os pedidos que quiser conferir</p>
                     </div>
 
-                    <div className='h-2 w-full overflow-hidden rounded-full bg-gray-100'>
+                    <div className='h-2 w-full overflow-hidden rounded-full bg-gray'>
                         <div
-                            className='h-2 rounded-full bg-orange-500 transition-all duration-1000 ease-linear'
+                            className='h-2 rounded-full bg-orange-base transition-all duration-1000 ease-linear'
                             style={{ width: `${(restante / SEGUNDOS_SESSAO) * 100}%` }}
                         />
                     </div>
-                    <p className='text-center text-xs text-gray-400'>
+                    <p className='text-center text-xs text-gray-dark'>
                         Sessão encerra em {restante}s de inatividade
                     </p>
 
-                    <form onSubmit={handlePedidoSubmit}>
+                    <form onSubmit={handlePedidoSubmit} className='flex gap-2'>
                         <Input
                             autoFocus
                             placeholder='Código do pedido'
                             value={pedidoInput}
                             onChange={(e) => setPedidoInput(e.target.value)}
+                            className='flex-1'
                             required
                         />
+                        <button
+                            type='button'
+                            onClick={() => setScannerPedidoAberto(true)}
+                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base'
+                            title='Escanear com a câmera'
+                        >
+                            <CameraIcon />
+                        </button>
                     </form>
 
                     {feed.length > 0 && (
@@ -168,7 +208,7 @@ export default function ColetaCracha() {
                             {feed.map((item, index) => (
                                 <li
                                     key={`${item.codigo}-${index}`}
-                                    className={item.ok ? 'text-green-600' : 'text-red-600'}
+                                    className={item.ok ? 'text-green-base' : 'text-red-base'}
                                 >
                                     {item.codigo} — {item.mensagem}
                                 </li>
@@ -176,6 +216,19 @@ export default function ColetaCracha() {
                         </ul>
                     )}
                 </div>
+            )}
+
+            {scannerCrachaAberto && (
+                <BarcodeScannerModal
+                    onClose={() => setScannerCrachaAberto(false)}
+                    onResult={handleCrachaScan}
+                />
+            )}
+            {scannerPedidoAberto && (
+                <BarcodeScannerModal
+                    onClose={() => setScannerPedidoAberto(false)}
+                    onResult={handlePedidoScan}
+                />
             )}
         </div>
     )

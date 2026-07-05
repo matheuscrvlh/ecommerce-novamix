@@ -6,11 +6,11 @@ type BadgeProps = {
 }
 
 const colors = {
-    green: 'bg-green-50 text-green-600',
-    red: 'bg-red-50 text-red-600',
-    orange: 'bg-orange-50 text-orange-600',
-    teal: 'bg-teal-50 text-teal-600',
-    gray: 'bg-gray-100 text-gray-600'
+    green: 'bg-green-base/10 text-green-base',
+    red: 'bg-red-base/10 text-red-base',
+    orange: 'bg-orange-base/10 text-orange-base',
+    teal: 'bg-gray-base/10 text-gray-base',
+    gray: 'bg-gray text-gray-text'
 }
 
 export default function Badge({ children, color = 'gray' }: BadgeProps) {

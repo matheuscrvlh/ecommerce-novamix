@@ -103,3 +103,23 @@ export function BadgeIcon({ className = 'h-5 w-5' }: IconProps) {
         </svg>
     )
 }
+
+export function CameraIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <path d='M4 8a2 2 0 012-2h1.5l1-1.5h7l1 1.5H18a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V8z' />
+            <circle cx='12' cy='13' r='3.5' />
+        </svg>
+    )
+}
+
+export function QrCodeIcon({ className = 'h-4 w-4' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <rect x='3' y='3' width='7' height='7' rx='1' />
+            <rect x='14' y='3' width='7' height='7' rx='1' />
+            <rect x='3' y='14' width='7' height='7' rx='1' />
+            <path d='M14 14h3v3h-3zM20 14v3M14 20h3M20 20v.01' />
+        </svg>
+    )
+}

@@ -5,9 +5,11 @@ import SidebarSection from '../../sections/SidebarSection'
 import PageHeaderSection from '../../sections/PageHeaderSection'
 import UserFormSection, { type UsuarioFormValues } from '../../sections/users/UserFormSection'
 import UsersTableSection from '../../sections/users/UsersTableSection'
+import UserQrCodeModal from '../../sections/users/UserQrCodeModal'
 import Button from '../../components/Button'
 import Alert from '../../components/Alert'
 import Modal from '../../components/Modal'
+import Footer from '../../components/Footer'
 import { PlusIcon } from '../../components/icons'
 
 export default function Users() {
@@ -20,6 +22,7 @@ export default function Users() {
     const [editando, setEditando] = useState<Usuario | null>(null)
     const [modalAberto, setModalAberto] = useState(false)
     const [excluindo, setExcluindo] = useState<Usuario | null>(null)
+    const [qrUsuario, setQrUsuario] = useState<Usuario | null>(null)
 
     useEffect(() => {
         getUsuarios(token!)
@@ -74,7 +77,7 @@ export default function Users() {
     }
 
     return (
-        <div className='flex min-h-screen flex-col bg-gray-50 md:flex-row'>
+        <div className='flex min-h-screen flex-col bg-gray md:flex-row'>
             <SidebarSection />
 
             <main className='flex-1 space-y-6 p-4 sm:p-8'>
@@ -98,8 +101,13 @@ export default function Users() {
                     carregando={carregando}
                     onEdit={abrirEdicao}
                     onDelete={setExcluindo}
+                    onShowQrCode={setQrUsuario}
                 />
+
+                <Footer />
             </main>
+
+            <UserQrCodeModal usuario={qrUsuario} onClose={() => setQrUsuario(null)} />
 
             <Modal
                 open={modalAberto}
@@ -109,7 +117,7 @@ export default function Users() {
                 <UserFormSection
                     key={editando?.id ?? 'novo'}
                     mode={editando ? 'edit' : 'create'}
-                    initialValues={editando ? { ...editando, senha: '' } : undefined}
+                    initialValues={editando ? { ...editando, senha: '', cracha: editando.cracha ?? '' } : undefined}
                     onSubmit={editando ? handleUpdate : handleCreate}
                 />
             </Modal>
@@ -119,7 +127,7 @@ export default function Users() {
                 onClose={() => setExcluindo(null)}
                 title='Excluir usuário'
             >
-                <p className='mb-4 text-sm text-gray-600'>
+                <p className='mb-4 text-sm text-gray-text'>
                     Tem certeza que deseja excluir <strong>{excluindo?.nome}</strong>? Essa ação não pode ser desfeita.
                 </p>
                 <div className='flex justify-end gap-2'>

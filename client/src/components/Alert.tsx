@@ -6,8 +6,8 @@ type AlertProps = {
 }
 
 const variants = {
-    error: 'bg-red-50 text-red-600 border-red-100',
-    info: 'bg-blue-50 text-blue-600 border-blue-100'
+    error: 'bg-red-base/10 text-red-base border-red-base/20',
+    info: 'bg-blue-base/10 text-blue-base border-blue-base/20'
 }
 
 export default function Alert({ children, variant = 'error' }: AlertProps) {

@@ -8,10 +8,10 @@ type StatCardProps = {
 }
 
 const colors = {
-    orange: { text: 'text-orange-600', bg: 'bg-orange-50' },
-    green: { text: 'text-green-600', bg: 'bg-green-50' },
-    red: { text: 'text-red-600', bg: 'bg-red-50' },
-    teal: { text: 'text-teal-600', bg: 'bg-teal-50' }
+    orange: { text: 'text-orange-base', bg: 'bg-orange-base/10' },
+    green: { text: 'text-green-base', bg: 'bg-green-base/10' },
+    red: { text: 'text-red-base', bg: 'bg-red-base/10' },
+    teal: { text: 'text-gray-base', bg: 'bg-gray-base/10' }
 }
 
 export default function StatCard({ label, value, color = 'orange', icon }: StatCardProps) {
@@ -20,7 +20,7 @@ export default function StatCard({ label, value, color = 'orange', icon }: StatC
     return (
         <div className='rounded-lg bg-white p-5 shadow-sm transition hover:shadow-md'>
             <div className='flex items-center justify-between'>
-                <span className='text-xs font-semibold tracking-wide text-gray-400 uppercase'>{label}</span>
+                <span className='text-xs font-semibold tracking-wide text-gray-dark uppercase'>{label}</span>
                 <span className={`flex h-9 w-9 items-center justify-center rounded-full ${palette.bg} ${palette.text}`}>
                     {icon}
                 </span>

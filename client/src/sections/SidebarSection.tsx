@@ -18,25 +18,25 @@ export default function SidebarSection() {
 
     return (
         <>
-            <div className='flex items-center justify-between border-b border-gray-100 bg-white p-4 md:hidden'>
+            <div className='relative flex items-center justify-center border-b border-gray bg-white p-4 md:hidden'>
                 <Logo compact />
-                <button onClick={() => setOpen(true)} className='text-gray-500'>
+                <button onClick={() => setOpen(true)} className='absolute top-1/2 right-4 -translate-y-1/2 text-gray-dark'>
                     <MenuIcon className='h-6 w-6' />
                 </button>
             </div>
 
             {open && (
-                <div className='fixed inset-0 z-40 bg-black/40 md:hidden' onClick={() => setOpen(false)} />
+                <div className='fixed inset-0 z-40 cursor-pointer bg-black/40 md:hidden' onClick={() => setOpen(false)} />
             )}
 
             <aside
-                className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 flex-col border-r border-gray-100 bg-white transition-transform md:static md:translate-x-0 ${
+                className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 flex-col border-r border-gray bg-white transition-transform md:static md:translate-x-0 ${
                     open ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
-                <div className='flex items-center justify-between'>
+                <div className='relative flex items-center justify-center p-4'>
                     <Logo />
-                    <button onClick={() => setOpen(false)} className='mr-4 text-gray-400 md:hidden'>
+                    <button onClick={() => setOpen(false)} className='absolute top-1/2 right-4 -translate-y-1/2 text-gray-dark md:hidden'>
                         <CloseIcon className='h-5 w-5' />
                     </button>
                 </div>

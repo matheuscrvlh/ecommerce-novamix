@@ -1,2 +1,44 @@
 @import 'tailwindcss';
 
+button:not(:disabled),
+[role='button'] {
+    cursor: pointer;
+}
+
+@theme {
+    --color-*: initial;
+    --color-white: #ffffff;
+    --color-black: #000000;
+    --color-gray: #F5F5F5;
+    --color-gray-dark: #354856;
+    --color-gray-base: #1E8581;
+    --color-gray-text: #33363F;
+    --color-orange-light: #FF8D0A;
+    --color-orange-base: #EA8006;
+    --color-orange-banner: #FE8100;
+    --color-blue-base: #243785;
+    --color-yellow-base: #FFE700;
+    --color-red-light: #F72B2A;
+    --color-red-base: #DF0406;
+    --color-green-base: #7BAD7F;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #qr-print-area,
+    #qr-print-area * {
+        visibility: visible;
+    }
+
+    #qr-print-area {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+}

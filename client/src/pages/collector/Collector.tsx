@@ -6,23 +6,24 @@ import Button from '../../components/Button'
 import Input from '../../components/Input'
 import Logo from '../../components/Logo'
 import Alert from '../../components/Alert'
-import { LogoutIcon, DashboardIcon } from '../../components/icons'
+import BarcodeScannerModal from '../../components/BarcodeScannerModal'
+import { LogoutIcon, DashboardIcon, CameraIcon } from '../../components/icons'
 
 export default function Collector() {
     const [codigoPedido, setCodigoPedido] = useState('')
     const [mensagem, setMensagem] = useState('')
     const [erro, setErro] = useState('')
     const [enviando, setEnviando] = useState(false)
+    const [scannerAberto, setScannerAberto] = useState(false)
     const { token, role, logout } = useAuth()
 
-    async function handleSubmit(event: SubmitEvent) {
-        event.preventDefault()
+    async function biparPedido(codigo: string) {
         setErro('')
         setMensagem('')
         setEnviando(true)
 
         try {
-            const result = await postOrder({ codigo_pedido: codigoPedido, token: token! })
+            const result = await postOrder({ codigo_pedido: codigo, token: token! })
             setMensagem(result.success ?? 'Pedido bipado com sucesso.')
             setCodigoPedido('')
         } catch (error) {
@@ -32,13 +33,24 @@ export default function Collector() {
         }
     }
 
+    async function handleSubmit(event: SubmitEvent) {
+        event.preventDefault()
+        await biparPedido(codigoPedido)
+    }
+
+    function handleScan(codigo: string) {
+        setScannerAberto(false)
+        setCodigoPedido(codigo)
+        biparPedido(codigo)
+    }
+
     return (
-        <div className='relative flex min-h-screen flex-col items-center justify-center gap-4 bg-linear-to-br from-orange-50 via-white to-teal-50 p-4'>
+        <div className='relative flex min-h-screen flex-col items-center justify-center gap-4 bg-linear-to-br from-orange-base/10 via-white to-gray-base/10 p-4'>
             <div className='absolute top-4 right-4 flex items-center gap-4'>
                 {role === 'ADMIN' && (
                     <Link
                         to='/dashboard'
-                        className='flex items-center gap-1 text-sm text-gray-500 transition hover:text-gray-700'
+                        className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text'
                     >
                         <DashboardIcon className='h-4 w-4' />
                         Voltar ao Dashboard
@@ -46,7 +58,7 @@ export default function Collector() {
                 )}
                 <button
                     onClick={logout}
-                    className='flex items-center gap-1 text-sm text-gray-500 transition hover:text-gray-700'
+                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text'
                 >
                     <LogoutIcon className='h-4 w-4' />
                     Sair
@@ -58,16 +70,27 @@ export default function Collector() {
                     <Logo />
                 </div>
 
-                <h1 className='text-center text-lg font-semibold text-gray-800'>Bipar pedido</h1>
+                <h1 className='text-center text-lg font-semibold text-gray-text'>Bipar pedido</h1>
 
                 <form onSubmit={handleSubmit} className='space-y-3'>
-                    <Input
-                        autoFocus
-                        placeholder='Código do pedido'
-                        value={codigoPedido}
-                        onChange={(e) => setCodigoPedido(e.target.value)}
-                        required
-                    />
+                    <div className='flex gap-2'>
+                        <Input
+                            autoFocus
+                            placeholder='Código do pedido'
+                            value={codigoPedido}
+                            onChange={(e) => setCodigoPedido(e.target.value)}
+                            className='flex-1'
+                            required
+                        />
+                        <button
+                            type='button'
+                            onClick={() => setScannerAberto(true)}
+                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base'
+                            title='Escanear com a câmera'
+                        >
+                            <CameraIcon />
+                        </button>
+                    </div>
 
                     <Button type='submit' className='w-full' disabled={enviando}>
                         {enviando ? 'Enviando...' : 'Bipar'}
@@ -75,10 +98,17 @@ export default function Collector() {
                 </form>
 
                 {mensagem && (
-                    <p className='rounded-md bg-green-50 px-4 py-3 text-sm text-green-600'>{mensagem}</p>
+                    <p className='rounded-md bg-green-base/10 px-4 py-3 text-sm text-green-base'>{mensagem}</p>
                 )}
                 {erro && <Alert>{erro}</Alert>}
             </div>
+
+            {scannerAberto && (
+                <BarcodeScannerModal
+                    onClose={() => setScannerAberto(false)}
+                    onResult={handleScan}
+                />
+            )}
         </div>
     )
 }

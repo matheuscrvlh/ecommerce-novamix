@@ -20,7 +20,7 @@ async function createTables() {
                 role usuario_cargo NOT NULL,
                 cracha VARCHAR(50),
                 status BOOLEAN DEFAULT true,
-                criado_em TIMESTAMP DEFAULT NOW()
+                criado_em TIMESTAMPTZ DEFAULT NOW()
             )
         `)
 
@@ -30,7 +30,7 @@ async function createTables() {
                 codigo_pedido VARCHAR (100) UNIQUE NOT NULL,
                 usuario_id INTEGER REFERENCES usuarios(id),
                 canal VARCHAR (100),
-                bipado_em TIMESTAMP
+                bipado_em TIMESTAMPTZ
                 
             )
         `)

@@ -22,7 +22,7 @@ export default function DashboardStatsSection({ pedidos }: DashboardStatsSection
 
     return (
         <section className='mb-8'>
-            <h2 className='mb-3 text-xs font-semibold tracking-wide text-gray-400 uppercase'>Pedidos</h2>
+            <h2 className='mb-3 text-xs font-semibold tracking-wide text-gray-dark uppercase'>Pedidos</h2>
             <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
                 <StatCard
                     label='Total bipados'

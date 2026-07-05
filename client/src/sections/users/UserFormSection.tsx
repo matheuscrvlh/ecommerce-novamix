@@ -10,6 +10,7 @@ export type UsuarioFormValues = {
     login: string
     senha: string
     role: string
+    cracha: string
     status: boolean
 }
 
@@ -19,7 +20,7 @@ type UserFormSectionProps = {
     onSubmit: (values: UsuarioFormValues) => Promise<void>
 }
 
-const emptyForm: UsuarioFormValues = { nome: '', login: '', senha: '', role: 'OPERADOR', status: true }
+const emptyForm: UsuarioFormValues = { nome: '', login: '', senha: '', role: 'OPERADOR', cracha: '', status: true }
 
 export default function UserFormSection({ mode, initialValues, onSubmit }: UserFormSectionProps) {
     const [values, setValues] = useState<UsuarioFormValues>(initialValues ?? emptyForm)
@@ -68,9 +69,14 @@ export default function UserFormSection({ mode, initialValues, onSubmit }: UserF
                 <option value='OPERADOR'>Operador</option>
                 <option value='ADMIN'>Admin</option>
             </Select>
+            <Input
+                placeholder='Crachá'
+                value={values.cracha}
+                onChange={(e) => setValues({ ...values, cracha: e.target.value })}
+            />
 
             {mode === 'edit' && (
-                <label className='flex items-center gap-2 text-sm text-gray-600'>
+                <label className='flex items-center gap-2 text-sm text-gray-text'>
                     <input
                         type='checkbox'
                         checked={values.status}

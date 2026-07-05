@@ -1,4 +1,5 @@
 import Spinner from '../../components/Spinner'
+import type { Usuario } from '../../api/users'
 
 type Pedido = {
     id: number
@@ -9,17 +10,25 @@ type Pedido = {
 
 type PedidosTableSectionProps = {
     pedidos: Pedido[]
+    usuarios: Usuario[]
     carregando: boolean
 }
 
-export default function PedidosTableSection({ pedidos, carregando }: PedidosTableSectionProps) {
+export default function PedidosTableSection({ pedidos, usuarios, carregando }: PedidosTableSectionProps) {
+    function usuarioLabel(usuario_id: number | null) {
+        if (usuario_id === null) return '—'
+
+        const usuario = usuarios.find((u) => u.id === usuario_id)
+        return usuario ? `${usuario_id} - ${usuario.nome}` : `${usuario_id}`
+    }
+
     return (
         <section className='rounded-lg bg-white p-6 shadow-sm'>
-            <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-400 uppercase'>Pedidos bipados</h2>
+            <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase'>Pedidos bipados</h2>
 
             <table className='w-full border-collapse text-left text-sm'>
                 <thead>
-                    <tr className='border-b border-gray-100 text-gray-400'>
+                    <tr className='border-b border-gray text-gray-dark'>
                         <th className='py-2 font-medium'>Código do pedido</th>
                         <th className='py-2 font-medium'>Usuário</th>
                         <th className='py-2 font-medium'>Bipado em</th>
@@ -36,9 +45,9 @@ export default function PedidosTableSection({ pedidos, carregando }: PedidosTabl
 
                     {!carregando &&
                         pedidos.map((pedido) => (
-                            <tr key={pedido.id} className='border-b border-gray-50 transition hover:bg-gray-50'>
+                            <tr key={pedido.id} className='border-b border-gray transition hover:bg-gray'>
                                 <td className='py-2'>{pedido.codigo_pedido}</td>
-                                <td className='py-2'>{pedido.usuario_id ?? '—'}</td>
+                                <td className='py-2'>{usuarioLabel(pedido.usuario_id)}</td>
                                 <td className='py-2'>
                                     {pedido.bipado_em ? new Date(pedido.bipado_em).toLocaleString('pt-BR') : '—'}
                                 </td>
@@ -47,7 +56,7 @@ export default function PedidosTableSection({ pedidos, carregando }: PedidosTabl
 
                     {!carregando && pedidos.length === 0 && (
                         <tr>
-                            <td colSpan={3} className='py-6 text-center text-gray-400'>Nenhum pedido bipado ainda.</td>
+                            <td colSpan={3} className='py-6 text-center text-gray-dark'>Nenhum pedido bipado ainda.</td>
                         </tr>
                     )}
                 </tbody>
