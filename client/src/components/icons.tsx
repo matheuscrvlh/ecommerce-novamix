@@ -113,6 +113,40 @@ export function CameraIcon({ className = 'h-5 w-5' }: IconProps) {
     )
 }
 
+export function ChevronLeftIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <path d='M15 18l-6-6 6-6' />
+        </svg>
+    )
+}
+
+export function ChevronRightIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <path d='M9 18l6-6-6-6' />
+        </svg>
+    )
+}
+
+export function ChevronsLeftIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <path d='M18 18l-6-6 6-6' />
+            <path d='M11 18l-6-6 6-6' />
+        </svg>
+    )
+}
+
+export function ChevronsRightIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <path d='M6 18l6-6-6-6' />
+            <path d='M13 18l6-6-6-6' />
+        </svg>
+    )
+}
+
 export function QrCodeIcon({ className = 'h-4 w-4' }: IconProps) {
     return (
         <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>

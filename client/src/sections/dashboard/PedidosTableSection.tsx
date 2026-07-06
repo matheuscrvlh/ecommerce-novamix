@@ -1,5 +1,9 @@
+import { useState } from 'react'
 import Spinner from '../../components/Spinner'
+import { ChevronLeftIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon } from '../../components/icons'
 import type { Usuario } from '../../api/users'
+
+const ITENS_POR_PAGINA = 100
 
 type Pedido = {
     id: number
@@ -15,6 +19,13 @@ type PedidosTableSectionProps = {
 }
 
 export default function PedidosTableSection({ pedidos, usuarios, carregando }: PedidosTableSectionProps) {
+    const [pagina, setPagina] = useState(0)
+
+    const totalPaginas = Math.max(1, Math.ceil(pedidos.length / ITENS_POR_PAGINA))
+    const paginaAtual = Math.min(pagina, totalPaginas - 1)
+    const inicio = paginaAtual * ITENS_POR_PAGINA
+    const pedidosPagina = pedidos.slice(inicio, inicio + ITENS_POR_PAGINA)
+
     function usuarioLabel(usuario_id: number | null) {
         if (usuario_id === null) return '—'
 
@@ -24,7 +35,14 @@ export default function PedidosTableSection({ pedidos, usuarios, carregando }: P
 
     return (
         <section className='rounded-lg bg-white p-6 shadow-sm'>
-            <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase'>Pedidos bipados</h2>
+            <div className='mb-4 flex items-center justify-between'>
+                <h2 className='text-xs font-semibold tracking-wide text-gray-dark uppercase'>Pedidos bipados</h2>
+                {!carregando && pedidos.length > 0 && (
+                    <span className='text-xs text-gray-dark'>
+                        {inicio + 1}–{Math.min(inicio + ITENS_POR_PAGINA, pedidos.length)} de {pedidos.length}
+                    </span>
+                )}
+            </div>
 
             <table className='w-full border-collapse text-left text-sm'>
                 <thead>
@@ -44,7 +62,7 @@ export default function PedidosTableSection({ pedidos, usuarios, carregando }: P
                     )}
 
                     {!carregando &&
-                        pedidos.map((pedido) => (
+                        pedidosPagina.map((pedido) => (
                             <tr key={pedido.id} className='border-b border-gray transition hover:bg-gray'>
                                 <td className='py-2'>{pedido.codigo_pedido}</td>
                                 <td className='py-2'>{usuarioLabel(pedido.usuario_id)}</td>
@@ -61,6 +79,44 @@ export default function PedidosTableSection({ pedidos, usuarios, carregando }: P
                     )}
                 </tbody>
             </table>
+
+            {!carregando && pedidos.length > ITENS_POR_PAGINA && (
+                <div className='mt-4 flex items-center justify-center gap-2'>
+                    <button
+                        onClick={() => setPagina(0)}
+                        disabled={paginaAtual === 0}
+                        title='Primeira página'
+                        className='rounded-md p-2 text-gray-dark transition hover:bg-gray hover:text-orange-base disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-dark'
+                    >
+                        <ChevronsLeftIcon />
+                    </button>
+                    <button
+                        onClick={() => setPagina((p) => Math.max(0, p - 1))}
+                        disabled={paginaAtual === 0}
+                        title='Página anterior'
+                        className='rounded-md p-2 text-gray-dark transition hover:bg-gray hover:text-orange-base disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-dark'
+                    >
+                        <ChevronLeftIcon />
+                    </button>
+                    <span className='mx-2 text-sm text-gray-dark'>Página {paginaAtual + 1} de {totalPaginas}</span>
+                    <button
+                        onClick={() => setPagina((p) => Math.min(totalPaginas - 1, p + 1))}
+                        disabled={paginaAtual >= totalPaginas - 1}
+                        title='Próxima página'
+                        className='rounded-md p-2 text-gray-dark transition hover:bg-gray hover:text-orange-base disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-dark'
+                    >
+                        <ChevronRightIcon />
+                    </button>
+                    <button
+                        onClick={() => setPagina(totalPaginas - 1)}
+                        disabled={paginaAtual >= totalPaginas - 1}
+                        title='Última página'
+                        className='rounded-md p-2 text-gray-dark transition hover:bg-gray hover:text-orange-base disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-dark'
+                    >
+                        <ChevronsRightIcon />
+                    </button>
+                </div>
+            )}
         </section>
     )
 }
