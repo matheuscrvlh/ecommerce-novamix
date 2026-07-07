@@ -31,6 +31,7 @@ export default function ColetaCracha() {
     const [feed, setFeed] = useState<ItemFeed[]>([])
     const [scannerCrachaAberto, setScannerCrachaAberto] = useState(false)
     const [scannerPedidoAberto, setScannerPedidoAberto] = useState(false)
+    const [ultimoResultadoScannerPedido, setUltimoResultadoScannerPedido] = useState<{ ok: boolean; mensagem: string } | null>(null)
 
     useEffect(() => {
         if (!sessao) return
@@ -83,7 +84,7 @@ export default function ColetaCracha() {
         verificarCracha(cracha)
     }
 
-    async function biparPedido(codigo: string) {
+    async function biparPedido(codigo: string, viaScanner = false) {
         if (!sessao) return
 
         setRestante(SEGUNDOS_SESSAO)
@@ -91,12 +92,13 @@ export default function ColetaCracha() {
 
         try {
             const result = await postOrderAs({ codigo_pedido: codigo, cracha: sessao.cracha!, token: token! })
-            setFeed((atual) => [{ codigo, ok: true, mensagem: result.success ?? 'Bipado com sucesso.' }, ...atual])
+            const msg = result.success ?? 'Bipado com sucesso.'
+            setFeed((atual) => [{ codigo, ok: true, mensagem: msg }, ...atual])
+            if (viaScanner) setUltimoResultadoScannerPedido({ ok: true, mensagem: `${codigo} — ${msg}` })
         } catch (error) {
-            setFeed((atual) => [
-                { codigo, ok: false, mensagem: error instanceof Error ? error.message : 'Erro ao bipar.' },
-                ...atual
-            ])
+            const msg = error instanceof Error ? error.message : 'Erro ao bipar.'
+            setFeed((atual) => [{ codigo, ok: false, mensagem: msg }, ...atual])
+            if (viaScanner) setUltimoResultadoScannerPedido({ ok: false, mensagem: `${codigo} — ${msg}` })
         }
     }
 
@@ -106,8 +108,7 @@ export default function ColetaCracha() {
     }
 
     function handlePedidoScan(codigo: string) {
-        setScannerPedidoAberto(false)
-        biparPedido(codigo)
+        biparPedido(codigo, true)
     }
 
     return (
@@ -198,7 +199,10 @@ export default function ColetaCracha() {
                         />
                         <button
                             type='button'
-                            onClick={() => setScannerPedidoAberto(true)}
+                            onClick={() => {
+                                setUltimoResultadoScannerPedido(null)
+                                setScannerPedidoAberto(true)
+                            }}
                             className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base'
                             title='Escanear com a câmera'
                         >
@@ -229,8 +233,12 @@ export default function ColetaCracha() {
             )}
             {scannerPedidoAberto && (
                 <BarcodeScannerModal
-                    onClose={() => setScannerPedidoAberto(false)}
+                    onClose={() => {
+                        setScannerPedidoAberto(false)
+                        setUltimoResultadoScannerPedido(null)
+                    }}
                     onResult={handlePedidoScan}
+                    ultimoResultado={ultimoResultadoScannerPedido}
                 />
             )}
         </div>

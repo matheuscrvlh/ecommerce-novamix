@@ -1,6 +1,7 @@
 import { useMemo, useState, type PointerEvent } from 'react'
 import { motion } from 'framer-motion'
 import AnimatedNumber from '../../components/AnimatedNumber'
+import Skeleton from '../../components/Skeleton'
 
 type Pedido = {
     id: number
@@ -10,6 +11,7 @@ type Pedido = {
 
 type ProducaoPorHoraSectionProps = {
     pedidos: Pedido[]
+    carregando: boolean
 }
 
 const HORAS = Array.from({ length: 24 }, (_, hora) => hora)
@@ -20,7 +22,7 @@ const PADDING_BASE = 4
 const ALTURA_PLOTAVEL = ALTURA - PADDING_TOPO - PADDING_BASE
 const PASSO_X = LARGURA / (HORAS.length - 1)
 
-export default function ProducaoPorHoraSection({ pedidos }: ProducaoPorHoraSectionProps) {
+export default function ProducaoPorHoraSection({ pedidos, carregando }: ProducaoPorHoraSectionProps) {
     const [horaAtiva, setHoraAtiva] = useState<number | null>(null)
 
     const contagemPorHora = useMemo(() => {
@@ -37,6 +39,15 @@ export default function ProducaoPorHoraSection({ pedidos }: ProducaoPorHoraSecti
 
     const total = contagemPorHora.reduce((soma, valor) => soma + valor, 0)
     const maximo = Math.max(...contagemPorHora)
+
+    if (carregando && total === 0) {
+        return (
+            <section className='mb-8 rounded-lg bg-white p-4 shadow-sm sm:p-6'>
+                <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase'>Produção por hora</h2>
+                <Skeleton className='h-32 w-full sm:h-40' />
+            </section>
+        )
+    }
 
     if (total === 0) {
         return (
