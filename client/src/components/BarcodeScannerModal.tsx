@@ -3,12 +3,20 @@ import { Html5Qrcode } from 'html5-qrcode'
 import Alert from './Alert'
 import { CloseIcon } from './icons'
 
+const COOLDOWN_ENTRE_LEITURAS_MS = 1500
+
+type ResultadoLeitura = {
+    ok: boolean
+    mensagem: string
+}
+
 type BarcodeScannerModalProps = {
     onClose: () => void
     onResult: (texto: string) => void
+    ultimoResultado?: ResultadoLeitura | null
 }
 
-export default function BarcodeScannerModal({ onClose, onResult }: BarcodeScannerModalProps) {
+export default function BarcodeScannerModal({ onClose, onResult, ultimoResultado }: BarcodeScannerModalProps) {
     const scannerId = useId().replace(/:/g, '')
     const [erro, setErro] = useState('')
     const onResultRef = useRef(onResult)
@@ -19,25 +27,30 @@ export default function BarcodeScannerModal({ onClose, onResult }: BarcodeScanne
 
     useEffect(() => {
         const scanner = new Html5Qrcode(scannerId)
-        let paraDe = false
+        let processando = false
+        let destruido = false
 
         scanner
             .start(
                 { facingMode: 'environment' },
                 { fps: 10, qrbox: { width: 250, height: 250 } },
                 (decodedText) => {
-                    if (paraDe) return
-                    paraDe = true
+                    if (processando) return
+                    processando = true
                     onResultRef.current(decodedText)
+
+                    setTimeout(() => {
+                        if (!destruido) processando = false
+                    }, COOLDOWN_ENTRE_LEITURAS_MS)
                 },
                 undefined
             )
             .catch(() => {
-                if (!paraDe) setErro('Não foi possível acessar a câmera. Verifique a permissão do navegador.')
+                if (!destruido) setErro('Não foi possível acessar a câmera. Verifique a permissão do navegador.')
             })
 
         return () => {
-            paraDe = true
+            destruido = true
             scanner.stop().then(() => scanner.clear()).catch(() => {})
         }
     }, [scannerId])
@@ -58,7 +71,21 @@ export default function BarcodeScannerModal({ onClose, onResult }: BarcodeScanne
                     </div>
                 )}
 
+                {ultimoResultado && (
+                    <div
+                        className={`mb-3 rounded-md px-3 py-2 text-sm ${
+                            ultimoResultado.ok ? 'bg-green-base/10 text-green-base' : 'bg-red-base/10 text-red-base'
+                        }`}
+                    >
+                        {ultimoResultado.mensagem}
+                    </div>
+                )}
+
                 <div id={scannerId} className='overflow-hidden rounded-md' />
+
+                <p className='mt-3 text-center text-xs text-gray-dark'>
+                    A câmera continua aberta — pode ir bipando os próximos pedidos direto.
+                </p>
             </div>
         </div>
     )

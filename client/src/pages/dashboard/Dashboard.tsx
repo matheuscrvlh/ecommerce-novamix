@@ -1,4 +1,4 @@
-import { useEffect, useState, type SubmitEvent } from 'react'
+import { useEffect, useRef, useState, type SubmitEvent } from 'react'
 import { getOrders } from '../../api/orders'
 import { getUsuarios, type Usuario } from '../../api/users'
 import { useAuth } from '../../hooks/useAuth'
@@ -13,7 +13,9 @@ import RankingModal from '../../sections/RankingModal'
 import Alert from '../../components/Alert'
 import Button from '../../components/Button'
 import Footer from '../../components/Footer'
+import Toast from '../../components/Toast'
 import { TrophyIcon } from '../../components/icons'
+import { tocarSomNotificacao } from '../../lib/notificationSound'
 
 type Pedido = {
     id: number
@@ -43,11 +45,26 @@ export default function Dashboard() {
     const [dataFinalInput, setDataFinalInput] = useState(hojeISO())
     const [filtro, setFiltro] = useState({ dataInicial: hojeISO(), dataFinal: hojeISO() })
     const [rankingAberto, setRankingAberto] = useState(false)
+    const [notificacao, setNotificacao] = useState<string | null>(null)
+
+    const idsConhecidosRef = useRef<Set<number> | null>(null)
+
+    useEffect(() => {
+        if (!notificacao) return
+        const timeout = setTimeout(() => setNotificacao(null), 4000)
+        return () => clearTimeout(timeout)
+    }, [notificacao])
+
+    useEffect(() => {
+        idsConhecidosRef.current = null
+    }, [filtro])
 
     useEffect(() => {
         let cancelado = false
 
         function buscar() {
+            if (document.hidden) return
+
             Promise.all([
                 getOrders({
                     dataInicial: `${filtro.dataInicial}T00:00:00`,
@@ -58,6 +75,24 @@ export default function Dashboard() {
             ])
                 .then(([pedidosResult, usuariosResult]) => {
                     if (cancelado) return
+
+                    if (idsConhecidosRef.current) {
+                        const novos = pedidosResult.filter(
+                            (pedido: Pedido) => !idsConhecidosRef.current!.has(pedido.id)
+                        )
+
+                        if (novos.length > 0) {
+                            tocarSomNotificacao()
+                            setNotificacao(
+                                novos.length === 1
+                                    ? `Novo pedido bipado: ${novos[0].codigo_pedido}`
+                                    : `${novos.length} novos pedidos bipados`
+                            )
+                        }
+                    }
+
+                    idsConhecidosRef.current = new Set(pedidosResult.map((pedido: Pedido) => pedido.id))
+
                     setPedidos(pedidosResult)
                     setUsuarios(usuariosResult)
                     setCarregando(false)
@@ -72,9 +107,16 @@ export default function Dashboard() {
         buscar()
         const intervalo = setInterval(buscar, INTERVALO_ATUALIZACAO_MS)
 
+        function handleVisibilidade() {
+            if (!document.hidden) buscar()
+        }
+
+        document.addEventListener('visibilitychange', handleVisibilidade)
+
         return () => {
             cancelado = true
             clearInterval(intervalo)
+            document.removeEventListener('visibilitychange', handleVisibilidade)
         }
     }, [token, filtro])
 
@@ -103,7 +145,7 @@ export default function Dashboard() {
                     </Button>
                 </div>
 
-                <PodiumSection pedidos={pedidos} usuarios={usuarios} />
+                <PodiumSection pedidos={pedidos} usuarios={usuarios} carregando={carregando} />
 
                 <DateFilterSection
                     dataInicial={dataInicialInput}
@@ -119,14 +161,15 @@ export default function Dashboard() {
                     </div>
                 )}
 
-                <DashboardStatsSection pedidos={pedidos} />
-                <ProducaoPorHoraSection pedidos={pedidos} />
+                <DashboardStatsSection pedidos={pedidos} carregando={carregando} />
+                <ProducaoPorHoraSection pedidos={pedidos} carregando={carregando} />
                 <PedidosTableSection pedidos={pedidos} usuarios={usuarios} carregando={carregando} />
 
                 <Footer />
             </main>
 
             <RankingModal open={rankingAberto} onClose={() => setRankingAberto(false)} />
+            <Toast mensagem={notificacao} />
         </div>
     )
 }

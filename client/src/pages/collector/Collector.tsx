@@ -17,19 +17,24 @@ export default function Collector() {
     const [enviando, setEnviando] = useState(false)
     const [scannerAberto, setScannerAberto] = useState(false)
     const [rankingAberto, setRankingAberto] = useState(false)
+    const [ultimoResultadoScanner, setUltimoResultadoScanner] = useState<{ ok: boolean; mensagem: string } | null>(null)
     const { token, role, logout } = useAuth()
 
-    async function biparPedido(codigo: string) {
+    async function biparPedido(codigo: string, viaScanner = false) {
         setErro('')
         setMensagem('')
         setEnviando(true)
 
         try {
             const result = await postOrder({ codigo_pedido: codigo, token: token! })
-            setMensagem(result.success ?? 'Pedido bipado com sucesso.')
+            const msg = result.success ?? 'Pedido bipado com sucesso.'
+            setMensagem(msg)
             setCodigoPedido('')
+            if (viaScanner) setUltimoResultadoScanner({ ok: true, mensagem: msg })
         } catch (error) {
-            setErro(error instanceof Error ? error.message : 'Erro ao bipar pedido.')
+            const msg = error instanceof Error ? error.message : 'Erro ao bipar pedido.'
+            setErro(msg)
+            if (viaScanner) setUltimoResultadoScanner({ ok: false, mensagem: msg })
         } finally {
             setEnviando(false)
         }
@@ -41,9 +46,8 @@ export default function Collector() {
     }
 
     function handleScan(codigo: string) {
-        setScannerAberto(false)
         setCodigoPedido(codigo)
-        biparPedido(codigo)
+        biparPedido(codigo, true)
     }
 
     return (
@@ -96,7 +100,10 @@ export default function Collector() {
                         />
                         <button
                             type='button'
-                            onClick={() => setScannerAberto(true)}
+                            onClick={() => {
+                                setUltimoResultadoScanner(null)
+                                setScannerAberto(true)
+                            }}
                             className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base'
                             title='Escanear com a câmera'
                         >
@@ -117,8 +124,12 @@ export default function Collector() {
 
             {scannerAberto && (
                 <BarcodeScannerModal
-                    onClose={() => setScannerAberto(false)}
+                    onClose={() => {
+                        setScannerAberto(false)
+                        setUltimoResultadoScanner(null)
+                    }}
                     onResult={handleScan}
+                    ultimoResultado={ultimoResultadoScanner}
                 />
             )}
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import Spinner from '../../components/Spinner'
 import Badge from '../../components/Badge'
 import Input from '../../components/Input'
+import Skeleton from '../../components/Skeleton'
 import {
     ChevronLeftIcon,
     ChevronRightIcon,
@@ -65,11 +65,14 @@ export default function PedidosTableSection({ pedidos, usuarios, carregando }: P
             : codigo
     }
 
+    const mostrarSkeleton = carregando && pedidos.length === 0
+    const linhasSkeleton = [0, 1, 2, 3, 4, 5]
+
     return (
         <section className='rounded-lg bg-white p-6 shadow-sm'>
             <div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
                 <h2 className='text-xs font-semibold tracking-wide text-gray-dark uppercase'>Pedidos bipados</h2>
-                {!carregando && pedidosFiltrados.length > 0 && (
+                {!mostrarSkeleton && pedidosFiltrados.length > 0 && (
                     <span className='text-xs text-gray-dark'>
                         {inicio + 1}–{Math.min(inicio + ITENS_POR_PAGINA, pedidosFiltrados.length)} de {pedidosFiltrados.length}
                     </span>
@@ -87,13 +90,19 @@ export default function PedidosTableSection({ pedidos, usuarios, carregando }: P
             </div>
 
             <div className='space-y-3 sm:hidden'>
-                {carregando && (
-                    <div className='py-8 text-center'>
-                        <Spinner className='mx-auto h-6 w-6' />
-                    </div>
-                )}
+                {mostrarSkeleton &&
+                    linhasSkeleton.map((linha) => (
+                        <div key={linha} className='rounded-lg border border-gray p-4'>
+                            <div className='flex items-start justify-between gap-3'>
+                                <Skeleton className='h-4 w-32' />
+                                <Skeleton className='h-5 w-14 rounded-full' />
+                            </div>
+                            <Skeleton className='mt-2 h-3 w-40' />
+                            <Skeleton className='mt-2 h-3 w-24' />
+                        </div>
+                    ))}
 
-                {!carregando &&
+                {!mostrarSkeleton &&
                     pedidosPagina.map((pedido) => (
                         <div
                             key={pedido.id}
@@ -123,7 +132,7 @@ export default function PedidosTableSection({ pedidos, usuarios, carregando }: P
                         </div>
                     ))}
 
-                {!carregando && pedidosFiltrados.length === 0 && (
+                {!mostrarSkeleton && pedidosFiltrados.length === 0 && (
                     <p className='py-6 text-center text-sm text-gray-dark'>
                         {termo ? 'Nenhum pedido encontrado para essa busca.' : 'Nenhum pedido bipado ainda.'}
                     </p>
@@ -147,15 +156,25 @@ export default function PedidosTableSection({ pedidos, usuarios, carregando }: P
                             </tr>
                         </thead>
                         <tbody>
-                            {carregando && (
-                                <tr>
-                                    <td colSpan={4} className='py-8 text-center'>
-                                        <Spinner className='mx-auto h-6 w-6' />
-                                    </td>
-                                </tr>
-                            )}
+                            {mostrarSkeleton &&
+                                linhasSkeleton.map((linha) => (
+                                    <tr key={linha} className='border-b border-gray last:border-0'>
+                                        <td className='px-4 py-3'>
+                                            <Skeleton className='h-3.5 w-28' />
+                                        </td>
+                                        <td className='px-4 py-3'>
+                                            <Skeleton className='h-3.5 w-24' />
+                                        </td>
+                                        <td className='px-4 py-3'>
+                                            <Skeleton className='h-3.5 w-36' />
+                                        </td>
+                                        <td className='px-4 py-3'>
+                                            <Skeleton className='h-5 w-16 rounded-full' />
+                                        </td>
+                                    </tr>
+                                ))}
 
-                            {!carregando &&
+                            {!mostrarSkeleton &&
                                 pedidosPagina.map((pedido) => (
                                     <tr key={pedido.id} className='border-b border-gray transition last:border-0 hover:bg-gray'>
                                         <td className='px-4 py-3 font-medium whitespace-nowrap text-gray-text'>
@@ -184,7 +203,7 @@ export default function PedidosTableSection({ pedidos, usuarios, carregando }: P
                                     </tr>
                                 ))}
 
-                            {!carregando && pedidosFiltrados.length === 0 && (
+                            {!mostrarSkeleton && pedidosFiltrados.length === 0 && (
                                 <tr>
                                     <td colSpan={4} className='py-6 text-center text-gray-dark'>
                                         {termo ? 'Nenhum pedido encontrado para essa busca.' : 'Nenhum pedido bipado ainda.'}
@@ -196,7 +215,7 @@ export default function PedidosTableSection({ pedidos, usuarios, carregando }: P
                 </div>
             </div>
 
-            {!carregando && pedidosFiltrados.length > ITENS_POR_PAGINA && (
+            {!mostrarSkeleton && pedidosFiltrados.length > ITENS_POR_PAGINA && (
                 <div className='mt-4 flex items-center justify-center gap-2'>
                     <button
                         onClick={() => setPagina(0)}
