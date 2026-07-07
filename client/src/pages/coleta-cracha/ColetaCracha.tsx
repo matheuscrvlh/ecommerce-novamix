@@ -156,7 +156,7 @@ export default function ColetaCracha() {
                         <button
                             type='button'
                             onClick={() => setScannerCrachaAberto(true)}
-                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base'
+                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden'
                             title='Escanear com a câmera'
                         >
                             <CameraIcon />
@@ -203,7 +203,7 @@ export default function ColetaCracha() {
                                 setUltimoResultadoScannerPedido(null)
                                 setScannerPedidoAberto(true)
                             }}
-                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base'
+                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden'
                             title='Escanear com a câmera'
                         >
                             <CameraIcon />

@@ -13,25 +13,19 @@ type DashboardStatsSectionProps = {
   carregando: boolean;
 };
 
-function isHoje(data: string | null) {
-  if (!data) return false;
-  return new Date(data).toDateString() === new Date().toDateString();
-}
-
 export default function DashboardStatsSection({
   pedidos,
   carregando,
 }: DashboardStatsSectionProps) {
-  const bipadosHoje = pedidos.filter((pedido) => isHoje(pedido.bipado_em));
-  const operadoresAtivosHoje = new Set(
-    bipadosHoje.map((pedido) => pedido.usuario_id),
+  const operadoresAtivos = new Set(
+    pedidos.map((pedido) => pedido.usuario_id),
   ).size;
 
   if (carregando && pedidos.length === 0) {
     return (
       <section className="mb-8">
         <h2 className="mb-3 text-xs font-semibold tracking-wide text-gray-dark uppercase">
-          Pedidos
+          Pedidos no período
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {[0, 1].map((indice) => (
@@ -54,18 +48,18 @@ export default function DashboardStatsSection({
   return (
     <section className="mb-8">
       <h2 className="mb-3 text-xs font-semibold tracking-wide text-gray-dark uppercase">
-        Pedidos
+        Pedidos no período
       </h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <StatCard
           label="Bipados"
-          value={bipadosHoje.length}
+          value={pedidos.length}
           color="green"
           icon={<CheckCircleIcon className="h-5 w-5" />}
         />
         <StatCard
-          label="Operadores ativos hoje"
-          value={operadoresAtivosHoje}
+          label="Operadores ativos"
+          value={operadoresAtivos}
           color="teal"
           icon={<UsersIcon className="h-5 w-5" />}
         />

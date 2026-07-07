@@ -1,6 +1,7 @@
 import type { SubmitEvent } from 'react'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
+import { CalendarIcon } from '../../components/icons'
 
 type DateFilterSectionProps = {
     dataInicial: string
@@ -8,6 +9,7 @@ type DateFilterSectionProps = {
     onDataInicialChange: (value: string) => void
     onDataFinalChange: (value: string) => void
     onSubmit: (event: SubmitEvent) => void
+    className?: string
 }
 
 export default function DateFilterSection({
@@ -15,10 +17,19 @@ export default function DateFilterSection({
     dataFinal,
     onDataInicialChange,
     onDataFinalChange,
-    onSubmit
+    onSubmit,
+    className = ''
 }: DateFilterSectionProps) {
     return (
-        <form onSubmit={onSubmit} className='mb-6 flex flex-wrap items-end gap-3 rounded-lg bg-white p-4 shadow-sm'>
+        <form
+            onSubmit={onSubmit}
+            className={`flex flex-wrap items-end gap-4 rounded-lg bg-white p-4 shadow-sm ${className}`}
+        >
+            <div className='flex items-center gap-2 pb-2 text-gray-dark'>
+                <CalendarIcon className='h-4 w-4' />
+                <span className='text-xs font-semibold tracking-wide uppercase'>Período</span>
+            </div>
+
             <div className='flex flex-col gap-1'>
                 <label className='text-xs font-medium text-gray-dark'>De</label>
                 <Input

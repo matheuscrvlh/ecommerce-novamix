@@ -26,6 +26,15 @@ export default function BarcodeScannerModal({ onClose, onResult, ultimoResultado
     })
 
     useEffect(() => {
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === 'Escape') onClose()
+        }
+
+        document.addEventListener('keydown', handleKeyDown)
+        return () => document.removeEventListener('keydown', handleKeyDown)
+    }, [onClose])
+
+    useEffect(() => {
         const scanner = new Html5Qrcode(scannerId)
         let processando = false
         let destruido = false
