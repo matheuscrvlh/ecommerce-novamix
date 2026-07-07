@@ -159,6 +159,33 @@ export function TrophyIcon({ className = 'h-5 w-5' }: IconProps) {
     )
 }
 
+export function CalendarIcon({ className = 'h-4 w-4' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <rect x='3' y='5' width='18' height='16' rx='2' />
+            <path d='M3 10h18M8 3v4M16 3v4' />
+        </svg>
+    )
+}
+
+export function ClockIcon({ className = 'h-4 w-4' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <circle cx='12' cy='12' r='9' />
+            <path d='M12 7v5l3.5 2' />
+        </svg>
+    )
+}
+
+export function SearchIcon({ className = 'h-4 w-4' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <circle cx='11' cy='11' r='7' />
+            <path d='M21 21l-4.35-4.35' />
+        </svg>
+    )
+}
+
 export function QrCodeIcon({ className = 'h-4 w-4' }: IconProps) {
     return (
         <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>

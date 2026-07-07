@@ -60,9 +60,9 @@ export default function Collector() {
                 )}
                 <button
                     onClick={() => setRankingAberto(true)}
-                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text'
+                    className='flex items-center gap-1 text-sm text-orange-base transition hover:text-orange-light'
                 >
-                    <TrophyIcon className='h-4 w-4' />
+                    <TrophyIcon className='h-4 w-4 origin-center animate-trophy-wiggle' />
                     Ranking
                 </button>
 

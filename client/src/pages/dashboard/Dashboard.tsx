@@ -7,8 +7,11 @@ import PageHeaderSection from '../../sections/PageHeaderSection'
 import DateFilterSection from '../../sections/dashboard/DateFilterSection'
 import DashboardStatsSection from '../../sections/dashboard/DashboardStatsSection'
 import PedidosTableSection from '../../sections/dashboard/PedidosTableSection'
+import RankingModal from '../../sections/RankingModal'
 import Alert from '../../components/Alert'
+import Button from '../../components/Button'
 import Footer from '../../components/Footer'
+import { TrophyIcon } from '../../components/icons'
 
 type Pedido = {
     id: number
@@ -35,6 +38,7 @@ export default function Dashboard() {
     const [dataInicialInput, setDataInicialInput] = useState(hojeISO())
     const [dataFinalInput, setDataFinalInput] = useState(hojeISO())
     const [filtro, setFiltro] = useState({ dataInicial: hojeISO(), dataFinal: hojeISO() })
+    const [rankingAberto, setRankingAberto] = useState(false)
 
     useEffect(() => {
         Promise.all([
@@ -70,6 +74,17 @@ export default function Dashboard() {
             <main className='flex-1 p-4 sm:p-8'>
                 <PageHeaderSection title='Dashboard' />
 
+                <div className='mb-4 flex justify-end'>
+                    <Button
+                        variant='ghost'
+                        className='flex items-center gap-2 text-orange-base'
+                        onClick={() => setRankingAberto(true)}
+                    >
+                        <TrophyIcon className='h-4 w-4 origin-center animate-trophy-wiggle' />
+                        Ranking
+                    </Button>
+                </div>
+
                 <DateFilterSection
                     dataInicial={dataInicialInput}
                     dataFinal={dataFinalInput}
@@ -89,6 +104,8 @@ export default function Dashboard() {
 
                 <Footer />
             </main>
+
+            <RankingModal open={rankingAberto} onClose={() => setRankingAberto(false)} />
         </div>
     )
 }

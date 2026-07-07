@@ -21,6 +21,30 @@ button:not(:disabled),
     --color-red-light: #F72B2A;
     --color-red-base: #DF0406;
     --color-green-base: #7BAD7F;
+
+    --animate-trophy-wiggle: trophy-wiggle 4s ease-in-out infinite;
+}
+
+@keyframes trophy-wiggle {
+    0%,
+    100% {
+        transform: rotate(0deg) scale(1);
+    }
+    2% {
+        transform: rotate(-16deg) scale(1.15);
+    }
+    4% {
+        transform: rotate(13deg) scale(1.15);
+    }
+    6% {
+        transform: rotate(-8deg) scale(1.05);
+    }
+    8% {
+        transform: rotate(5deg) scale(1.05);
+    }
+    10% {
+        transform: rotate(0deg) scale(1);
+    }
 }
 
 @media print {
