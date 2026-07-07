@@ -14,11 +14,39 @@ export async function postOrder({ codigo_pedido, token }: PostOrderParams) {
     })
 }
 
-export async function getOrders(token: string) {
+type GetOrdersParams = {
+    dataInicial: string
+    dataFinal: string
+    token: string
+}
+
+export async function getOrders({ dataInicial, dataFinal, token }: GetOrdersParams) {
     return client({
-        url: '/pedidos',
+        url: '/pedidos/buscar',
         token,
-        method: 'GET'
+        method: 'POST',
+        data: { dataInicial, dataFinal }
+    })
+}
+
+type GetRankingParams = {
+    dataInicial: string
+    dataFinal: string
+    token: string
+}
+
+export type RankingUsuario = {
+    id: number
+    nome: string
+    count: string
+}
+
+export async function getRanking({ dataInicial, dataFinal, token }: GetRankingParams): Promise<RankingUsuario[]> {
+    return client({
+        url: '/pedidos/resumo-usuarios',
+        token,
+        method: 'POST',
+        data: { dataInicial, dataFinal }
     })
 }
 

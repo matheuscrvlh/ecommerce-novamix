@@ -7,7 +7,8 @@ import Input from '../../components/Input'
 import Logo from '../../components/Logo'
 import Alert from '../../components/Alert'
 import BarcodeScannerModal from '../../components/BarcodeScannerModal'
-import { LogoutIcon, DashboardIcon, CameraIcon } from '../../components/icons'
+import RankingModal from '../../sections/RankingModal'
+import { LogoutIcon, DashboardIcon, TrophyIcon, CameraIcon } from '../../components/icons'
 
 export default function Collector() {
     const [codigoPedido, setCodigoPedido] = useState('')
@@ -15,6 +16,7 @@ export default function Collector() {
     const [erro, setErro] = useState('')
     const [enviando, setEnviando] = useState(false)
     const [scannerAberto, setScannerAberto] = useState(false)
+    const [rankingAberto, setRankingAberto] = useState(false)
     const { token, role, logout } = useAuth()
 
     async function biparPedido(codigo: string) {
@@ -56,6 +58,13 @@ export default function Collector() {
                         Voltar ao Dashboard
                     </Link>
                 )}
+                <button
+                    onClick={() => setRankingAberto(true)}
+                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text'
+                >
+                    <TrophyIcon className='h-4 w-4' />
+                    Ranking
+                </button>
                 <button
                     onClick={logout}
                     className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text'
@@ -109,6 +118,8 @@ export default function Collector() {
                     onResult={handleScan}
                 />
             )}
+
+            <RankingModal open={rankingAberto} onClose={() => setRankingAberto(false)} />
         </div>
     )
 }

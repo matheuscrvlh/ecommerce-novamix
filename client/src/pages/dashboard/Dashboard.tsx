@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type SubmitEvent } from 'react'
 import { getOrders } from '../../api/orders'
 import { getUsuarios, type Usuario } from '../../api/users'
 import { useAuth } from '../../hooks/useAuth'
 import SidebarSection from '../../sections/SidebarSection'
 import PageHeaderSection from '../../sections/PageHeaderSection'
+import DateFilterSection from '../../sections/dashboard/DateFilterSection'
 import DashboardStatsSection from '../../sections/dashboard/DashboardStatsSection'
 import PedidosTableSection from '../../sections/dashboard/PedidosTableSection'
 import Alert from '../../components/Alert'
@@ -16,6 +17,14 @@ type Pedido = {
     bipado_em: string | null
 }
 
+function hojeISO() {
+    const hoje = new Date()
+    const ano = hoje.getFullYear()
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0')
+    const dia = String(hoje.getDate()).padStart(2, '0')
+    return `${ano}-${mes}-${dia}`
+}
+
 export default function Dashboard() {
     const { token } = useAuth()
     const [pedidos, setPedidos] = useState<Pedido[]>([])
@@ -23,8 +32,22 @@ export default function Dashboard() {
     const [erro, setErro] = useState('')
     const [carregando, setCarregando] = useState(true)
 
+    const [dataInicialInput, setDataInicialInput] = useState(hojeISO())
+    const [dataFinalInput, setDataFinalInput] = useState(hojeISO())
+    const [filtro, setFiltro] = useState({ dataInicial: hojeISO(), dataFinal: hojeISO() })
+
     useEffect(() => {
-        Promise.all([getOrders(token!), getUsuarios(token!)])
+        setCarregando(true)
+        setErro('')
+
+        Promise.all([
+            getOrders({
+                dataInicial: `${filtro.dataInicial}T00:00:00`,
+                dataFinal: `${filtro.dataFinal}T23:59:59.999`,
+                token: token!
+            }),
+            getUsuarios(token!)
+        ])
             .then(([pedidosResult, usuariosResult]) => {
                 setPedidos(pedidosResult)
                 setUsuarios(usuariosResult)
@@ -34,7 +57,12 @@ export default function Dashboard() {
                 setErro(error instanceof Error ? error.message : 'Erro ao buscar pedidos.')
                 setCarregando(false)
             })
-    }, [token])
+    }, [token, filtro])
+
+    function handleFiltrar(event: SubmitEvent) {
+        event.preventDefault()
+        setFiltro({ dataInicial: dataInicialInput, dataFinal: dataFinalInput })
+    }
 
     return (
         <div className='flex min-h-screen flex-col bg-gray md:flex-row'>
@@ -42,6 +70,14 @@ export default function Dashboard() {
 
             <main className='flex-1 p-4 sm:p-8'>
                 <PageHeaderSection title='Dashboard' />
+
+                <DateFilterSection
+                    dataInicial={dataInicialInput}
+                    dataFinal={dataFinalInput}
+                    onDataInicialChange={setDataInicialInput}
+                    onDataFinalChange={setDataFinalInput}
+                    onSubmit={handleFiltrar}
+                />
 
                 {erro && (
                     <div className='mb-4'>

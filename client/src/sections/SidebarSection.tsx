@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
 import SidebarLink from '../components/SidebarLink'
 import Button from '../components/Button'
-import { DashboardIcon, UsersIcon, PackageIcon, BadgeIcon, LogoutIcon, MenuIcon, CloseIcon } from '../components/icons'
+import { DashboardIcon, UsersIcon, PackageIcon, BadgeIcon, TrophyIcon, LogoutIcon, MenuIcon, CloseIcon } from '../components/icons'
 import { useAuth } from '../hooks/useAuth'
+import RankingModal from './RankingModal'
 
 export default function SidebarSection() {
     const { logout } = useAuth()
     const navigate = useNavigate()
     const [open, setOpen] = useState(false)
+    const [rankingAberto, setRankingAberto] = useState(false)
 
     function handleLogout() {
         logout()
@@ -54,6 +56,13 @@ export default function SidebarSection() {
                     <SidebarLink to='/coleta-cracha' icon={<BadgeIcon className='h-5 w-5' />}>
                         Coleta por Crachá
                     </SidebarLink>
+                    <button
+                        onClick={() => setRankingAberto(true)}
+                        className='flex items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium text-gray-text transition hover:bg-gray'
+                    >
+                        <TrophyIcon className='h-5 w-5' />
+                        Ranking
+                    </button>
                 </nav>
 
                 <div className='p-4'>
@@ -67,6 +76,8 @@ export default function SidebarSection() {
                     </Button>
                 </div>
             </aside>
+
+            <RankingModal open={rankingAberto} onClose={() => setRankingAberto(false)} />
         </>
     )
 }

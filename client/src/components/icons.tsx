@@ -147,6 +147,18 @@ export function ChevronsRightIcon({ className = 'h-5 w-5' }: IconProps) {
     )
 }
 
+export function TrophyIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <path d='M7 4h10v5a5 5 0 01-10 0V4z' />
+            <path d='M7 5H4a3 3 0 003 3M17 5h3a3 3 0 01-3 3' />
+            <path d='M12 14v3' />
+            <path d='M9 20h6' />
+            <path d='M10 17h4v3h-4z' />
+        </svg>
+    )
+}
+
 export function QrCodeIcon({ className = 'h-4 w-4' }: IconProps) {
     return (
         <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
