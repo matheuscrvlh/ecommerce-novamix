@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
-import { createUsuario, deleteUsuario, getUsuarios, updateUsuario, type Usuario } from '../../api/users'
+import { useState } from 'react'
+import { createUsuario, deleteUsuario, updateUsuario, type Usuario } from '../../api/users'
 import { useAuth } from '../../hooks/useAuth'
+import { useUsuarios } from '../../hooks/useUsuarios'
 import SidebarSection from '../../sections/SidebarSection'
 import PageHeaderSection from '../../sections/PageHeaderSection'
 import UserFormSection, { type UsuarioFormValues } from '../../sections/users/UserFormSection'
 import UsersTableSection from '../../sections/users/UsersTableSection'
+import UsersFilterSection, { type FiltroCargo } from '../../sections/users/UsersFilterSection'
 import UserQrCodeModal from '../../sections/users/UserQrCodeModal'
 import Button from '../../components/Button'
 import Alert from '../../components/Alert'
@@ -14,31 +16,14 @@ import { PlusIcon } from '../../components/icons'
 
 export default function Users() {
     const { token } = useAuth()
-    const [usuarios, setUsuarios] = useState<Usuario[]>([])
+    const { usuarios, carregando, recarregar } = useUsuarios()
     const [erro, setErro] = useState('')
-    const [carregando, setCarregando] = useState(true)
-    const [versao, setVersao] = useState(0)
 
     const [editando, setEditando] = useState<Usuario | null>(null)
     const [modalAberto, setModalAberto] = useState(false)
     const [excluindo, setExcluindo] = useState<Usuario | null>(null)
     const [qrUsuario, setQrUsuario] = useState<Usuario | null>(null)
-
-    useEffect(() => {
-        getUsuarios(token!)
-            .then((result) => {
-                setUsuarios(result)
-                setCarregando(false)
-            })
-            .catch((error) => {
-                setErro(error instanceof Error ? error.message : 'Erro ao buscar usuários.')
-                setCarregando(false)
-            })
-    }, [token, versao])
-
-    function recarregar() {
-        setVersao((v) => v + 1)
-    }
+    const [filtroCargo, setFiltroCargo] = useState<FiltroCargo>('TODOS')
 
     function abrirCriacao() {
         setEditando(null)
@@ -62,6 +47,10 @@ export default function Users() {
         setEditando(null)
         recarregar()
     }
+
+    const usuariosFiltrados = usuarios.filter(
+        (usuario) => filtroCargo === 'TODOS' || usuario.role === filtroCargo
+    )
 
     async function confirmarExclusao() {
         if (!excluindo) return
@@ -96,8 +85,10 @@ export default function Users() {
 
                 {erro && <Alert>{erro}</Alert>}
 
+                <UsersFilterSection filtro={filtroCargo} onFiltroChange={setFiltroCargo} />
+
                 <UsersTableSection
-                    usuarios={usuarios}
+                    usuarios={usuariosFiltrados}
                     carregando={carregando}
                     onEdit={abrirEdicao}
                     onDelete={setExcluindo}

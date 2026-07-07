@@ -13,7 +13,7 @@ import {
 } from '../../components/icons'
 import type { Usuario } from '../../api/users'
 
-const ITENS_POR_PAGINA = 100
+const ITENS_POR_PAGINA = 30
 const TAMANHO_MAXIMO_CODIGO = 16
 
 type Pedido = {
