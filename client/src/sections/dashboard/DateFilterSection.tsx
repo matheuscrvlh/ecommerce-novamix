@@ -23,34 +23,38 @@ export default function DateFilterSection({
     return (
         <form
             onSubmit={onSubmit}
-            className={`flex flex-wrap items-end gap-4 rounded-lg bg-white p-4 shadow-sm ${className}`}
+            className={`flex flex-wrap items-center gap-3 rounded-lg bg-white p-4 shadow-sm ${className}`}
         >
-            <div className='flex items-center gap-2 pb-2 text-gray-dark'>
+            <div className='flex shrink-0 items-center gap-2 text-gray-dark'>
                 <CalendarIcon className='h-4 w-4' />
                 <span className='text-xs font-semibold tracking-wide uppercase'>Período</span>
             </div>
 
-            <div className='flex flex-col gap-1'>
-                <label className='text-xs font-medium text-gray-dark'>De</label>
-                <Input
-                    type='date'
-                    value={dataInicial}
-                    max={dataFinal}
-                    onChange={(e) => onDataInicialChange(e.target.value)}
-                    required
-                />
+            <div className='flex flex-wrap items-center gap-2'>
+                <div className='w-40'>
+                    <Input
+                        type='date'
+                        value={dataInicial}
+                        max={dataFinal}
+                        onChange={(e) => onDataInicialChange(e.target.value)}
+                        required
+                    />
+                </div>
+                <span className='text-xs text-gray-dark'>até</span>
+                <div className='w-40'>
+                    <Input
+                        type='date'
+                        value={dataFinal}
+                        min={dataInicial}
+                        onChange={(e) => onDataFinalChange(e.target.value)}
+                        required
+                    />
+                </div>
             </div>
-            <div className='flex flex-col gap-1'>
-                <label className='text-xs font-medium text-gray-dark'>Até</label>
-                <Input
-                    type='date'
-                    value={dataFinal}
-                    min={dataInicial}
-                    onChange={(e) => onDataFinalChange(e.target.value)}
-                    required
-                />
-            </div>
-            <Button type='submit'>Filtrar</Button>
+
+            <Button type='submit' className='shrink-0'>
+                Filtrar
+            </Button>
         </form>
     )
 }
