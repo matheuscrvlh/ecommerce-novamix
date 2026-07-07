@@ -7,6 +7,11 @@ type CreateOrderBody = {
     cracha: string
 }
 
+type GetOrderBody = {
+    dataInicial: string
+    dataFinal: string
+}
+
 async function postOrder(req: FastifyRequest<{Body: CreateOrderBody}>, res: FastifyReply) {
     const { codigo_pedido, cracha } = req.body
 
@@ -57,11 +62,15 @@ async function postOrder(req: FastifyRequest<{Body: CreateOrderBody}>, res: Fast
     }
 }
 
-async function getOrders(req: FastifyRequest, res: FastifyReply) {
+async function getOrders(req: FastifyRequest<{Body: GetOrderBody}>, res: FastifyReply) {
+    const { dataInicial, dataFinal } = req.body
+    
     try {
-        const result = await db.query(
-            'SELECT * FROM pedidos'
-        )
+        const result = await db.query(`
+            SELECT * FROM pedidos
+            ORDER BY bipado_em DESC
+            WHERE bipado_em >= $1 AND bipado_em <= $2
+        `,[dataInicial, dataFinal])
 
         return res.code(200).send(result.rows)
     } catch {
