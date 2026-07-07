@@ -65,9 +65,12 @@ export default function Collector() {
                     <TrophyIcon className='h-4 w-4' />
                     Ranking
                 </button>
+
+                <div className='h-4 w-px bg-gray-base/30' />
+
                 <button
                     onClick={logout}
-                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text'
+                    className='flex items-center gap-1 text-sm font-medium text-red-base transition hover:text-red-light'
                 >
                     <LogoutIcon className='h-4 w-4' />
                     Sair
