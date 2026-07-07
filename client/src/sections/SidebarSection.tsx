@@ -30,7 +30,7 @@ export default function SidebarSection() {
             )}
 
             <aside
-                className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 flex-col border-r border-gray bg-white transition-transform md:static md:translate-x-0 ${
+                className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 flex-col border-r border-gray bg-white transition-transform md:sticky md:top-0 md:translate-x-0 ${
                     open ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
