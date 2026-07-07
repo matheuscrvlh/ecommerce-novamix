@@ -1,8 +1,9 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { getUsuarios, type Usuario } from '../../api/users'
+import type { Usuario } from '../../api/users'
 import { postOrderAs } from '../../api/orders'
 import { useAuth } from '../../hooks/useAuth'
+import { useUsuarios } from '../../hooks/useUsuarios'
 import Button from '../../components/Button'
 import Input from '../../components/Input'
 import Logo from '../../components/Logo'
@@ -20,10 +21,10 @@ type ItemFeed = {
 
 export default function ColetaCracha() {
     const { token, logout } = useAuth()
+    const { usuarios, carregando: carregandoUsuarios } = useUsuarios()
 
     const [crachaInput, setCrachaInput] = useState('')
     const [erroCracha, setErroCracha] = useState('')
-    const [buscando, setBuscando] = useState(false)
 
     const [sessao, setSessao] = useState<Usuario | null>(null)
     const [restante, setRestante] = useState(SEGUNDOS_SESSAO)
@@ -50,33 +51,30 @@ export default function ColetaCracha() {
         return () => clearInterval(interval)
     }, [sessao])
 
-    async function verificarCracha(cracha: string) {
+    function verificarCracha(cracha: string) {
         setErroCracha('')
-        setBuscando(true)
 
-        try {
-            const usuarios = await getUsuarios(token!)
-            const encontrado = usuarios.find(
-                (usuario) => usuario.cracha === cracha.trim() && usuario.status
-            )
+        if (carregandoUsuarios) {
+            setErroCracha('Aguarde, carregando lista de usuários...')
+            return
+        }
 
-            if (!encontrado) {
-                setErroCracha('Crachá não encontrado ou usuário inativo.')
-            } else {
-                setSessao(encontrado)
-                setRestante(SEGUNDOS_SESSAO)
-                setCrachaInput('')
-            }
-        } catch (error) {
-            setErroCracha(error instanceof Error ? error.message : 'Erro ao buscar crachá.')
-        } finally {
-            setBuscando(false)
+        const encontrado = usuarios.find(
+            (usuario) => usuario.cracha === cracha.trim() && usuario.status
+        )
+
+        if (!encontrado) {
+            setErroCracha('Crachá não encontrado ou usuário inativo.')
+        } else {
+            setSessao(encontrado)
+            setRestante(SEGUNDOS_SESSAO)
+            setCrachaInput('')
         }
     }
 
-    async function handleCrachaSubmit(event: SubmitEvent) {
+    function handleCrachaSubmit(event: SubmitEvent) {
         event.preventDefault()
-        await verificarCracha(crachaInput)
+        verificarCracha(crachaInput)
     }
 
     function handleCrachaScan(cracha: string) {
@@ -165,8 +163,8 @@ export default function ColetaCracha() {
 
                     {erroCracha && <Alert>{erroCracha}</Alert>}
 
-                    <Button type='submit' className='w-full' disabled={buscando}>
-                        {buscando ? 'Verificando...' : 'Entrar'}
+                    <Button type='submit' className='w-full'>
+                        Entrar
                     </Button>
                 </form>
             )}
