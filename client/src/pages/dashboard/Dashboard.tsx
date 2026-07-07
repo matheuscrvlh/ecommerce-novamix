@@ -22,6 +22,8 @@ type Pedido = {
     bipado_em: string | null
 }
 
+const INTERVALO_ATUALIZACAO_MS = 15000
+
 function hojeISO() {
     const hoje = new Date()
     const ano = hoje.getFullYear()
@@ -43,23 +45,37 @@ export default function Dashboard() {
     const [rankingAberto, setRankingAberto] = useState(false)
 
     useEffect(() => {
-        Promise.all([
-            getOrders({
-                dataInicial: `${filtro.dataInicial}T00:00:00`,
-                dataFinal: `${filtro.dataFinal}T23:59:59.999`,
-                token: token!
-            }),
-            getUsuarios(token!)
-        ])
-            .then(([pedidosResult, usuariosResult]) => {
-                setPedidos(pedidosResult)
-                setUsuarios(usuariosResult)
-                setCarregando(false)
-            })
-            .catch((error) => {
-                setErro(error instanceof Error ? error.message : 'Erro ao buscar pedidos.')
-                setCarregando(false)
-            })
+        let cancelado = false
+
+        function buscar() {
+            Promise.all([
+                getOrders({
+                    dataInicial: `${filtro.dataInicial}T00:00:00`,
+                    dataFinal: `${filtro.dataFinal}T23:59:59.999`,
+                    token: token!
+                }),
+                getUsuarios(token!)
+            ])
+                .then(([pedidosResult, usuariosResult]) => {
+                    if (cancelado) return
+                    setPedidos(pedidosResult)
+                    setUsuarios(usuariosResult)
+                    setCarregando(false)
+                })
+                .catch((error) => {
+                    if (cancelado) return
+                    setErro(error instanceof Error ? error.message : 'Erro ao buscar pedidos.')
+                    setCarregando(false)
+                })
+        }
+
+        buscar()
+        const intervalo = setInterval(buscar, INTERVALO_ATUALIZACAO_MS)
+
+        return () => {
+            cancelado = true
+            clearInterval(intervalo)
+        }
     }, [token, filtro])
 
     function handleFiltrar(event: SubmitEvent) {

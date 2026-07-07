@@ -1,4 +1,6 @@
 import { useMemo, useState, type PointerEvent } from 'react'
+import { motion } from 'framer-motion'
+import AnimatedNumber from '../../components/AnimatedNumber'
 
 type Pedido = {
     id: number
@@ -61,6 +63,7 @@ export default function ProducaoPorHoraSection({ pedidos }: ProducaoPorHoraSecti
     const horaExibida = horaAtiva ?? ultimaHoraComDado
     const valorExibido = contagemPorHora[horaExibida]
     const pontoAtivo = coordenadas(horaExibida)
+    const pontoAoVivo = coordenadas(ultimaHoraComDado)
 
     function handlePointerMove(event: PointerEvent<SVGSVGElement>) {
         const rect = event.currentTarget.getBoundingClientRect()
@@ -70,7 +73,12 @@ export default function ProducaoPorHoraSection({ pedidos }: ProducaoPorHoraSecti
     }
 
     return (
-        <section className='mb-8 rounded-lg bg-white p-6 shadow-sm'>
+        <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className='mb-8 rounded-lg bg-white p-6 shadow-sm'
+        >
             <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase'>Produção por hora</h2>
 
             <div className='overflow-x-auto'>
@@ -109,22 +117,55 @@ export default function ProducaoPorHoraSection({ pedidos }: ProducaoPorHoraSecti
                                 />
                                 <line x1='0' y1={baseY} x2={LARGURA} y2={baseY} className='stroke-gray-dark/20' strokeWidth='1' />
 
-                                <path d={areaPath} fill='url(#producaoGradiente)' stroke='none' />
-                                <path d={linePath} fill='none' className='stroke-green-base' strokeWidth='2' strokeLinejoin='round' strokeLinecap='round' />
+                                <motion.path
+                                    fill='url(#producaoGradiente)'
+                                    stroke='none'
+                                    animate={{ d: areaPath }}
+                                    transition={{ duration: 0.6, ease: 'easeInOut' }}
+                                />
+                                <motion.path
+                                    fill='none'
+                                    className='stroke-green-base'
+                                    strokeWidth='2'
+                                    strokeLinejoin='round'
+                                    strokeLinecap='round'
+                                    animate={{ d: linePath }}
+                                    transition={{ duration: 0.6, ease: 'easeInOut' }}
+                                />
 
                                 {horaAtiva !== null && (
-                                    <line
-                                        x1={pontoAtivo.x}
-                                        x2={pontoAtivo.x}
+                                    <motion.line
                                         y1={PADDING_TOPO}
                                         y2={baseY}
                                         className='stroke-gray-dark/30'
                                         strokeWidth='1'
                                         strokeDasharray='3 3'
+                                        initial={{ x1: pontoAtivo.x, x2: pontoAtivo.x, opacity: 0 }}
+                                        animate={{ x1: pontoAtivo.x, x2: pontoAtivo.x, opacity: 1 }}
+                                        transition={{ type: 'spring', stiffness: 400, damping: 32 }}
                                     />
                                 )}
 
-                                <circle cx={pontoAtivo.x} cy={pontoAtivo.y} r='4.5' className='fill-green-base stroke-white' strokeWidth='2' />
+                                {/* pulso "ao vivo" no último horário com pedido, quando ninguém está passando o mouse */}
+                                {horaAtiva === null && (
+                                    <motion.circle
+                                        cx={pontoAoVivo.x}
+                                        cy={pontoAoVivo.y}
+                                        r='4.5'
+                                        className='fill-green-base'
+                                        animate={{ scale: [1, 2.2, 1], opacity: [0.5, 0, 0.5] }}
+                                        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                                        style={{ originX: '50%', originY: '50%' }}
+                                    />
+                                )}
+
+                                <motion.circle
+                                    r='4.5'
+                                    className='fill-green-base stroke-white'
+                                    strokeWidth='2'
+                                    animate={{ cx: pontoAtivo.x, cy: pontoAtivo.y }}
+                                    transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                                />
 
                                 {HORAS.map((hora) => (
                                     <rect
@@ -146,13 +187,17 @@ export default function ProducaoPorHoraSection({ pedidos }: ProducaoPorHoraSecti
 
                             <div className='pointer-events-none absolute right-1 bottom-1 text-right'>
                                 <span className='text-sm font-semibold text-gray-text'>
-                                    {valorExibido} pedido{valorExibido === 1 ? '' : 's'}
+                                    <AnimatedNumber value={valorExibido} /> pedido{valorExibido === 1 ? '' : 's'}
                                 </span>
                                 <span className='ml-1 text-xs text-gray-dark'>{horaExibida}h</span>
                             </div>
 
                             {horaAtiva !== null && (
-                                <div
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    transition={{ duration: 0.15 }}
                                     className={`pointer-events-none absolute z-10 -translate-y-full rounded-md bg-gray-text px-2 py-1 text-xs whitespace-nowrap text-white shadow-lg ${
                                         horaAtiva <= 1
                                             ? 'left-0'
@@ -172,7 +217,7 @@ export default function ProducaoPorHoraSection({ pedidos }: ProducaoPorHoraSecti
                                         {valorExibido} pedido{valorExibido === 1 ? '' : 's'}
                                     </span>
                                     <span className='ml-1 text-white/70'>· {horaAtiva}h</span>
-                                </div>
+                                </motion.div>
                             )}
                         </div>
                     </div>
@@ -184,6 +229,6 @@ export default function ProducaoPorHoraSection({ pedidos }: ProducaoPorHoraSecti
                     </div>
                 </div>
             </div>
-        </section>
+        </motion.section>
     )
 }
