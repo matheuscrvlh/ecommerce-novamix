@@ -77,12 +77,12 @@ export default function ProducaoPorHoraSection({ pedidos }: ProducaoPorHoraSecti
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className='mb-8 rounded-lg bg-white p-6 shadow-sm'
+            className='mb-8 rounded-lg bg-white p-4 shadow-sm sm:p-6'
         >
             <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase'>Produção por hora</h2>
 
             <div className='overflow-x-auto'>
-                <div className='min-w-180'>
+                <div className='sm:min-w-180'>
                     <div className='flex'>
                         <div className='flex w-8 shrink-0 flex-col justify-between text-right text-[10px] text-gray-dark'>
                             <span>{maximo}</span>
@@ -186,10 +186,10 @@ export default function ProducaoPorHoraSection({ pedidos }: ProducaoPorHoraSecti
                             </svg>
 
                             <div className='pointer-events-none absolute right-1 bottom-1 text-right'>
-                                <span className='text-sm font-semibold text-gray-text'>
+                                <span className='text-[10px] font-semibold text-gray-text sm:text-sm'>
                                     <AnimatedNumber value={valorExibido} /> pedido{valorExibido === 1 ? '' : 's'}
                                 </span>
-                                <span className='ml-1 text-xs text-gray-dark'>{horaExibida}h</span>
+                                <span className='ml-1 text-[9px] text-gray-dark sm:text-xs'>{horaExibida}h</span>
                             </div>
 
                             {horaAtiva !== null && (
@@ -198,7 +198,7 @@ export default function ProducaoPorHoraSection({ pedidos }: ProducaoPorHoraSecti
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
                                     transition={{ duration: 0.15 }}
-                                    className={`pointer-events-none absolute z-10 -translate-y-full rounded-md bg-gray-text px-2 py-1 text-xs whitespace-nowrap text-white shadow-lg ${
+                                    className={`pointer-events-none absolute z-10 -translate-y-full rounded-md bg-gray-text px-1.5 py-0.5 text-[9px] whitespace-nowrap text-white shadow-lg sm:px-2 sm:py-1 sm:text-xs ${
                                         horaAtiva <= 1
                                             ? 'left-0'
                                             : horaAtiva >= 22
@@ -207,7 +207,7 @@ export default function ProducaoPorHoraSection({ pedidos }: ProducaoPorHoraSecti
                                     }`}
                                     style={{
                                         top: `${(pontoAtivo.y / ALTURA) * 100}%`,
-                                        marginTop: '-10px',
+                                        marginTop: '-8px',
                                         ...(horaAtiva > 1 && horaAtiva < 22
                                             ? { left: `${(pontoAtivo.x / LARGURA) * 100}%` }
                                             : {})
@@ -224,7 +224,9 @@ export default function ProducaoPorHoraSection({ pedidos }: ProducaoPorHoraSecti
 
                     <div className='ml-8 flex justify-between pt-1 text-[10px] text-gray-dark'>
                         {HORAS.filter((hora) => hora % 2 === 0).map((hora) => (
-                            <span key={hora}>{hora}h</span>
+                            <span key={hora} className={hora % 4 === 0 ? '' : 'hidden sm:inline'}>
+                                {hora}h
+                            </span>
                         ))}
                     </div>
                 </div>
