@@ -57,7 +57,8 @@ async function postOrder(req: FastifyRequest<{Body: CreateOrderBody}>, res: Fast
         );
 
         return res.code(201).send({ success: 'Pedido adicionado.'})
-    } catch {
+    } catch (error) {
+        console.error(error)
         res.code(500).send({ error: 'Erro ao adicionar pedido.' })
     }
 }
@@ -68,13 +69,34 @@ async function getOrders(req: FastifyRequest<{Body: GetOrderBody}>, res: Fastify
     try {
         const result = await db.query(`
             SELECT * FROM pedidos
-            ORDER BY bipado_em DESC
             WHERE bipado_em >= $1 AND bipado_em <= $2
+            ORDER BY bipado_em DESC
         `,[dataInicial, dataFinal])
 
         return res.code(200).send(result.rows)
-    } catch {
+    } catch (error) {
+        console.error(error)
         res.code(500).send({ error: 'Erro ao buscar pedidos.'})
+    }
+}
+
+async function getOrdersCountByUser(req:FastifyRequest<{Body: GetOrderBody}>, res:FastifyReply) {
+    const { dataInicial, dataFinal } = req.body
+
+    try {
+        const result = await db.query(`
+            SELECT u.id, u.nome, count(codigo_pedido)
+            FROM pedidos p
+            JOIN usuarios u
+            ON p.usuario_id = u.id
+            WHERE bipado_em >= $1 AND bipado_em <= $2
+            GROUP BY u.id, u.nome
+        `,[dataInicial, dataFinal])
+
+        return res.code(200).send(result.rows)
+    } catch (error) {
+        console.error(error)
+        res.code(500).send({ error: 'Erro ao buscar pedidos por usuários.'})
     }
 }
 
@@ -99,13 +121,15 @@ async function deleteOrder(req: FastifyRequest<{Params: {codigo_pedido: string}}
         )
 
         res.code(200).send({ success: 'Pedido deletado com sucesso.'})
-    } catch {
+    } catch (error) {
+        console.error(error)
         res.code(500).send({ error: 'Erro ao deletar pedido.'})
     }
 }
 
 export async function ordersRoutes(fastify: FastifyInstance) {
     fastify.post('/pedidos', { preHandler: [authenticate] }, postOrder);
-    fastify.get('/pedidos', { preHandler: [authenticate, checkAdmin] }, getOrders);
+    fastify.post('/pedidos/buscar', { preHandler: [authenticate, checkAdmin] }, getOrders);
+    fastify.post('/pedidos/resumo-usuarios', { preHandler: [authenticate, checkAdmin] }, getOrdersCountByUser);
     fastify.delete('/pedidos/:codigo_pedido', { preHandler: [authenticate, checkAdmin] }, deleteOrder)
 }
