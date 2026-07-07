@@ -6,6 +6,8 @@ import SidebarSection from '../../sections/SidebarSection'
 import PageHeaderSection from '../../sections/PageHeaderSection'
 import DateFilterSection from '../../sections/dashboard/DateFilterSection'
 import DashboardStatsSection from '../../sections/dashboard/DashboardStatsSection'
+import PodiumSection from '../../sections/dashboard/PodiumSection'
+import ProducaoPorHoraSection from '../../sections/dashboard/ProducaoPorHoraSection'
 import PedidosTableSection from '../../sections/dashboard/PedidosTableSection'
 import RankingModal from '../../sections/RankingModal'
 import Alert from '../../components/Alert'
@@ -85,6 +87,8 @@ export default function Dashboard() {
                     </Button>
                 </div>
 
+                <PodiumSection pedidos={pedidos} usuarios={usuarios} />
+
                 <DateFilterSection
                     dataInicial={dataInicialInput}
                     dataFinal={dataFinalInput}
@@ -100,6 +104,7 @@ export default function Dashboard() {
                 )}
 
                 <DashboardStatsSection pedidos={pedidos} />
+                <ProducaoPorHoraSection pedidos={pedidos} />
                 <PedidosTableSection pedidos={pedidos} usuarios={usuarios} carregando={carregando} />
 
                 <Footer />

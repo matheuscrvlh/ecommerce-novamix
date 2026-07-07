@@ -21,6 +21,9 @@ button:not(:disabled),
     --color-red-light: #F72B2A;
     --color-red-base: #DF0406;
     --color-green-base: #7BAD7F;
+    --color-gold: #D4AF37;
+    --color-silver: #A8AFB8;
+    --color-bronze: #CD7F32;
 
     --animate-trophy-wiggle: trophy-wiggle 4s ease-in-out infinite;
 }
