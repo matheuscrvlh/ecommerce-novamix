@@ -37,9 +37,6 @@ export default function Dashboard() {
     const [filtro, setFiltro] = useState({ dataInicial: hojeISO(), dataFinal: hojeISO() })
 
     useEffect(() => {
-        setCarregando(true)
-        setErro('')
-
         Promise.all([
             getOrders({
                 dataInicial: `${filtro.dataInicial}T00:00:00`,
@@ -61,6 +58,8 @@ export default function Dashboard() {
 
     function handleFiltrar(event: SubmitEvent) {
         event.preventDefault()
+        setCarregando(true)
+        setErro('')
         setFiltro({ dataInicial: dataInicialInput, dataFinal: dataFinalInput })
     }
 

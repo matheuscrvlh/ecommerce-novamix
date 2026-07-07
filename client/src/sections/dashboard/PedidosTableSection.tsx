@@ -44,41 +44,43 @@ export default function PedidosTableSection({ pedidos, usuarios, carregando }: P
                 )}
             </div>
 
-            <table className='w-full border-collapse text-left text-sm'>
-                <thead>
-                    <tr className='border-b border-gray text-gray-dark'>
-                        <th className='py-2 font-medium'>Código do pedido</th>
-                        <th className='py-2 font-medium'>Usuário</th>
-                        <th className='py-2 font-medium'>Bipado em</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {carregando && (
-                        <tr>
-                            <td colSpan={3} className='py-8 text-center'>
-                                <Spinner className='mx-auto h-6 w-6' />
-                            </td>
+            <div className='overflow-x-auto'>
+                <table className='w-full min-w-140 border-collapse text-left text-sm'>
+                    <thead>
+                        <tr className='border-b border-gray text-gray-dark'>
+                            <th className='py-2 font-medium'>Código do pedido</th>
+                            <th className='py-2 font-medium'>Usuário</th>
+                            <th className='py-2 font-medium'>Bipado em</th>
                         </tr>
-                    )}
-
-                    {!carregando &&
-                        pedidosPagina.map((pedido) => (
-                            <tr key={pedido.id} className='border-b border-gray transition hover:bg-gray'>
-                                <td className='py-2'>{pedido.codigo_pedido}</td>
-                                <td className='py-2'>{usuarioLabel(pedido.usuario_id)}</td>
-                                <td className='py-2'>
-                                    {pedido.bipado_em ? new Date(pedido.bipado_em).toLocaleString('pt-BR') : '—'}
+                    </thead>
+                    <tbody>
+                        {carregando && (
+                            <tr>
+                                <td colSpan={3} className='py-8 text-center'>
+                                    <Spinner className='mx-auto h-6 w-6' />
                                 </td>
                             </tr>
-                        ))}
+                        )}
 
-                    {!carregando && pedidos.length === 0 && (
-                        <tr>
-                            <td colSpan={3} className='py-6 text-center text-gray-dark'>Nenhum pedido bipado ainda.</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+                        {!carregando &&
+                            pedidosPagina.map((pedido) => (
+                                <tr key={pedido.id} className='border-b border-gray transition hover:bg-gray'>
+                                    <td className='py-2 whitespace-nowrap'>{pedido.codigo_pedido}</td>
+                                    <td className='py-2 whitespace-nowrap'>{usuarioLabel(pedido.usuario_id)}</td>
+                                    <td className='py-2 whitespace-nowrap'>
+                                        {pedido.bipado_em ? new Date(pedido.bipado_em).toLocaleString('pt-BR') : '—'}
+                                    </td>
+                                </tr>
+                            ))}
+
+                        {!carregando && pedidos.length === 0 && (
+                            <tr>
+                                <td colSpan={3} className='py-6 text-center text-gray-dark'>Nenhum pedido bipado ainda.</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
 
             {!carregando && pedidos.length > ITENS_POR_PAGINA && (
                 <div className='mt-4 flex items-center justify-center gap-2'>

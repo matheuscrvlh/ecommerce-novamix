@@ -6,8 +6,6 @@ import Alert from '../components/Alert'
 import Spinner from '../components/Spinner'
 import DateFilterSection from './dashboard/DateFilterSection'
 
-const INICIO_PADRAO = '2000-01-01'
-
 function hojeISO() {
     const hoje = new Date()
     const ano = hoje.getFullYear()
@@ -27,16 +25,11 @@ export default function RankingModal({ open, onClose }: RankingModalProps) {
     const [erro, setErro] = useState('')
     const [carregando, setCarregando] = useState(true)
 
-    const [dataInicialInput, setDataInicialInput] = useState(INICIO_PADRAO)
+    const [dataInicialInput, setDataInicialInput] = useState(hojeISO())
     const [dataFinalInput, setDataFinalInput] = useState(hojeISO())
-    const [filtro, setFiltro] = useState({ dataInicial: INICIO_PADRAO, dataFinal: hojeISO() })
+    const [filtro, setFiltro] = useState({ dataInicial: hojeISO(), dataFinal: hojeISO() })
 
     useEffect(() => {
-        if (!open) return
-
-        setCarregando(true)
-        setErro('')
-
         getRanking({
             dataInicial: `${filtro.dataInicial}T00:00:00`,
             dataFinal: `${filtro.dataFinal}T23:59:59.999`,
@@ -51,10 +44,12 @@ export default function RankingModal({ open, onClose }: RankingModalProps) {
                 setErro(error instanceof Error ? error.message : 'Erro ao buscar ranking.')
                 setCarregando(false)
             })
-    }, [open, token, filtro])
+    }, [token, filtro])
 
     function handleFiltrar(event: SubmitEvent) {
         event.preventDefault()
+        setCarregando(true)
+        setErro('')
         setFiltro({ dataInicial: dataInicialInput, dataFinal: dataFinalInput })
     }
 
