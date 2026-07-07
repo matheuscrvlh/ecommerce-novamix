@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { TrophyIcon } from '../../components/icons'
 import AnimatedNumber from '../../components/AnimatedNumber'
+import Skeleton from '../../components/Skeleton'
 import type { Usuario } from '../../api/users'
 
 type Pedido = {
@@ -12,7 +13,10 @@ type Pedido = {
 type PodiumSectionProps = {
     pedidos: Pedido[]
     usuarios: Usuario[]
+    carregando: boolean
 }
+
+const ALTURAS_SKELETON = ['h-14', 'h-10', 'h-8', 'h-6', 'h-5']
 
 const MEDALHAS = [
     {
@@ -67,7 +71,7 @@ function isHoje(data: string | null) {
     return new Date(data).toDateString() === new Date().toDateString()
 }
 
-export default function PodiumSection({ pedidos, usuarios }: PodiumSectionProps) {
+export default function PodiumSection({ pedidos, usuarios, carregando }: PodiumSectionProps) {
     const contagem = new Map<number, number>()
 
     pedidos
@@ -84,6 +88,25 @@ export default function PodiumSection({ pedidos, usuarios }: PodiumSectionProps)
             const usuario = usuarios.find((u) => u.id === usuario_id)
             return { usuario_id, nome: usuario?.nome ?? `Usuário ${usuario_id}`, total }
         })
+
+    if (carregando && podio.length === 0) {
+        return (
+            <section className='mb-4'>
+                <h2 className='mb-2 text-xs font-semibold tracking-wide text-gray-dark uppercase'>Pódio de hoje</h2>
+
+                <div className='flex items-end justify-center gap-3 rounded-lg bg-white p-4 pt-6 shadow-sm'>
+                    {ALTURAS_SKELETON.map((altura, index) => (
+                        <div key={index} className='flex w-16 flex-col items-center gap-1.5'>
+                            <Skeleton className='h-3.5 w-3.5 rounded-full' />
+                            <Skeleton className='h-2.5 w-12' />
+                            <Skeleton className='h-2.5 w-6' />
+                            <Skeleton className={`w-full rounded-t-md rounded-b-none ${altura}`} />
+                        </div>
+                    ))}
+                </div>
+            </section>
+        )
+    }
 
     if (podio.length === 0) return null
 
