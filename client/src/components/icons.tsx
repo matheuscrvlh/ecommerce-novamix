@@ -22,6 +22,15 @@ export function UsersIcon({ className = 'h-5 w-5' }: IconProps) {
     )
 }
 
+export function UserAvatarIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='currentColor' className={className}>
+            <circle cx='12' cy='8' r='4' />
+            <path d='M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8a1 1 0 01-1 1H5a1 1 0 01-1-1z' />
+        </svg>
+    )
+}
+
 export function LogoutIcon({ className = 'h-5 w-5' }: IconProps) {
     return (
         <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>

@@ -50,7 +50,18 @@ button:not(:disabled),
     }
 }
 
+@page {
+    size: A4;
+    margin: 0;
+}
+
 @media print {
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
     body * {
         visibility: hidden;
     }
@@ -58,13 +69,18 @@ button:not(:disabled),
     #qr-print-area,
     #qr-print-area * {
         visibility: visible;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
     }
 
     #qr-print-area {
         position: fixed;
-        inset: 0;
+        top: 0;
+        left: 0;
+        width: 210mm;
+        height: 297mm;
+        margin: 0;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
     }

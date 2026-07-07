@@ -104,7 +104,7 @@ export default function Collector() {
                                 setUltimoResultadoScanner(null)
                                 setScannerAberto(true)
                             }}
-                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base'
+                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden'
                             title='Escanear com a câmera'
                         >
                             <CameraIcon />

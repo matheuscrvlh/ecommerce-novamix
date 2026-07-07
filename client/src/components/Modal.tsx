@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { CloseIcon } from './icons'
 
 type ModalProps = {
@@ -9,6 +9,17 @@ type ModalProps = {
 }
 
 export default function Modal({ open, onClose, title, children }: ModalProps) {
+    useEffect(() => {
+        if (!open) return
+
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === 'Escape') onClose()
+        }
+
+        document.addEventListener('keydown', handleKeyDown)
+        return () => document.removeEventListener('keydown', handleKeyDown)
+    }, [open, onClose])
+
     if (!open) return null
 
     return (

@@ -90,9 +90,9 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
             transition={{ duration: 0.4 }}
             className='mb-8 rounded-lg bg-white p-4 shadow-sm sm:p-6'
         >
-            <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase'>Produção por hora</h2>
+            <h2 className='text-xs font-semibold tracking-wide text-gray-dark uppercase'>Produção por hora</h2>
 
-            <div className='overflow-x-auto'>
+            <div className='overflow-x-auto overflow-y-visible pt-8'>
                 <div className='sm:min-w-180'>
                     <div className='flex'>
                         <div className='flex w-8 shrink-0 flex-col justify-between text-right text-[10px] text-gray-dark'>
@@ -209,7 +209,7 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
                                     transition={{ duration: 0.15 }}
-                                    className={`pointer-events-none absolute z-10 -translate-y-full rounded-md bg-gray-text px-1.5 py-0.5 text-[9px] whitespace-nowrap text-white shadow-lg sm:px-2 sm:py-1 sm:text-xs ${
+                                    className={`pointer-events-none absolute z-30 -translate-y-full rounded-md bg-gray-text px-1.5 py-0.5 text-[9px] whitespace-nowrap text-white shadow-lg sm:px-2 sm:py-1 sm:text-xs ${
                                         horaAtiva <= 1
                                             ? 'left-0'
                                             : horaAtiva >= 22

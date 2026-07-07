@@ -134,26 +134,25 @@ export default function Dashboard() {
             <main className='flex-1 p-4 sm:p-8'>
                 <PageHeaderSection title='Dashboard' />
 
-                <div className='mb-4 flex justify-end'>
+                <div className='mb-6 flex flex-col gap-3 sm:flex-row sm:items-start'>
+                    <DateFilterSection
+                        className='sm:flex-1'
+                        dataInicial={dataInicialInput}
+                        dataFinal={dataFinalInput}
+                        onDataInicialChange={setDataInicialInput}
+                        onDataFinalChange={setDataFinalInput}
+                        onSubmit={handleFiltrar}
+                    />
+
                     <Button
                         variant='ghost'
-                        className='flex items-center gap-2 text-orange-base'
+                        className='flex items-center justify-center gap-2 self-start bg-white text-orange-base shadow-sm sm:h-17.5'
                         onClick={() => setRankingAberto(true)}
                     >
                         <TrophyIcon className='h-4 w-4 origin-center animate-trophy-wiggle' />
                         Ranking
                     </Button>
                 </div>
-
-                <PodiumSection pedidos={pedidos} usuarios={usuarios} carregando={carregando} />
-
-                <DateFilterSection
-                    dataInicial={dataInicialInput}
-                    dataFinal={dataFinalInput}
-                    onDataInicialChange={setDataInicialInput}
-                    onDataFinalChange={setDataFinalInput}
-                    onSubmit={handleFiltrar}
-                />
 
                 {erro && (
                     <div className='mb-4'>
@@ -163,6 +162,7 @@ export default function Dashboard() {
 
                 <DashboardStatsSection pedidos={pedidos} carregando={carregando} />
                 <ProducaoPorHoraSection pedidos={pedidos} carregando={carregando} />
+                <PodiumSection pedidos={pedidos} usuarios={usuarios} carregando={carregando} />
                 <PedidosTableSection pedidos={pedidos} usuarios={usuarios} carregando={carregando} />
 
                 <Footer />
