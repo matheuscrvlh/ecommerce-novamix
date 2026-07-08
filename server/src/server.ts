@@ -5,6 +5,7 @@ import { db } from './database/database.ts'
 import { usersRoutes } from './routes/users.routes.ts'
 import { authRoutes } from './routes/auth.routes.ts'
 import { ordersRoutes } from './routes/orders.routes.ts'
+import { eventsRoutes } from './routes/events.routes.ts'
 
 const app = Fastify()
 
@@ -27,6 +28,7 @@ app.register(cors, {
 app.register(usersRoutes)
 app.register(authRoutes)
 app.register(ordersRoutes)
+app.register(eventsRoutes)
 
 async function start() {
     await app.listen({ host: '0.0.0.0', port: process.env.SERVER_PORT }, () => {})
