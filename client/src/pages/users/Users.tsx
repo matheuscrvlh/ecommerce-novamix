@@ -12,6 +12,7 @@ import Button from '../../components/Button'
 import Alert from '../../components/Alert'
 import Modal from '../../components/Modal'
 import Footer from '../../components/Footer'
+import ThemeToggle from '../../components/ThemeToggle'
 import { PlusIcon } from '../../components/icons'
 
 export default function Users() {
@@ -66,15 +67,11 @@ export default function Users() {
     }
 
     return (
-        <div className='flex min-h-screen flex-col bg-gray md:flex-row'>
+        <div className='flex min-h-screen flex-col bg-gray md:flex-row dark:bg-dark-bg'>
             <SidebarSection />
 
             <main className='flex-1 space-y-6 p-4 sm:p-8'>
-                <div className='flex items-center justify-between gap-4'>
-                    <div className='flex-1'>
-                        <PageHeaderSection title='Usuários' />
-                    </div>
-                </div>
+                <PageHeaderSection title='Usuários' action={<ThemeToggle className='hidden md:block' />} />
 
                 <div className='flex justify-end'>
                     <Button className='flex items-center gap-2' onClick={abrirCriacao}>
@@ -118,7 +115,7 @@ export default function Users() {
                 onClose={() => setExcluindo(null)}
                 title='Excluir usuário'
             >
-                <p className='mb-4 text-sm text-gray-text'>
+                <p className='mb-4 text-sm text-gray-text dark:text-dark-text'>
                     Tem certeza que deseja excluir <strong>{excluindo?.nome}</strong>? Essa ação não pode ser desfeita.
                 </p>
                 <div className='flex justify-end gap-2'>

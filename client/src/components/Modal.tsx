@@ -28,12 +28,12 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
             onClick={onClose}
         >
             <div
-                className='w-full max-w-lg rounded-lg bg-white p-6 shadow-lg'
+                className='w-full max-w-lg rounded-lg bg-white p-6 shadow-lg dark:bg-dark-surface'
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className='mb-4 flex items-center justify-between'>
-                    <h2 className='text-lg font-semibold text-gray-text'>{title}</h2>
-                    <button onClick={onClose} className='text-gray-dark transition hover:text-gray-text'>
+                    <h2 className='text-lg font-semibold text-gray-text dark:text-dark-text'>{title}</h2>
+                    <button onClick={onClose} className='text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'>
                         <CloseIcon className='h-5 w-5' />
                     </button>
                 </div>

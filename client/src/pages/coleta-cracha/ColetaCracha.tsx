@@ -9,6 +9,7 @@ import Input from '../../components/Input'
 import Logo from '../../components/Logo'
 import Alert from '../../components/Alert'
 import BarcodeScannerModal from '../../components/BarcodeScannerModal'
+import ThemeToggle from '../../components/ThemeToggle'
 import { DashboardIcon, LogoutIcon, CameraIcon } from '../../components/icons'
 
 const SEGUNDOS_SESSAO = 15
@@ -110,15 +111,19 @@ export default function ColetaCracha() {
     }
 
     return (
-        <div className='relative flex min-h-screen flex-col items-center justify-center gap-6 bg-linear-to-br from-orange-base/10 via-white to-gray-base/10 p-4'>
+        <div className='relative flex min-h-screen flex-col items-center justify-center gap-6 bg-linear-to-br from-orange-base/10 via-white to-gray-base/10 p-4 dark:bg-dark-bg dark:from-dark-bg dark:via-dark-bg dark:to-dark-bg'>
             <div className='absolute top-4 right-4 flex items-center gap-4'>
                 <Link
                     to='/dashboard'
-                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text'
+                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
                 >
                     <DashboardIcon className='h-4 w-4' />
                     Voltar ao Dashboard
                 </Link>
+
+                <div className='h-4 w-px bg-gray-base/30' />
+
+                <ThemeToggle />
 
                 <div className='h-4 w-px bg-gray-base/30' />
 
@@ -136,9 +141,9 @@ export default function ColetaCracha() {
             </div>
 
             {!sessao && (
-                <form onSubmit={handleCrachaSubmit} className='w-full max-w-sm space-y-4 rounded-lg bg-white p-8 shadow-sm'>
-                    <h1 className='text-center text-lg font-semibold text-gray-text'>Coleta por Crachá</h1>
-                    <p className='text-center text-sm text-gray-dark'>
+                <form onSubmit={handleCrachaSubmit} className='w-full max-w-sm space-y-4 rounded-lg bg-white p-8 shadow-sm dark:bg-dark-surface'>
+                    <h1 className='text-center text-lg font-semibold text-gray-text dark:text-dark-text'>Coleta por Crachá</h1>
+                    <p className='text-center text-sm text-gray-dark dark:text-dark-text-muted'>
                         Bipe ou digite seu crachá pra começar a conferir pedidos
                     </p>
 
@@ -154,7 +159,7 @@ export default function ColetaCracha() {
                         <button
                             type='button'
                             onClick={() => setScannerCrachaAberto(true)}
-                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden'
+                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
                             title='Escanear com a câmera'
                         >
                             <CameraIcon />
@@ -170,19 +175,19 @@ export default function ColetaCracha() {
             )}
 
             {sessao && (
-                <div className='w-full max-w-sm space-y-4 rounded-lg bg-white p-8 shadow-sm'>
+                <div className='w-full max-w-sm space-y-4 rounded-lg bg-white p-8 shadow-sm dark:bg-dark-surface'>
                     <div className='text-center'>
-                        <h1 className='text-lg font-semibold text-gray-text'>Olá, {sessao.nome}!</h1>
-                        <p className='text-sm text-gray-dark'>Bipe os pedidos que quiser conferir</p>
+                        <h1 className='text-lg font-semibold text-gray-text dark:text-dark-text'>Olá, {sessao.nome}!</h1>
+                        <p className='text-sm text-gray-dark dark:text-dark-text-muted'>Bipe os pedidos que quiser conferir</p>
                     </div>
 
-                    <div className='h-2 w-full overflow-hidden rounded-full bg-gray'>
+                    <div className='h-2 w-full overflow-hidden rounded-full bg-gray dark:bg-dark-surface-2'>
                         <div
                             className='h-2 rounded-full bg-orange-base transition-all duration-1000 ease-linear'
                             style={{ width: `${(restante / SEGUNDOS_SESSAO) * 100}%` }}
                         />
                     </div>
-                    <p className='text-center text-xs text-gray-dark'>
+                    <p className='text-center text-xs text-gray-dark dark:text-dark-text-muted'>
                         Sessão encerra em {restante}s de inatividade
                     </p>
 
@@ -201,7 +206,7 @@ export default function ColetaCracha() {
                                 setUltimoResultadoScannerPedido(null)
                                 setScannerPedidoAberto(true)
                             }}
-                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden'
+                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
                             title='Escanear com a câmera'
                         >
                             <CameraIcon />

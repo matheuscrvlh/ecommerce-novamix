@@ -18,9 +18,9 @@ export default function StatCard({ label, value, color = 'orange', icon }: StatC
     const palette = colors[color]
 
     return (
-        <div className='rounded-lg bg-white p-5 shadow-sm transition hover:shadow-md'>
+        <div className='rounded-lg bg-white p-5 shadow-sm transition hover:shadow-md dark:bg-dark-surface'>
             <div className='flex items-center justify-between'>
-                <span className='text-xs font-semibold tracking-wide text-gray-dark uppercase'>{label}</span>
+                <span className='text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>{label}</span>
                 <span className={`flex h-9 w-9 items-center justify-center rounded-full ${palette.bg} ${palette.text}`}>
                     {icon}
                 </span>

@@ -10,7 +10,7 @@ export default function Logo({ compact = false }: LogoProps) {
             <img
                 src={logoNm}
                 alt='Logo Novamix'
-                className={compact ? 'h-12 w-auto' : 'w-[70%] max-w-48'}
+                className={`rounded-lg bg-white dark:p-1.5 ${compact ? 'h-12 w-auto' : 'w-[70%] max-w-48'}`}
             />
         </div>
     )

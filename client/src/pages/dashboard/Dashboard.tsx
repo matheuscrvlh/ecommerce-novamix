@@ -14,6 +14,7 @@ import Alert from '../../components/Alert'
 import Button from '../../components/Button'
 import Footer from '../../components/Footer'
 import Toast from '../../components/Toast'
+import ThemeToggle from '../../components/ThemeToggle'
 import { TrophyIcon } from '../../components/icons'
 import { tocarSomNotificacao } from '../../lib/notificationSound'
 
@@ -124,11 +125,11 @@ export default function Dashboard() {
     }
 
     return (
-        <div className='flex min-h-screen flex-col bg-gray md:flex-row'>
+        <div className='flex min-h-screen flex-col bg-gray md:flex-row dark:bg-dark-bg'>
             <SidebarSection />
 
             <main className='flex-1 p-4 sm:p-8'>
-                <PageHeaderSection title='Dashboard' />
+                <PageHeaderSection title='Dashboard' action={<ThemeToggle className='hidden md:block' />} />
 
                 <DateFilterSection
                     className='mb-6'
@@ -150,7 +151,7 @@ export default function Dashboard() {
                 <div className='mb-2 flex justify-end'>
                     <Button
                         variant='ghost'
-                        className='flex items-center gap-2 bg-white text-orange-base shadow-sm'
+                        className='flex items-center gap-2 bg-white text-orange-base shadow-sm dark:bg-dark-surface'
                         onClick={() => setRankingAberto(true)}
                     >
                         <TrophyIcon className='h-4 w-4 origin-center animate-trophy-wiggle' />

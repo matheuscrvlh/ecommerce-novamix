@@ -66,10 +66,10 @@ export default function BarcodeScannerModal({ onClose, onResult, ultimoResultado
 
     return (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4'>
-            <div className='w-full max-w-sm rounded-lg bg-white p-4 shadow-lg'>
+            <div className='w-full max-w-sm rounded-lg bg-white p-4 shadow-lg dark:bg-dark-surface'>
                 <div className='mb-3 flex items-center justify-between'>
-                    <h2 className='text-sm font-semibold text-gray-text'>Aponte a câmera pro código</h2>
-                    <button onClick={onClose} className='text-gray-dark transition hover:text-gray-text'>
+                    <h2 className='text-sm font-semibold text-gray-text dark:text-dark-text'>Aponte a câmera pro código</h2>
+                    <button onClick={onClose} className='text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'>
                         <CloseIcon className='h-5 w-5' />
                     </button>
                 </div>
@@ -92,7 +92,7 @@ export default function BarcodeScannerModal({ onClose, onResult, ultimoResultado
 
                 <div id={scannerId} className='overflow-hidden rounded-md' />
 
-                <p className='mt-3 text-center text-xs text-gray-dark'>
+                <p className='mt-3 text-center text-xs text-gray-dark dark:text-dark-text-muted'>
                     A câmera continua aberta — pode ir bipando os próximos pedidos direto.
                 </p>
             </div>

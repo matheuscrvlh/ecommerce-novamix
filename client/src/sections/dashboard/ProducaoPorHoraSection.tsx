@@ -42,8 +42,8 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
 
     if (carregando && total === 0) {
         return (
-            <section className='mb-8 rounded-lg bg-white p-4 shadow-sm sm:p-6'>
-                <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase'>Produção por hora</h2>
+            <section className='mb-8 rounded-lg bg-white p-4 shadow-sm sm:p-6 dark:bg-dark-surface'>
+                <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>Produção por hora</h2>
                 <Skeleton className='h-32 w-full sm:h-40' />
             </section>
         )
@@ -51,9 +51,9 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
 
     if (total === 0) {
         return (
-            <section className='mb-8 rounded-lg bg-white p-6 shadow-sm'>
-                <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase'>Produção por hora</h2>
-                <p className='py-8 text-center text-sm text-gray-dark'>Sem pedidos bipados no período selecionado.</p>
+            <section className='mb-8 rounded-lg bg-white p-6 shadow-sm dark:bg-dark-surface'>
+                <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>Produção por hora</h2>
+                <p className='py-8 text-center text-sm text-gray-dark dark:text-dark-text-muted'>Sem pedidos bipados no período selecionado.</p>
             </section>
         )
     }
@@ -88,14 +88,14 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className='mb-8 rounded-lg bg-white p-4 shadow-sm sm:p-6'
+            className='mb-8 rounded-lg bg-white p-4 shadow-sm sm:p-6 dark:bg-dark-surface'
         >
-            <h2 className='text-xs font-semibold tracking-wide text-gray-dark uppercase'>Produção por hora</h2>
+            <h2 className='text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>Produção por hora</h2>
 
             <div className='overflow-x-auto overflow-y-visible pt-8'>
                 <div className='sm:min-w-180'>
                     <div className='flex'>
-                        <div className='flex w-8 shrink-0 flex-col justify-between text-right text-[10px] text-gray-dark'>
+                        <div className='flex w-8 shrink-0 flex-col justify-between text-right text-[10px] text-gray-dark dark:text-dark-text-muted'>
                             <span>{maximo}</span>
                             <span>{Math.round(maximo / 2)}</span>
                             <span>0</span>
@@ -117,16 +117,16 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
                                     </linearGradient>
                                 </defs>
 
-                                <line x1='0' y1={PADDING_TOPO} x2={LARGURA} y2={PADDING_TOPO} className='stroke-gray-dark/10' strokeWidth='1' />
+                                <line x1='0' y1={PADDING_TOPO} x2={LARGURA} y2={PADDING_TOPO} className='stroke-gray-dark/10 dark:stroke-dark-text-muted/15' strokeWidth='1' />
                                 <line
                                     x1='0'
                                     y1={PADDING_TOPO + ALTURA_PLOTAVEL / 2}
                                     x2={LARGURA}
                                     y2={PADDING_TOPO + ALTURA_PLOTAVEL / 2}
-                                    className='stroke-gray-dark/10'
+                                    className='stroke-gray-dark/10 dark:stroke-dark-text-muted/15'
                                     strokeWidth='1'
                                 />
-                                <line x1='0' y1={baseY} x2={LARGURA} y2={baseY} className='stroke-gray-dark/20' strokeWidth='1' />
+                                <line x1='0' y1={baseY} x2={LARGURA} y2={baseY} className='stroke-gray-dark/20 dark:stroke-dark-text-muted/25' strokeWidth='1' />
 
                                 <motion.path
                                     fill='url(#producaoGradiente)'
@@ -197,10 +197,10 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
                             </svg>
 
                             <div className='pointer-events-none absolute right-1 bottom-1 text-right'>
-                                <span className='text-[10px] font-semibold text-gray-text sm:text-sm'>
+                                <span className='text-[10px] font-semibold text-gray-text sm:text-sm dark:text-dark-text'>
                                     <AnimatedNumber value={valorExibido} /> pedido{valorExibido === 1 ? '' : 's'}
                                 </span>
-                                <span className='ml-1 text-[9px] text-gray-dark sm:text-xs'>{horaExibida}h</span>
+                                <span className='ml-1 text-[9px] text-gray-dark sm:text-xs dark:text-dark-text-muted'>{horaExibida}h</span>
                             </div>
 
                             {horaAtiva !== null && (
@@ -233,7 +233,7 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
                         </div>
                     </div>
 
-                    <div className='ml-8 flex justify-between pt-1 text-[10px] text-gray-dark'>
+                    <div className='ml-8 flex justify-between pt-1 text-[10px] text-gray-dark dark:text-dark-text-muted'>
                         {HORAS.filter((hora) => hora % 2 === 0).map((hora) => (
                             <span key={hora} className={hora % 4 === 0 ? '' : 'hidden sm:inline'}>
                                 {hora}h

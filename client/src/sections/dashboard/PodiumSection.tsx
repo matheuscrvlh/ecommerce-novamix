@@ -49,7 +49,7 @@ const MEDALHAS = [
     {
         posicao: '4º',
         altura: 'h-6',
-        texto: 'text-gray-dark',
+        texto: 'text-gray-dark dark:text-dark-text-muted',
         glow: 'transparent',
         claro: '#5C7285',
         base: '#354856',
@@ -58,7 +58,7 @@ const MEDALHAS = [
     {
         posicao: '5º',
         altura: 'h-5',
-        texto: 'text-gray-dark',
+        texto: 'text-gray-dark dark:text-dark-text-muted',
         glow: 'transparent',
         claro: '#5C7285',
         base: '#354856',
@@ -92,9 +92,9 @@ export default function PodiumSection({ pedidos, usuarios, carregando }: PodiumS
     if (carregando && podio.length === 0) {
         return (
             <section className='mb-4'>
-                <h2 className='mb-2 text-xs font-semibold tracking-wide text-gray-dark uppercase'>Pódio de hoje</h2>
+                <h2 className='mb-2 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>Pódio de hoje</h2>
 
-                <div className='flex items-end justify-center gap-3 rounded-lg bg-white p-4 pt-6 shadow-sm'>
+                <div className='flex items-end justify-center gap-3 rounded-lg bg-white p-4 pt-6 shadow-sm dark:bg-dark-surface'>
                     {ALTURAS_SKELETON.map((altura, index) => (
                         <div key={index} className='flex w-16 flex-col items-center gap-1.5'>
                             <Skeleton className='h-3.5 w-3.5 rounded-full' />
@@ -112,9 +112,9 @@ export default function PodiumSection({ pedidos, usuarios, carregando }: PodiumS
 
     return (
         <section className='mb-4'>
-            <h2 className='mb-2 text-xs font-semibold tracking-wide text-gray-dark uppercase'>Pódio de hoje</h2>
+            <h2 className='mb-2 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>Pódio de hoje</h2>
 
-            <div className='flex items-end justify-center gap-3 rounded-lg bg-white p-4 pt-6 shadow-sm'>
+            <div className='flex items-end justify-center gap-3 rounded-lg bg-white p-4 pt-6 shadow-sm dark:bg-dark-surface'>
                 <AnimatePresence>
                     {podio.map((item, index) => {
                         const medalha = MEDALHAS[index]
@@ -154,12 +154,12 @@ export default function PodiumSection({ pedidos, usuarios, carregando }: PodiumS
                                 </motion.div>
 
                                 <p
-                                    className='mt-0.5 w-full truncate text-center text-[10px] font-semibold text-gray-text'
+                                    className='mt-0.5 w-full truncate text-center text-[10px] font-semibold text-gray-text dark:text-dark-text'
                                     title={item.nome}
                                 >
                                     {item.nome}
                                 </p>
-                                <AnimatedNumber value={item.total} className='text-[10px] text-gray-dark' />
+                                <AnimatedNumber value={item.total} className='text-[10px] text-gray-dark dark:text-dark-text-muted' />
 
                                 <motion.div
                                     layout

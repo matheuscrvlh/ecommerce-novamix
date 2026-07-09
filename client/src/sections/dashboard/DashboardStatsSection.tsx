@@ -24,14 +24,14 @@ export default function DashboardStatsSection({
   if (carregando && pedidos.length === 0) {
     return (
       <section className="mb-8">
-        <h2 className="mb-3 text-xs font-semibold tracking-wide text-gray-dark uppercase">
+        <h2 className="mb-3 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted">
           Pedidos no período
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {[0, 1].map((indice) => (
             <div
               key={indice}
-              className="rounded-lg bg-white p-5 shadow-sm"
+              className="rounded-lg bg-white p-5 shadow-sm dark:bg-dark-surface"
             >
               <div className="flex items-center justify-between">
                 <Skeleton className="h-3 w-28" />
@@ -47,7 +47,7 @@ export default function DashboardStatsSection({
 
   return (
     <section className="mb-8">
-      <h2 className="mb-3 text-xs font-semibold tracking-wide text-gray-dark uppercase">
+      <h2 className="mb-3 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted">
         Pedidos no período
       </h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

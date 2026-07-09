@@ -13,7 +13,7 @@ export default function SidebarLink({ to, icon, children }: SidebarLinkProps) {
             to={to}
             className={({ isActive }) =>
                 `flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition ${
-                    isActive ? 'bg-orange-base text-white' : 'text-gray-text hover:bg-gray'
+                    isActive ? 'bg-orange-base text-white' : 'text-gray-text hover:bg-gray dark:text-dark-text dark:hover:bg-dark-surface-2'
                 }`
             }
         >
