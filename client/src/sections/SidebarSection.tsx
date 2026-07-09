@@ -20,9 +20,14 @@ export default function SidebarSection() {
         <>
             <div className='relative flex items-center justify-center border-b border-gray bg-white p-4 md:hidden'>
                 <Logo compact />
-                <button onClick={() => setOpen(true)} className='absolute top-1/2 right-4 -translate-y-1/2 text-gray-dark'>
-                    <MenuIcon className='h-6 w-6' />
-                </button>
+                <div className='absolute top-1/2 right-4 flex -translate-y-1/2 items-center gap-3'>
+                    <button onClick={handleLogout} className='text-red-base transition hover:text-red-light' title='Sair'>
+                        <LogoutIcon className='h-5 w-5' />
+                    </button>
+                    <button onClick={() => setOpen(true)} className='text-gray-dark'>
+                        <MenuIcon className='h-6 w-6' />
+                    </button>
+                </div>
             </div>
 
             {open && (
