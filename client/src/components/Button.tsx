@@ -7,7 +7,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 const variants = {
     primary: 'bg-orange-base text-white hover:bg-orange-light',
     danger: 'bg-red-light text-white hover:bg-red-base',
-    ghost: 'bg-transparent text-gray-text hover:bg-gray'
+    ghost: 'bg-transparent text-gray-text hover:bg-gray dark:text-dark-text dark:hover:bg-dark-surface-2'
 }
 
 export default function Button({ children, className = '', variant = 'primary', ...props }: ButtonProps) {

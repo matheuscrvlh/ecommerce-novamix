@@ -8,6 +8,7 @@ import Logo from '../../components/Logo'
 import Alert from '../../components/Alert'
 import BarcodeScannerModal from '../../components/BarcodeScannerModal'
 import RankingModal from '../../sections/RankingModal'
+import ThemeToggle from '../../components/ThemeToggle'
 import { LogoutIcon, DashboardIcon, TrophyIcon, CameraIcon } from '../../components/icons'
 
 export default function Collector() {
@@ -51,12 +52,12 @@ export default function Collector() {
     }
 
     return (
-        <div className='relative flex min-h-screen flex-col items-center justify-center gap-4 bg-linear-to-br from-orange-base/10 via-white to-gray-base/10 p-4'>
+        <div className='relative flex min-h-screen flex-col items-center justify-center gap-4 bg-linear-to-br from-orange-base/10 via-white to-gray-base/10 p-4 dark:bg-dark-bg dark:from-dark-bg dark:via-dark-bg dark:to-dark-bg'>
             <div className='absolute top-4 right-4 flex items-center gap-4'>
                 {role === 'ADMIN' && (
                     <Link
                         to='/dashboard'
-                        className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text'
+                        className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
                     >
                         <DashboardIcon className='h-4 w-4' />
                         Voltar ao Dashboard
@@ -72,6 +73,10 @@ export default function Collector() {
 
                 <div className='h-4 w-px bg-gray-base/30' />
 
+                <ThemeToggle />
+
+                <div className='h-4 w-px bg-gray-base/30' />
+
                 <button
                     onClick={logout}
                     className='flex items-center gap-1 text-sm font-medium text-red-base transition hover:text-red-light'
@@ -81,12 +86,12 @@ export default function Collector() {
                 </button>
             </div>
 
-            <div className='w-full max-w-sm space-y-5 rounded-lg bg-white p-8 shadow-sm'>
+            <div className='w-full max-w-sm space-y-5 rounded-lg bg-white p-8 shadow-sm dark:bg-dark-surface'>
                 <div className='flex justify-center'>
                     <Logo />
                 </div>
 
-                <h1 className='text-center text-lg font-semibold text-gray-text'>Bipar pedido</h1>
+                <h1 className='text-center text-lg font-semibold text-gray-text dark:text-dark-text'>Bipar pedido</h1>
 
                 <form onSubmit={handleSubmit} className='space-y-3'>
                     <div className='flex gap-2'>
@@ -104,7 +109,7 @@ export default function Collector() {
                                 setUltimoResultadoScanner(null)
                                 setScannerAberto(true)
                             }}
-                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden'
+                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
                             title='Escanear com a câmera'
                         >
                             <CameraIcon />

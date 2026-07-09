@@ -38,7 +38,7 @@ export default function UserQrCodeModal({ usuario, onClose }: UserQrCodeModalPro
     return (
         <Modal open={usuario !== null} onClose={onClose} title={`Crachá — ${usuario?.nome ?? ''}`}>
             {!usuario?.cracha && (
-                <p className='text-center text-sm text-gray-dark'>
+                <p className='text-center text-sm text-gray-dark dark:text-dark-text-muted'>
                     Esse usuário ainda não tem um crachá cadastrado.
                 </p>
             )}

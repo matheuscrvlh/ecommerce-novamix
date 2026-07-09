@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
 import SidebarLink from '../components/SidebarLink'
 import Button from '../components/Button'
+import ThemeToggle from '../components/ThemeToggle'
 import { DashboardIcon, UsersIcon, PackageIcon, BadgeIcon, LogoutIcon, MenuIcon, CloseIcon } from '../components/icons'
 import { useAuth } from '../hooks/useAuth'
 
@@ -18,13 +19,14 @@ export default function SidebarSection() {
 
     return (
         <>
-            <div className='relative flex items-center justify-center border-b border-gray bg-white p-4 md:hidden'>
+            <div className='relative flex items-center justify-center border-b border-gray bg-white p-4 md:hidden dark:border-dark-border dark:bg-dark-surface'>
                 <Logo compact />
                 <div className='absolute top-1/2 right-4 flex -translate-y-1/2 items-center gap-3'>
+                    <ThemeToggle />
                     <button onClick={handleLogout} className='text-red-base transition hover:text-red-light' title='Sair'>
                         <LogoutIcon className='h-5 w-5' />
                     </button>
-                    <button onClick={() => setOpen(true)} className='text-gray-dark'>
+                    <button onClick={() => setOpen(true)} className='text-gray-dark dark:text-dark-text-muted'>
                         <MenuIcon className='h-6 w-6' />
                     </button>
                 </div>
@@ -35,13 +37,13 @@ export default function SidebarSection() {
             )}
 
             <aside
-                className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 flex-col border-r border-gray bg-white transition-transform md:sticky md:top-0 md:translate-x-0 ${
+                className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 flex-col border-r border-gray bg-white transition-transform md:sticky md:top-0 md:translate-x-0 dark:border-dark-border dark:bg-dark-surface ${
                     open ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
                 <div className='relative flex items-center justify-center p-4'>
                     <Logo />
-                    <button onClick={() => setOpen(false)} className='absolute top-1/2 right-4 -translate-y-1/2 text-gray-dark md:hidden'>
+                    <button onClick={() => setOpen(false)} className='absolute top-1/2 right-4 -translate-y-1/2 text-gray-dark md:hidden dark:text-dark-text-muted'>
                         <CloseIcon className='h-5 w-5' />
                     </button>
                 </div>

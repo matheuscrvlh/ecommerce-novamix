@@ -82,7 +82,7 @@ export default function RankingModal({ open, onClose }: RankingModalProps) {
             />
 
             <div className='relative mt-3'>
-                <SearchIcon className='pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-dark' />
+                <SearchIcon className='pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-dark dark:text-dark-text-muted' />
                 <Input
                     placeholder='Buscar operador'
                     value={busca}
@@ -98,7 +98,7 @@ export default function RankingModal({ open, onClose }: RankingModalProps) {
             )}
 
             {!carregando && !erro && ranking.length > 0 && (
-                <p className='mt-3 text-xs text-gray-dark'>
+                <p className='mt-3 text-xs text-gray-dark dark:text-dark-text-muted'>
                     {rankingFiltrado.length} de {ranking.length} operador{ranking.length === 1 ? '' : 'es'} no período
                 </p>
             )}
@@ -114,7 +114,7 @@ export default function RankingModal({ open, onClose }: RankingModalProps) {
                     ))}
 
                 {!carregando && rankingFiltrado.length === 0 && (
-                    <p className='py-6 text-center text-sm text-gray-dark'>
+                    <p className='py-6 text-center text-sm text-gray-dark dark:text-dark-text-muted'>
                         {termo ? 'Nenhum operador encontrado.' : 'Nenhum pedido bipado no período.'}
                     </p>
                 )}
@@ -122,13 +122,13 @@ export default function RankingModal({ open, onClose }: RankingModalProps) {
                 {!carregando &&
                     rankingFiltrado.map((usuario) => {
                         const posicao = ranking.findIndex((item) => item.id === usuario.id)
-                        const corPosicao = CORES_POSICAO[posicao] ?? 'bg-gray text-gray-dark'
+                        const corPosicao = CORES_POSICAO[posicao] ?? 'bg-gray text-gray-dark dark:bg-dark-surface-2 dark:text-dark-text-muted'
                         const percentual = Math.max(6, (Number(usuario.count) / maiorContagem) * 100)
 
                         return (
                             <div
                                 key={usuario.id}
-                                className='relative overflow-hidden rounded-md transition hover:bg-gray'
+                                className='relative overflow-hidden rounded-md transition hover:bg-gray dark:hover:bg-dark-surface-2'
                             >
                                 <div
                                     className='absolute inset-y-0 left-0 bg-orange-base/10'
@@ -141,7 +141,7 @@ export default function RankingModal({ open, onClose }: RankingModalProps) {
                                         >
                                             {posicao + 1}
                                         </span>
-                                        <span className='truncate text-sm text-gray-text'>{usuario.nome}</span>
+                                        <span className='truncate text-sm text-gray-text dark:text-dark-text'>{usuario.nome}</span>
                                     </div>
                                     <span className='shrink-0 text-sm font-semibold text-orange-base'>{usuario.count}</span>
                                 </div>

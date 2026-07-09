@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 button:not(:disabled),
 [role='button'] {
     cursor: pointer;
@@ -25,7 +27,18 @@ button:not(:disabled),
     --color-silver: #5C8AD1;
     --color-bronze: #E8621C;
 
+    --color-dark-bg: #0E141B;
+    --color-dark-surface: #1A2330;
+    --color-dark-surface-2: #232F3F;
+    --color-dark-border: #2E3B4D;
+    --color-dark-text: #E7EAEE;
+    --color-dark-text-muted: #93A2B4;
+
     --animate-trophy-wiggle: trophy-wiggle 4s ease-in-out infinite;
+}
+
+html.dark {
+    color-scheme: dark;
 }
 
 @keyframes trophy-wiggle {
