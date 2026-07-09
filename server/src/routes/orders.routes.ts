@@ -8,6 +8,7 @@ type CreateOrderBody = {
 }
 
 type GetOrderBody = {
+    idPedido?: string
     dataInicial: string
     dataFinal: string
 }
@@ -80,6 +81,30 @@ async function getOrders(req: FastifyRequest<{Body: GetOrderBody}>, res: Fastify
     }
 }
 
+async function orderConsultation(req: FastifyRequest<{Body: GetOrderBody}>, res: FastifyReply) {
+    const { idPedido } = req.body
+
+    try {
+        const result = await db.query(`
+            SELECT * 
+            FROM pedidos
+            WHERE id = $1
+        `, [idPedido])
+
+        if(result.rows.length === 0) {
+            res.code(401).send({ error: 'Pedido não encontrado.' })
+        }
+
+        const usuario = await result.rows[0]?.usuario_id
+        const data = await result.rows[0]?.bipado_em 
+
+        res.code(200).send({ success: `Pedido já coletado por ${usuario} em ${data}`})
+    } catch (error) {
+        console.log(error)
+        res.code(500).send({ error: 'Erro ao buscar pedidos.'})
+    }
+}
+
 async function getOrdersCountByUser(req:FastifyRequest<{Body: GetOrderBody}>, res:FastifyReply) {
     const { dataInicial, dataFinal } = req.body
 
@@ -130,6 +155,7 @@ async function deleteOrder(req: FastifyRequest<{Params: {codigo_pedido: string}}
 export async function ordersRoutes(fastify: FastifyInstance) {
     fastify.post('/pedidos', { preHandler: [authenticate] }, postOrder);
     fastify.post('/pedidos/buscar', { preHandler: [authenticate, checkAdmin] }, getOrders);
+    fastify.post('/pedidos/consulta', { preHandler: [authenticate, checkAdmin] }, orderConsultation);
     fastify.post('/pedidos/resumo-usuarios', { preHandler: [authenticate, checkAdmin] }, getOrdersCountByUser);
     fastify.delete('/pedidos/:codigo_pedido', { preHandler: [authenticate, checkAdmin] }, deleteOrder)
 }
