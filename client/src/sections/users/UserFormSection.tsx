@@ -76,7 +76,7 @@ export default function UserFormSection({ mode, initialValues, onSubmit }: UserF
             />
 
             {mode === 'edit' && (
-                <label className='flex items-center gap-2 text-sm text-gray-text'>
+                <label className='flex items-center gap-2 text-sm text-gray-text dark:text-dark-text'>
                     <input
                         type='checkbox'
                         checked={values.status}

@@ -23,9 +23,9 @@ export default function DateFilterSection({
     return (
         <form
             onSubmit={onSubmit}
-            className={`flex flex-wrap items-center gap-3 rounded-lg bg-white p-4 shadow-sm ${className}`}
+            className={`flex flex-wrap items-center gap-3 rounded-lg bg-white p-4 shadow-sm dark:bg-dark-surface ${className}`}
         >
-            <div className='flex shrink-0 items-center gap-2 text-gray-dark'>
+            <div className='flex shrink-0 items-center gap-2 text-gray-dark dark:text-dark-text-muted'>
                 <CalendarIcon className='h-4 w-4' />
                 <span className='text-xs font-semibold tracking-wide uppercase'>Período</span>
             </div>
@@ -40,7 +40,7 @@ export default function DateFilterSection({
                         required
                     />
                 </div>
-                <span className='text-xs text-gray-dark'>até</span>
+                <span className='text-xs text-gray-dark dark:text-dark-text-muted'>até</span>
                 <div className='w-40'>
                     <Input
                         type='date'
