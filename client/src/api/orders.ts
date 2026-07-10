@@ -64,6 +64,21 @@ export async function consultOrder({ codigoPedido, token }: ConsultOrderParams) 
     })
 }
 
+type EditOrderParams = {
+    codigoPedido: string
+    usuarioId: number
+    token: string
+}
+
+export async function editOrder({ codigoPedido, usuarioId, token }: EditOrderParams) {
+    return client({
+        url: `/pedidos/${codigoPedido}`,
+        token,
+        method: 'PUT',
+        data: { id: usuarioId }
+    })
+}
+
 type PostOrderAsParams = {
     codigo_pedido: string
     cracha: string

@@ -1,11 +1,12 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
-import { consultOrder, getOrders } from '../../api/orders'
+import { consultOrder, editOrder, getOrders } from '../../api/orders'
 import { useAuth } from '../../hooks/useAuth'
 import { useUsuariosResumo } from '../../hooks/useUsuariosResumo'
 import SidebarSection from '../../sections/SidebarSection'
 import PageHeaderSection from '../../sections/PageHeaderSection'
 import DateFilterSection from '../../sections/dashboard/DateFilterSection'
 import PedidosTableSection from '../../sections/pedidos/PedidosTableSection'
+import EditarOperadorModal from '../../sections/pedidos/EditarOperadorModal'
 import Alert from '../../components/Alert'
 import Button from '../../components/Button'
 import Input from '../../components/Input'
@@ -51,26 +52,32 @@ export default function Pedidos() {
     const [dataFinalInput, setDataFinalInput] = useState(hojeISO())
     const [filtro, setFiltro] = useState({ dataInicial: hojeISO(), dataFinal: hojeISO() })
 
-    useEffect(() => {
-        let cancelado = false
+    const [editandoPedido, setEditandoPedido] = useState<string | null>(null)
+
+    function buscarPedidos(cancelado?: () => boolean) {
         setCarregando(true)
         setErroTabela('')
 
-        getOrders({
+        return getOrders({
             dataInicial: `${filtro.dataInicial}T00:00:00`,
             dataFinal: `${filtro.dataFinal}T23:59:59.999`,
             token: token!
         })
             .then((resultado) => {
-                if (cancelado) return
+                if (cancelado?.()) return
                 setPedidos(resultado)
                 setCarregando(false)
             })
             .catch((error) => {
-                if (cancelado) return
+                if (cancelado?.()) return
                 setErroTabela(error instanceof Error ? error.message : 'Erro ao buscar pedidos.')
                 setCarregando(false)
             })
+    }
+
+    useEffect(() => {
+        let cancelado = false
+        buscarPedidos(() => cancelado)
 
         return () => {
             cancelado = true
@@ -80,6 +87,15 @@ export default function Pedidos() {
     function handleFiltrar(event: SubmitEvent) {
         event.preventDefault()
         setFiltro({ dataInicial: dataInicialInput, dataFinal: dataFinalInput })
+    }
+
+    async function handleSalvarOperador(usuarioId: number) {
+        const codigo = editandoPedido!
+        await editOrder({ codigoPedido: codigo, usuarioId, token: token! })
+        await buscarPedidos()
+        if (resultado) {
+            await consultarPedido(codigo)
+        }
     }
 
     async function consultarPedido(codigo: string) {
@@ -151,13 +167,18 @@ export default function Pedidos() {
                     </form>
 
                     {resultado && (
-                        <p
-                            className={`mt-4 rounded-md px-4 py-3 text-sm ${
+                        <div
+                            className={`mt-4 flex flex-wrap items-center justify-between gap-2 rounded-md px-4 py-3 text-sm ${
                                 resultado.bipado ? 'bg-green-base/10 text-green-base' : 'bg-orange-base/10 text-orange-base'
                             }`}
                         >
-                            {resultado.mensagem}
-                        </p>
+                            <span>{resultado.mensagem}</span>
+                            {resultado.bipado && (
+                                <Button variant='ghost' className='shrink-0' onClick={() => setEditandoPedido(codigoPedido)}>
+                                    Alterar operador
+                                </Button>
+                            )}
+                        </div>
                     )}
                     {erroConsulta && (
                         <div className='mt-4'>
@@ -181,7 +202,12 @@ export default function Pedidos() {
                     onSubmit={handleFiltrar}
                 />
 
-                <PedidosTableSection pedidos={pedidos} usuarios={usuarios} carregando={carregando} />
+                <PedidosTableSection
+                    pedidos={pedidos}
+                    usuarios={usuarios}
+                    carregando={carregando}
+                    onEditarOperador={(pedido) => setEditandoPedido(pedido.codigo_pedido)}
+                />
 
                 <Footer />
             </main>
@@ -192,6 +218,13 @@ export default function Pedidos() {
                     onResult={handleScan}
                 />
             )}
+
+            <EditarOperadorModal
+                codigoPedido={editandoPedido}
+                usuarios={usuarios}
+                onClose={() => setEditandoPedido(null)}
+                onSubmit={handleSalvarOperador}
+            />
         </div>
     )
 }
