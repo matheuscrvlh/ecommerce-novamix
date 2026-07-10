@@ -157,16 +157,26 @@ async function putMePassword(req: FastifyRequest<{Body: UpdatePasswordBody}>, re
 async function deleteUser(req:FastifyRequest<{Body: CreateUserBody}>, res:FastifyReply) {
     const { id } = req.body
 
-    const result = await db.query(
-        'DELETE FROM usuarios WHERE id = $1',
-        [id]
-    );
+    try {
+        const result = await db.query(`
+            DELETE FROM usuarios WHERE id = $1
+            `,[id]
+        );
 
-    if(result.rowCount === 0) {
-        return res.code(401).send({ error: 'Erro ao deletar usuário.'})
-    };
+        if(result.rowCount === 0) {
+            return res.code(404).send({ error: 'Erro ao deletar usuário.'})
+        };
 
-    return res.code(204).send({ success: 'Usuário deletado com sucesso'})
+        return res.code(200).send({ success: 'Usuário deletado com sucesso'})
+    } catch (error) {
+        console.log(error);
+
+        if((error as { code?: string }).code === '23503') {
+            return res.code(409).send({ error: 'Não é possível excluir: este usuário possui pedidos vinculados.'})
+        }
+
+        res.code(500).send({ error: 'Erro ao deletar usuário.'})
+    }
 }
 
 export async function usersRoutes(fastify: FastifyInstance) {
