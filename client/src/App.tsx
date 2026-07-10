@@ -1,6 +1,7 @@
 import AppRoutes from "./routes/AppRoutes"
 import { AuthProvider } from "./context/AuthContext"
 import { UsuariosProvider } from "./context/UsuariosContext"
+import { UsuariosResumoProvider } from "./context/UsuariosResumoContext"
 import { ThemeProvider } from "./context/ThemeContext"
 
 function App() {
@@ -8,9 +9,11 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <UsuariosProvider>
-          <AppRoutes />
-        </UsuariosProvider>
+        <UsuariosResumoProvider>
+          <UsuariosProvider>
+            <AppRoutes />
+          </UsuariosProvider>
+        </UsuariosResumoProvider>
       </AuthProvider>
     </ThemeProvider>
   )

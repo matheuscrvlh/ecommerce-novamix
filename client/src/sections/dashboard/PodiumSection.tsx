@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { TrophyIcon } from '../../components/icons'
 import AnimatedNumber from '../../components/AnimatedNumber'
 import Skeleton from '../../components/Skeleton'
-import type { Usuario } from '../../api/users'
+import type { UsuarioResumo } from '../../api/users'
 
 type Pedido = {
     id: number
@@ -12,7 +12,7 @@ type Pedido = {
 
 type PodiumSectionProps = {
     pedidos: Pedido[]
-    usuarios: Usuario[]
+    usuarios: UsuarioResumo[]
     carregando: boolean
 }
 
@@ -66,20 +66,13 @@ const MEDALHAS = [
     }
 ]
 
-function isHoje(data: string | null) {
-    if (!data) return false
-    return new Date(data).toDateString() === new Date().toDateString()
-}
-
 export default function PodiumSection({ pedidos, usuarios, carregando }: PodiumSectionProps) {
     const contagem = new Map<number, number>()
 
-    pedidos
-        .filter((pedido) => isHoje(pedido.bipado_em))
-        .forEach((pedido) => {
-            if (pedido.usuario_id === null) return
-            contagem.set(pedido.usuario_id, (contagem.get(pedido.usuario_id) ?? 0) + 1)
-        })
+    pedidos.forEach((pedido) => {
+        if (pedido.usuario_id === null) return
+        contagem.set(pedido.usuario_id, (contagem.get(pedido.usuario_id) ?? 0) + 1)
+    })
 
     const podio = [...contagem.entries()]
         .sort((a, b) => b[1] - a[1])
@@ -92,7 +85,7 @@ export default function PodiumSection({ pedidos, usuarios, carregando }: PodiumS
     if (carregando && podio.length === 0) {
         return (
             <section className='mb-4'>
-                <h2 className='mb-2 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>Pódio de hoje</h2>
+                <h2 className='mb-2 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>Pódio do período</h2>
 
                 <div className='flex items-end justify-center gap-3 rounded-lg bg-white p-4 pt-6 shadow-sm dark:bg-dark-surface'>
                     {ALTURAS_SKELETON.map((altura, index) => (
@@ -112,7 +105,7 @@ export default function PodiumSection({ pedidos, usuarios, carregando }: PodiumS
 
     return (
         <section className='mb-4'>
-            <h2 className='mb-2 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>Pódio de hoje</h2>
+            <h2 className='mb-2 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>Pódio do período</h2>
 
             <div className='flex items-end justify-center gap-3 rounded-lg bg-white p-4 pt-6 shadow-sm dark:bg-dark-surface'>
                 <AnimatePresence>

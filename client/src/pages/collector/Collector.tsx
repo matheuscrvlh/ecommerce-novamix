@@ -9,7 +9,7 @@ import Alert from '../../components/Alert'
 import BarcodeScannerModal from '../../components/BarcodeScannerModal'
 import RankingModal from '../../sections/RankingModal'
 import ThemeToggle from '../../components/ThemeToggle'
-import { LogoutIcon, DashboardIcon, TrophyIcon, CameraIcon } from '../../components/icons'
+import { LogoutIcon, DashboardIcon, TrophyIcon, CameraIcon, QrCodeIcon, UserAvatarIcon } from '../../components/icons'
 
 export default function Collector() {
     const [codigoPedido, setCodigoPedido] = useState('')
@@ -19,7 +19,7 @@ export default function Collector() {
     const [scannerAberto, setScannerAberto] = useState(false)
     const [rankingAberto, setRankingAberto] = useState(false)
     const [ultimoResultadoScanner, setUltimoResultadoScanner] = useState<{ ok: boolean; mensagem: string } | null>(null)
-    const { token, role, logout } = useAuth()
+    const { token, logout } = useAuth()
 
     async function biparPedido(codigo: string, viaScanner = false) {
         setErro('')
@@ -54,15 +54,30 @@ export default function Collector() {
     return (
         <div className='relative flex min-h-screen flex-col items-center justify-center gap-4 bg-linear-to-br from-orange-base/10 via-white to-gray-base/10 p-4 dark:bg-dark-bg dark:from-dark-bg dark:via-dark-bg dark:to-dark-bg'>
             <div className='absolute top-4 right-4 flex items-center gap-4'>
-                {role === 'ADMIN' && (
-                    <Link
-                        to='/dashboard'
-                        className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
-                    >
-                        <DashboardIcon className='h-4 w-4' />
-                        Voltar ao Dashboard
-                    </Link>
-                )}
+                <Link
+                    to='/dashboard'
+                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
+                >
+                    <DashboardIcon className='h-4 w-4' />
+                    Dashboard
+                </Link>
+
+                <Link
+                    to='/pedidos'
+                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
+                >
+                    <QrCodeIcon className='h-4 w-4' />
+                    Pedidos
+                </Link>
+
+                <Link
+                    to='/conta'
+                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
+                >
+                    <UserAvatarIcon className='h-4 w-4' />
+                    Minha Conta
+                </Link>
+
                 <button
                     onClick={() => setRankingAberto(true)}
                     className='flex items-center gap-1 text-sm text-orange-base transition hover:text-orange-light'
