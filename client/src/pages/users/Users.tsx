@@ -40,7 +40,14 @@ export default function Users() {
     }
 
     async function handleCreate(values: UsuarioFormValues) {
-        await createUsuario({ ...values, token: token! })
+        await createUsuario({
+            nome: values.nome,
+            login: values.login,
+            senha: values.senha!,
+            role: values.role,
+            cracha: values.cracha,
+            token: token!
+        })
         setModalAberto(false)
         recarregar()
     }

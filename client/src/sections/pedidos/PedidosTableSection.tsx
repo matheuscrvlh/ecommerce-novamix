@@ -9,7 +9,8 @@ import {
     ChevronsRightIcon,
     CalendarIcon,
     ClockIcon,
-    SearchIcon
+    SearchIcon,
+    EditIcon
 } from '../../components/icons'
 import type { UsuarioResumo } from '../../api/users'
 
@@ -27,9 +28,10 @@ type PedidosTableSectionProps = {
     pedidos: Pedido[]
     usuarios: UsuarioResumo[]
     carregando: boolean
+    onEditarOperador: (pedido: Pedido) => void
 }
 
-export default function PedidosTableSection({ pedidos, usuarios, carregando }: PedidosTableSectionProps) {
+export default function PedidosTableSection({ pedidos, usuarios, carregando, onEditarOperador }: PedidosTableSectionProps) {
     const [pagina, setPagina] = useState(0)
     const [busca, setBusca] = useState('')
 
@@ -110,7 +112,16 @@ export default function PedidosTableSection({ pedidos, usuarios, carregando }: P
                         >
                             <div className='flex items-start justify-between gap-3'>
                                 <p className='truncate font-semibold text-gray-text dark:text-dark-text'>{usuarioLabel(pedido.usuario_id)}</p>
-                                <Badge color='green'>Bipado</Badge>
+                                <div className='flex shrink-0 items-center gap-2'>
+                                    <Badge color='green'>Bipado</Badge>
+                                    <button
+                                        onClick={() => onEditarOperador(pedido)}
+                                        className='rounded-md p-1 text-gray-dark transition hover:bg-gray hover:text-orange-base dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
+                                        title='Alterar operador'
+                                    >
+                                        <EditIcon />
+                                    </button>
+                                </div>
                             </div>
 
                             <p className='mt-2 truncate text-[11px] text-gray-dark dark:text-dark-text-muted'>
@@ -153,6 +164,7 @@ export default function PedidosTableSection({ pedidos, usuarios, carregando }: P
                                     </span>
                                 </th>
                                 <th className='px-4 py-3'>Status</th>
+                                <th className='px-4 py-3' />
                             </tr>
                         </thead>
                         <tbody>
@@ -170,6 +182,9 @@ export default function PedidosTableSection({ pedidos, usuarios, carregando }: P
                                         </td>
                                         <td className='px-4 py-3'>
                                             <Skeleton className='h-5 w-16 rounded-full' />
+                                        </td>
+                                        <td className='px-4 py-3'>
+                                            <Skeleton className='h-6 w-6' />
                                         </td>
                                     </tr>
                                 ))}
@@ -200,12 +215,21 @@ export default function PedidosTableSection({ pedidos, usuarios, carregando }: P
                                         <td className='px-4 py-3 whitespace-nowrap'>
                                             <Badge color='green'>Bipado</Badge>
                                         </td>
+                                        <td className='px-4 py-3 whitespace-nowrap'>
+                                            <button
+                                                onClick={() => onEditarOperador(pedido)}
+                                                className='rounded-md p-2 text-gray-dark transition hover:bg-gray hover:text-orange-base dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
+                                                title='Alterar operador'
+                                            >
+                                                <EditIcon />
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))}
 
                             {!mostrarSkeleton && pedidosFiltrados.length === 0 && (
                                 <tr>
-                                    <td colSpan={4} className='py-6 text-center text-gray-dark dark:text-dark-text-muted'>
+                                    <td colSpan={5} className='py-6 text-center text-gray-dark dark:text-dark-text-muted'>
                                         {termo ? 'Nenhum pedido encontrado para essa busca.' : 'Nenhum pedido bipado ainda.'}
                                     </td>
                                 </tr>

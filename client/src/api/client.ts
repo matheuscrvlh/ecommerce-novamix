@@ -3,7 +3,7 @@ const BASE_URL = import.meta.env.VITE_API_URL
 type ClientParams = {
     url: string,
     token: string | null,
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
     data?: unknown
 }
 
