@@ -24,6 +24,7 @@ export default function Users() {
     const [editando, setEditando] = useState<Usuario | null>(null)
     const [modalAberto, setModalAberto] = useState(false)
     const [excluindo, setExcluindo] = useState<Usuario | null>(null)
+    const [erroExclusao, setErroExclusao] = useState('')
     const [qrUsuario, setQrUsuario] = useState<Usuario | null>(null)
     const [senhaUsuario, setSenhaUsuario] = useState<Usuario | null>(null)
     const [filtroCargo, setFiltroCargo] = useState<FiltroCargo>('TODOS')
@@ -86,11 +87,16 @@ export default function Users() {
         try {
             await deleteUsuario(excluindo.id, token!)
             setExcluindo(null)
+            setErroExclusao('')
             recarregar()
         } catch (error) {
-            setErro(error instanceof Error ? error.message : 'Erro ao excluir usuário.')
-            setExcluindo(null)
+            setErroExclusao(error instanceof Error ? error.message : 'Erro ao excluir usuário.')
         }
+    }
+
+    function fecharModalExclusao() {
+        setExcluindo(null)
+        setErroExclusao('')
     }
 
     return (
@@ -151,14 +157,16 @@ export default function Users() {
 
             <Modal
                 open={excluindo !== null}
-                onClose={() => setExcluindo(null)}
+                onClose={fecharModalExclusao}
                 title='Excluir usuário'
             >
+                {erroExclusao && <div className='mb-4'><Alert>{erroExclusao}</Alert></div>}
+
                 <p className='mb-4 text-sm text-gray-text dark:text-dark-text'>
                     Tem certeza que deseja excluir <strong>{excluindo?.nome}</strong>? Essa ação não pode ser desfeita.
                 </p>
                 <div className='flex justify-end gap-2'>
-                    <Button variant='ghost' onClick={() => setExcluindo(null)}>Cancelar</Button>
+                    <Button variant='ghost' onClick={fecharModalExclusao}>Cancelar</Button>
                     <Button variant='danger' onClick={confirmarExclusao}>Excluir</Button>
                 </div>
             </Modal>
