@@ -8,7 +8,7 @@ type CreateOrderBody = {
 }
 
 type GetOrderBody = {
-    idPedido?: string
+    codigoPedido?: string
     dataInicial: string
     dataFinal: string
 }
@@ -82,23 +82,32 @@ async function getOrders(req: FastifyRequest<{Body: GetOrderBody}>, res: Fastify
 }
 
 async function orderConsultation(req: FastifyRequest<{Body: GetOrderBody}>, res: FastifyReply) {
-    const { idPedido } = req.body
+    const { codigoPedido } = req.body
 
     try {
         const result = await db.query(`
             SELECT * 
             FROM pedidos
-            WHERE id = $1
-        `, [idPedido])
+            WHERE codigo_pedido = $1
+        `, [codigoPedido])
 
         if(result.rows.length === 0) {
-            res.code(401).send({ error: 'Pedido não encontrado.' })
+            res.code(404).send({ error: 'Pedido não encontrado.' })
+            return
         }
 
-        const usuario = await result.rows[0]?.usuario_id
-        const data = await result.rows[0]?.bipado_em 
+        const idUser = result.rows[0]?.usuario_id
+        const data = result.rows[0]?.bipado_em
 
-        res.code(200).send({ success: `Pedido já coletado por ${usuario} em ${data}`})
+        const searchUser = await db.query(`
+            SELECT nome
+            FROM usuarios
+            WHERE id = $1
+        `, [idUser])
+
+        const nome = searchUser.rows[0]?.nome ?? 'Desconhecido'
+
+        res.code(200).send({ success: `Pedido já coletado por ${nome} em ${data}`})
     } catch (error) {
         console.log(error)
         res.code(500).send({ error: 'Erro ao buscar pedidos.'})
@@ -122,6 +131,35 @@ async function getOrdersCountByUser(req:FastifyRequest<{Body: GetOrderBody}>, re
     } catch (error) {
         console.error(error)
         res.code(500).send({ error: 'Erro ao buscar pedidos por usuários.'})
+    }
+}
+
+async function putOrder(req: FastifyRequest, res: FastifyReply) {
+    const { id } = req.body
+    const codigo_pedido = req.params.codigo_pedido
+
+    try {
+        const searchOrder = await db.query(`
+            SELECT codigo_pedido
+            FROM pedidos
+            WHERE codigo_pedido = $1
+        `, [codigo_pedido]);
+
+        if(searchOrder.rows.length === 0) {
+            res.code(401).send({ error: 'Erro ao achar pedido'});
+            return
+        }
+
+        const result = await db.query(`
+            UPDATE pedidos
+            SET usuario_id = $1, bipado_em = NOW()
+            WHERE codigo_pedido = $2
+        `, [id, codigo_pedido])
+
+        res.code(200).send({ success: 'Sucesso ao editar pedido.'})
+    } catch (error) {
+        console.log(error);
+        res.code(401).send({ error: 'Erro ao editar pedido.'})
     }
 }
 
@@ -154,8 +192,9 @@ async function deleteOrder(req: FastifyRequest<{Params: {codigo_pedido: string}}
 
 export async function ordersRoutes(fastify: FastifyInstance) {
     fastify.post('/pedidos', { preHandler: [authenticate] }, postOrder);
-    fastify.post('/pedidos/buscar', { preHandler: [authenticate, checkAdmin] }, getOrders);
-    fastify.post('/pedidos/consulta', { preHandler: [authenticate, checkAdmin] }, orderConsultation);
-    fastify.post('/pedidos/resumo-usuarios', { preHandler: [authenticate, checkAdmin] }, getOrdersCountByUser);
+    fastify.post('/pedidos/buscar', { preHandler: [authenticate] }, getOrders);
+    fastify.post('/pedidos/consulta', { preHandler: [authenticate] }, orderConsultation);
+    fastify.post('/pedidos/resumo-usuarios', { preHandler: [authenticate] }, getOrdersCountByUser);
+    fastify.put('/pedidos/:codigo_pedido', { preHandler: [authenticate, checkAdmin] }, putOrder);
     fastify.delete('/pedidos/:codigo_pedido', { preHandler: [authenticate, checkAdmin] }, deleteOrder)
 }

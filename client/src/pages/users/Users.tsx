@@ -1,13 +1,14 @@
 import { useState } from 'react'
-import { createUsuario, deleteUsuario, updateUsuario, type Usuario } from '../../api/users'
+import { createUsuario, deleteUsuario, updateUsuario, updatePassword, type Usuario } from '../../api/users'
 import { useAuth } from '../../hooks/useAuth'
 import { useUsuarios } from '../../hooks/useUsuarios'
 import SidebarSection from '../../sections/SidebarSection'
 import PageHeaderSection from '../../sections/PageHeaderSection'
 import UserFormSection, { type UsuarioFormValues } from '../../sections/users/UserFormSection'
 import UsersTableSection from '../../sections/users/UsersTableSection'
-import UsersFilterSection, { type FiltroCargo } from '../../sections/users/UsersFilterSection'
+import UsersFilterSection, { type FiltroCargo, type FiltroStatus } from '../../sections/users/UsersFilterSection'
 import UserQrCodeModal from '../../sections/users/UserQrCodeModal'
+import UserPasswordModal from '../../sections/users/UserPasswordModal'
 import Button from '../../components/Button'
 import Alert from '../../components/Alert'
 import Modal from '../../components/Modal'
@@ -24,7 +25,9 @@ export default function Users() {
     const [modalAberto, setModalAberto] = useState(false)
     const [excluindo, setExcluindo] = useState<Usuario | null>(null)
     const [qrUsuario, setQrUsuario] = useState<Usuario | null>(null)
+    const [senhaUsuario, setSenhaUsuario] = useState<Usuario | null>(null)
     const [filtroCargo, setFiltroCargo] = useState<FiltroCargo>('TODOS')
+    const [filtroStatus, setFiltroStatus] = useState<FiltroStatus>('ATIVOS')
 
     function abrirCriacao() {
         setEditando(null)
@@ -43,15 +46,32 @@ export default function Users() {
     }
 
     async function handleUpdate(values: UsuarioFormValues) {
-        await updateUsuario({ ...values, id: editando!.id, token: token! })
+        await updateUsuario({
+            id: editando!.id,
+            nome: values.nome,
+            login: values.login,
+            role: values.role,
+            cracha: values.cracha,
+            status: values.status,
+            token: token!
+        })
         setModalAberto(false)
         setEditando(null)
         recarregar()
     }
 
-    const usuariosFiltrados = usuarios.filter(
-        (usuario) => filtroCargo === 'TODOS' || usuario.role === filtroCargo
-    )
+    async function handleUpdatePassword(novaSenha: string) {
+        await updatePassword({ idUsuario: senhaUsuario!.id, novaSenha, token: token! })
+    }
+
+    const usuariosFiltrados = usuarios.filter((usuario) => {
+        const passaCargo = filtroCargo === 'TODOS' || usuario.role === filtroCargo
+        const passaStatus =
+            filtroStatus === 'TODOS' ||
+            (filtroStatus === 'ATIVOS' ? usuario.status : !usuario.status)
+
+        return passaCargo && passaStatus
+    })
 
     async function confirmarExclusao() {
         if (!excluindo) return
@@ -82,7 +102,12 @@ export default function Users() {
 
                 {erro && <Alert>{erro}</Alert>}
 
-                <UsersFilterSection filtro={filtroCargo} onFiltroChange={setFiltroCargo} />
+                <UsersFilterSection
+                    filtroCargo={filtroCargo}
+                    onFiltroCargoChange={setFiltroCargo}
+                    filtroStatus={filtroStatus}
+                    onFiltroStatusChange={setFiltroStatus}
+                />
 
                 <UsersTableSection
                     usuarios={usuariosFiltrados}
@@ -90,12 +115,19 @@ export default function Users() {
                     onEdit={abrirEdicao}
                     onDelete={setExcluindo}
                     onShowQrCode={setQrUsuario}
+                    onChangePassword={setSenhaUsuario}
                 />
 
                 <Footer />
             </main>
 
             <UserQrCodeModal usuario={qrUsuario} onClose={() => setQrUsuario(null)} />
+
+            <UserPasswordModal
+                usuario={senhaUsuario}
+                onClose={() => setSenhaUsuario(null)}
+                onSubmit={handleUpdatePassword}
+            />
 
             <Modal
                 open={modalAberto}
@@ -105,7 +137,7 @@ export default function Users() {
                 <UserFormSection
                     key={editando?.id ?? 'novo'}
                     mode={editando ? 'edit' : 'create'}
-                    initialValues={editando ? { ...editando, senha: '', cracha: editando.cracha ?? '' } : undefined}
+                    initialValues={editando ? { ...editando, cracha: editando.cracha ?? '' } : undefined}
                     onSubmit={editando ? handleUpdate : handleCreate}
                 />
             </Modal>

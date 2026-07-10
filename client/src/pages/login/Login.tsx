@@ -42,7 +42,7 @@ export default function Login() {
 
             <form
                 onSubmit={handleSubmit}
-                className='bg-white dark:bg-dark-surface w-[90%] max-w-95 mx-auto my-auto flex flex-col gap-3 p-6
+                className='bg-white w-[90%] max-w-95 mx-auto my-auto flex flex-col gap-3 p-6
                            justify-center rounded-xl shadow-2xl relative z-10
                            md:w-105 md:max-w-105 md:absolute md:right-[8%]
                            md:top-1/2 md:-translate-y-1/2 md:mx-0
@@ -55,6 +55,7 @@ export default function Login() {
                     value={login}
                     onChange={(e) => setLogin(e.target.value)}
                     required
+                    alwaysLight
                 />
                 <Input
                     type='password'
@@ -62,6 +63,7 @@ export default function Login() {
                     value={senha}
                     onChange={(e) => setSenha(e.target.value)}
                     required
+                    alwaysLight
                 />
 
                 {erro && <Alert>{erro}</Alert>}
@@ -70,7 +72,7 @@ export default function Login() {
                     {enviando ? 'Entrando...' : 'Entrar'}
                 </Button>
 
-                <Footer stacked />
+                <Footer stacked alwaysLight />
             </form>
         </main>
     )

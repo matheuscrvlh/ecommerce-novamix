@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState, type SubmitEvent } from 'react'
 import { getOrders } from '../../api/orders'
 import { useAuth } from '../../hooks/useAuth'
-import { useUsuarios } from '../../hooks/useUsuarios'
+import { useUsuariosResumo } from '../../hooks/useUsuariosResumo'
 import SidebarSection from '../../sections/SidebarSection'
 import PageHeaderSection from '../../sections/PageHeaderSection'
 import DateFilterSection from '../../sections/dashboard/DateFilterSection'
 import DashboardStatsSection from '../../sections/dashboard/DashboardStatsSection'
 import PodiumSection from '../../sections/dashboard/PodiumSection'
-import ProducaoPorHoraSection from '../../sections/dashboard/ProducaoPorHoraSection'
-import PedidosTableSection from '../../sections/dashboard/PedidosTableSection'
+import ProducaoSection from '../../sections/dashboard/ProducaoSection'
+import UltimosPedidosSection from '../../sections/dashboard/UltimosPedidosSection'
 import RankingModal from '../../sections/RankingModal'
 import Alert from '../../components/Alert'
 import Button from '../../components/Button'
@@ -37,7 +37,7 @@ function hojeISO() {
 
 export default function Dashboard() {
     const { token } = useAuth()
-    const { usuarios } = useUsuarios()
+    const { usuarios } = useUsuariosResumo()
     const [pedidos, setPedidos] = useState<Pedido[]>([])
     const [erro, setErro] = useState('')
     const [carregando, setCarregando] = useState(true)
@@ -161,9 +161,14 @@ export default function Dashboard() {
 
                 <PodiumSection pedidos={pedidos} usuarios={usuarios} carregando={carregando} />
 
-                <ProducaoPorHoraSection pedidos={pedidos} carregando={carregando} />
+                <ProducaoSection
+                    pedidos={pedidos}
+                    carregando={carregando}
+                    dataInicial={filtro.dataInicial}
+                    dataFinal={filtro.dataFinal}
+                />
 
-                <PedidosTableSection pedidos={pedidos} usuarios={usuarios} carregando={carregando} />
+                <UltimosPedidosSection pedidos={pedidos} usuarios={usuarios} carregando={carregando} />
 
                 <Footer />
             </main>

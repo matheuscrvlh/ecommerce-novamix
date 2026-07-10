@@ -8,7 +8,7 @@ export type UsuarioFormValues = {
     id?: number
     nome: string
     login: string
-    senha: string
+    senha?: string
     role: string
     cracha: string
     status: boolean
@@ -55,13 +55,15 @@ export default function UserFormSection({ mode, initialValues, onSubmit }: UserF
                 onChange={(e) => setValues({ ...values, login: e.target.value })}
                 required
             />
-            <Input
-                type='password'
-                placeholder={mode === 'create' ? 'Senha' : 'Nova senha'}
-                value={values.senha}
-                onChange={(e) => setValues({ ...values, senha: e.target.value })}
-                required
-            />
+            {mode === 'create' && (
+                <Input
+                    type='password'
+                    placeholder='Senha'
+                    value={values.senha ?? ''}
+                    onChange={(e) => setValues({ ...values, senha: e.target.value })}
+                    required
+                />
+            )}
             <Select
                 value={values.role}
                 onChange={(e) => setValues({ ...values, role: e.target.value })}

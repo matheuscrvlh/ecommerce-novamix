@@ -4,11 +4,11 @@ import Logo from '../components/Logo'
 import SidebarLink from '../components/SidebarLink'
 import Button from '../components/Button'
 import ThemeToggle from '../components/ThemeToggle'
-import { DashboardIcon, UsersIcon, PackageIcon, BadgeIcon, LogoutIcon, MenuIcon, CloseIcon } from '../components/icons'
+import { DashboardIcon, UsersIcon, PackageIcon, BadgeIcon, LogoutIcon, MenuIcon, CloseIcon, QrCodeIcon, UserAvatarIcon } from '../components/icons'
 import { useAuth } from '../hooks/useAuth'
 
 export default function SidebarSection() {
-    const { logout } = useAuth()
+    const { logout, role } = useAuth()
     const navigate = useNavigate()
     const [open, setOpen] = useState(false)
 
@@ -52,14 +52,26 @@ export default function SidebarSection() {
                     <SidebarLink to='/dashboard' icon={<DashboardIcon className='h-5 w-5' />}>
                         Dashboard
                     </SidebarLink>
-                    <SidebarLink to='/usuarios' icon={<UsersIcon className='h-5 w-5' />}>
-                        Usuários
+                    <SidebarLink to='/pedidos' icon={<QrCodeIcon className='h-5 w-5' />}>
+                        Pedidos
                     </SidebarLink>
                     <SidebarLink to='/collector' icon={<PackageIcon className='h-5 w-5' />}>
                         Bipar
                     </SidebarLink>
-                    <SidebarLink to='/coleta-cracha' icon={<BadgeIcon className='h-5 w-5' />}>
-                        Coleta por Crachá
+
+                    {role === 'ADMIN' && (
+                        <>
+                            <SidebarLink to='/usuarios' icon={<UsersIcon className='h-5 w-5' />}>
+                                Usuários
+                            </SidebarLink>
+                            <SidebarLink to='/coleta-cracha' icon={<BadgeIcon className='h-5 w-5' />}>
+                                Coleta por Crachá
+                            </SidebarLink>
+                        </>
+                    )}
+
+                    <SidebarLink to='/conta' icon={<UserAvatarIcon className='h-5 w-5' />}>
+                        Minha Conta
                     </SidebarLink>
                 </nav>
 

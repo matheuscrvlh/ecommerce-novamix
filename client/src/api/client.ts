@@ -20,6 +20,11 @@ export default async function client({ url, token, method, data }: ClientParams)
     const body = res.status === 204 ? null : await res.json().catch(() => null)
 
     if (!res.ok) {
+        if (res.status === 401 && window.location.pathname !== '/login') {
+            localStorage.removeItem('token')
+            window.location.href = '/login'
+        }
+
         throw new Error(body?.error ?? `Erro ao efetuar o fetch do(a) ${url}.`)
     }
 

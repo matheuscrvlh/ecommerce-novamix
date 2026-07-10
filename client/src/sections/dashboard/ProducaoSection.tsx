@@ -9,41 +9,81 @@ type Pedido = {
     bipado_em: string | null
 }
 
-type ProducaoPorHoraSectionProps = {
+type ProducaoSectionProps = {
     pedidos: Pedido[]
     carregando: boolean
+    dataInicial: string
+    dataFinal: string
 }
 
-const HORAS = Array.from({ length: 24 }, (_, hora) => hora)
+type Bucket = {
+    label: string
+    valor: number
+}
+
 const LARGURA = 720
 const ALTURA = 160
 const PADDING_TOPO = 16
 const PADDING_BASE = 4
 const ALTURA_PLOTAVEL = ALTURA - PADDING_TOPO - PADDING_BASE
-const PASSO_X = LARGURA / (HORAS.length - 1)
 
-export default function ProducaoPorHoraSection({ pedidos, carregando }: ProducaoPorHoraSectionProps) {
-    const [horaAtiva, setHoraAtiva] = useState<number | null>(null)
+function listarDias(dataInicial: string, dataFinal: string) {
+    const dias: string[] = []
+    const cursor = new Date(`${dataInicial}T00:00:00`)
+    const fim = new Date(`${dataFinal}T00:00:00`)
 
-    const contagemPorHora = useMemo(() => {
-        const contagem = new Array(24).fill(0)
+    while (cursor <= fim) {
+        dias.push(cursor.toISOString().slice(0, 10))
+        cursor.setDate(cursor.getDate() + 1)
+    }
+
+    return dias
+}
+
+export default function ProducaoSection({ pedidos, carregando, dataInicial, dataFinal }: ProducaoSectionProps) {
+    const [indiceAtivo, setIndiceAtivo] = useState<number | null>(null)
+
+    const porDia = dataInicial !== dataFinal
+
+    const buckets = useMemo<Bucket[]>(() => {
+        if (!porDia) {
+            const contagem = new Array(24).fill(0)
+
+            pedidos.forEach((pedido) => {
+                if (!pedido.bipado_em) return
+                contagem[new Date(pedido.bipado_em).getHours()] += 1
+            })
+
+            return contagem.map((valor, hora) => ({ label: `${hora}h`, valor }))
+        }
+
+        const dias = listarDias(dataInicial, dataFinal)
+        const contagemPorDia = new Map(dias.map((dia) => [dia, 0]))
 
         pedidos.forEach((pedido) => {
             if (!pedido.bipado_em) return
-            const hora = new Date(pedido.bipado_em).getHours()
-            contagem[hora] += 1
+            const dia = pedido.bipado_em.slice(0, 10)
+            if (contagemPorDia.has(dia)) {
+                contagemPorDia.set(dia, (contagemPorDia.get(dia) ?? 0) + 1)
+            }
         })
 
-        return contagem
-    }, [pedidos])
+        return dias.map((dia) => ({
+            label: new Date(`${dia}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+            valor: contagemPorDia.get(dia) ?? 0
+        }))
+    }, [pedidos, porDia, dataInicial, dataFinal])
 
-    const total = contagemPorHora.reduce((soma, valor) => soma + valor, 0)
-    const maximo = Math.max(...contagemPorHora)
+    const titulo = porDia ? 'Produção por dia' : 'Produção por hora'
+    const total = buckets.reduce((soma, bucket) => soma + bucket.valor, 0)
+    const maximo = Math.max(...buckets.map((bucket) => bucket.valor))
+    const passoX = LARGURA / Math.max(1, buckets.length - 1)
+    const passoLabel = Math.max(1, Math.ceil(buckets.length / 15))
 
     if (carregando && total === 0) {
         return (
             <section className='mb-8 rounded-lg bg-white p-4 shadow-sm sm:p-6 dark:bg-dark-surface'>
-                <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>Produção por hora</h2>
+                <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>{titulo}</h2>
                 <Skeleton className='h-32 w-full sm:h-40' />
             </section>
         )
@@ -52,35 +92,36 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
     if (total === 0) {
         return (
             <section className='mb-8 rounded-lg bg-white p-6 shadow-sm dark:bg-dark-surface'>
-                <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>Produção por hora</h2>
+                <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>{titulo}</h2>
                 <p className='py-8 text-center text-sm text-gray-dark dark:text-dark-text-muted'>Sem pedidos bipados no período selecionado.</p>
             </section>
         )
     }
 
-    function coordenadas(hora: number) {
-        const valor = contagemPorHora[hora]
-        const x = hora * PASSO_X
+    function coordenadas(indice: number) {
+        const valor = buckets[indice].valor
+        const x = indice * passoX
         const y = PADDING_TOPO + (1 - valor / maximo) * ALTURA_PLOTAVEL
         return { x, y, valor }
     }
 
-    const pontos = HORAS.map((hora) => coordenadas(hora))
+    const pontos = buckets.map((_, indice) => coordenadas(indice))
     const linePath = pontos.map((ponto, index) => `${index === 0 ? 'M' : 'L'} ${ponto.x},${ponto.y}`).join(' ')
     const baseY = PADDING_TOPO + ALTURA_PLOTAVEL
     const areaPath = `${linePath} L ${pontos[pontos.length - 1].x},${baseY} L ${pontos[0].x},${baseY} Z`
 
-    const ultimaHoraComDado = [...HORAS].reverse().find((hora) => contagemPorHora[hora] > 0) ?? 0
-    const horaExibida = horaAtiva ?? ultimaHoraComDado
-    const valorExibido = contagemPorHora[horaExibida]
-    const pontoAtivo = coordenadas(horaExibida)
-    const pontoAoVivo = coordenadas(ultimaHoraComDado)
+    const ultimoIndiceComDado = [...buckets.keys()].reverse().find((indice) => buckets[indice].valor > 0) ?? 0
+    const indiceExibido = indiceAtivo ?? ultimoIndiceComDado
+    const valorExibido = buckets[indiceExibido].valor
+    const labelExibido = buckets[indiceExibido].label
+    const pontoAtivo = coordenadas(indiceExibido)
+    const pontoAoVivo = coordenadas(ultimoIndiceComDado)
 
     function handlePointerMove(event: PointerEvent<SVGSVGElement>) {
         const rect = event.currentTarget.getBoundingClientRect()
         const posicaoRelativa = (event.clientX - rect.left) / rect.width
-        const hora = Math.round(posicaoRelativa * (HORAS.length - 1))
-        setHoraAtiva(Math.min(23, Math.max(0, hora)))
+        const indice = Math.round(posicaoRelativa * (buckets.length - 1))
+        setIndiceAtivo(Math.min(buckets.length - 1, Math.max(0, indice)))
     }
 
     return (
@@ -90,7 +131,7 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
             transition={{ duration: 0.4 }}
             className='mb-8 rounded-lg bg-white p-4 shadow-sm sm:p-6 dark:bg-dark-surface'
         >
-            <h2 className='text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>Produção por hora</h2>
+            <h2 className='text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>{titulo}</h2>
 
             <div className='overflow-x-auto overflow-y-visible pt-8'>
                 <div className='sm:min-w-180'>
@@ -106,9 +147,9 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
                                 viewBox={`0 0 ${LARGURA} ${ALTURA}`}
                                 className='w-full touch-none'
                                 onPointerMove={handlePointerMove}
-                                onPointerLeave={() => setHoraAtiva(null)}
+                                onPointerLeave={() => setIndiceAtivo(null)}
                                 role='img'
-                                aria-label='Gráfico de pedidos bipados por hora'
+                                aria-label={`Gráfico de pedidos bipados ${porDia ? 'por dia' : 'por hora'}`}
                             >
                                 <defs>
                                     <linearGradient id='producaoGradiente' x1='0' y1='0' x2='0' y2='1'>
@@ -144,7 +185,7 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
                                     transition={{ duration: 0.6, ease: 'easeInOut' }}
                                 />
 
-                                {horaAtiva !== null && (
+                                {indiceAtivo !== null && (
                                     <motion.line
                                         y1={PADDING_TOPO}
                                         y2={baseY}
@@ -157,8 +198,8 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
                                     />
                                 )}
 
-                                {/* pulso "ao vivo" no último horário com pedido, quando ninguém está passando o mouse */}
-                                {horaAtiva === null && (
+                                {/* pulso "ao vivo" no último ponto com pedido, quando ninguém está passando o mouse */}
+                                {indiceAtivo === null && (
                                     <motion.circle
                                         cx={pontoAoVivo.x}
                                         cy={pontoAoVivo.y}
@@ -178,19 +219,19 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
                                     transition={{ type: 'spring', stiffness: 400, damping: 32 }}
                                 />
 
-                                {HORAS.map((hora) => (
+                                {buckets.map((bucket, indice) => (
                                     <rect
-                                        key={hora}
-                                        x={hora * PASSO_X - PASSO_X / 2}
+                                        key={indice}
+                                        x={indice * passoX - passoX / 2}
                                         y='0'
-                                        width={PASSO_X}
+                                        width={passoX}
                                         height={ALTURA}
                                         fill='transparent'
                                         tabIndex={0}
                                         role='graphics-symbol'
-                                        aria-label={`${hora}h: ${contagemPorHora[hora]} pedido${contagemPorHora[hora] === 1 ? '' : 's'}`}
-                                        onFocus={() => setHoraAtiva(hora)}
-                                        onBlur={() => setHoraAtiva(null)}
+                                        aria-label={`${bucket.label}: ${bucket.valor} pedido${bucket.valor === 1 ? '' : 's'}`}
+                                        onFocus={() => setIndiceAtivo(indice)}
+                                        onBlur={() => setIndiceAtivo(null)}
                                         className='outline-none'
                                     />
                                 ))}
@@ -200,26 +241,26 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
                                 <span className='text-[10px] font-semibold text-gray-text sm:text-sm dark:text-dark-text'>
                                     <AnimatedNumber value={valorExibido} /> pedido{valorExibido === 1 ? '' : 's'}
                                 </span>
-                                <span className='ml-1 text-[9px] text-gray-dark sm:text-xs dark:text-dark-text-muted'>{horaExibida}h</span>
+                                <span className='ml-1 text-[9px] text-gray-dark sm:text-xs dark:text-dark-text-muted'>{labelExibido}</span>
                             </div>
 
-                            {horaAtiva !== null && (
+                            {indiceAtivo !== null && (
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
                                     transition={{ duration: 0.15 }}
                                     className={`pointer-events-none absolute z-30 -translate-y-full rounded-md bg-gray-text px-1.5 py-0.5 text-[9px] whitespace-nowrap text-white shadow-lg sm:px-2 sm:py-1 sm:text-xs ${
-                                        horaAtiva <= 1
+                                        indiceAtivo <= 1
                                             ? 'left-0'
-                                            : horaAtiva >= 22
+                                            : indiceAtivo >= buckets.length - 2
                                               ? 'right-0'
                                               : 'left-1/2 -translate-x-1/2'
                                     }`}
                                     style={{
                                         top: `${(pontoAtivo.y / ALTURA) * 100}%`,
                                         marginTop: '-8px',
-                                        ...(horaAtiva > 1 && horaAtiva < 22
+                                        ...(indiceAtivo > 1 && indiceAtivo < buckets.length - 2
                                             ? { left: `${(pontoAtivo.x / LARGURA) * 100}%` }
                                             : {})
                                     }}
@@ -227,16 +268,19 @@ export default function ProducaoPorHoraSection({ pedidos, carregando }: Producao
                                     <span className='font-semibold'>
                                         {valorExibido} pedido{valorExibido === 1 ? '' : 's'}
                                     </span>
-                                    <span className='ml-1 text-white/70'>· {horaAtiva}h</span>
+                                    <span className='ml-1 text-white/70'>· {labelExibido}</span>
                                 </motion.div>
                             )}
                         </div>
                     </div>
 
                     <div className='ml-8 flex justify-between pt-1 text-[10px] text-gray-dark dark:text-dark-text-muted'>
-                        {HORAS.filter((hora) => hora % 2 === 0).map((hora) => (
-                            <span key={hora} className={hora % 4 === 0 ? '' : 'hidden sm:inline'}>
-                                {hora}h
+                        {buckets.map((bucket, indice) => (
+                            <span
+                                key={indice}
+                                className={indice % passoLabel === 0 ? (porDia ? '' : indice % 4 === 0 ? '' : 'hidden sm:inline') : 'hidden'}
+                            >
+                                {bucket.label}
                             </span>
                         ))}
                     </div>

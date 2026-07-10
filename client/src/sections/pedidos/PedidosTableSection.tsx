@@ -11,7 +11,7 @@ import {
     ClockIcon,
     SearchIcon
 } from '../../components/icons'
-import type { Usuario } from '../../api/users'
+import type { UsuarioResumo } from '../../api/users'
 
 const ITENS_POR_PAGINA = 30
 const TAMANHO_MAXIMO_CODIGO = 16
@@ -25,7 +25,7 @@ type Pedido = {
 
 type PedidosTableSectionProps = {
     pedidos: Pedido[]
-    usuarios: Usuario[]
+    usuarios: UsuarioResumo[]
     carregando: boolean
 }
 

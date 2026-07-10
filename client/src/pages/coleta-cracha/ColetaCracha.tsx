@@ -1,7 +1,7 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
 import { Link } from 'react-router-dom'
 import type { Usuario } from '../../api/users'
-import { postOrderAs } from '../../api/orders'
+import { postOrderAs, getOrders } from '../../api/orders'
 import { useAuth } from '../../hooks/useAuth'
 import { useUsuarios } from '../../hooks/useUsuarios'
 import Button from '../../components/Button'
@@ -9,10 +9,26 @@ import Input from '../../components/Input'
 import Logo from '../../components/Logo'
 import Alert from '../../components/Alert'
 import BarcodeScannerModal from '../../components/BarcodeScannerModal'
+import PodiumSection from '../../sections/dashboard/PodiumSection'
 import ThemeToggle from '../../components/ThemeToggle'
 import { DashboardIcon, LogoutIcon, CameraIcon } from '../../components/icons'
 
 const SEGUNDOS_SESSAO = 15
+const INTERVALO_PODIO_MS = 15000
+
+type PedidoPodio = {
+    id: number
+    usuario_id: number | null
+    bipado_em: string | null
+}
+
+function hojeISO() {
+    const hoje = new Date()
+    const ano = hoje.getFullYear()
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0')
+    const dia = String(hoje.getDate()).padStart(2, '0')
+    return `${ano}-${mes}-${dia}`
+}
 
 type ItemFeed = {
     codigo: string
@@ -33,6 +49,8 @@ export default function ColetaCracha() {
     const [feed, setFeed] = useState<ItemFeed[]>([])
     const [scannerCrachaAberto, setScannerCrachaAberto] = useState(false)
     const [scannerPedidoAberto, setScannerPedidoAberto] = useState(false)
+    const [pedidos, setPedidos] = useState<PedidoPodio[]>([])
+    const [carregandoPedidos, setCarregandoPedidos] = useState(true)
     const [ultimoResultadoScannerPedido, setUltimoResultadoScannerPedido] = useState<{ ok: boolean; mensagem: string } | null>(null)
 
     useEffect(() => {
@@ -51,6 +69,29 @@ export default function ColetaCracha() {
 
         return () => clearInterval(interval)
     }, [sessao])
+
+    function buscarPedidosPodio() {
+        const hoje = hojeISO()
+
+        getOrders({
+            dataInicial: `${hoje}T00:00:00`,
+            dataFinal: `${hoje}T23:59:59.999`,
+            token: token!
+        })
+            .then((resultado) => {
+                setPedidos(resultado)
+                setCarregandoPedidos(false)
+            })
+            .catch(() => {
+                setCarregandoPedidos(false)
+            })
+    }
+
+    useEffect(() => {
+        buscarPedidosPodio()
+        const intervalo = setInterval(buscarPedidosPodio, INTERVALO_PODIO_MS)
+        return () => clearInterval(intervalo)
+    }, [token])
 
     function verificarCracha(cracha: string) {
         setErroCracha('')
@@ -94,6 +135,7 @@ export default function ColetaCracha() {
             const msg = result.success ?? 'Bipado com sucesso.'
             setFeed((atual) => [{ codigo, ok: true, mensagem: msg }, ...atual])
             if (viaScanner) setUltimoResultadoScannerPedido({ ok: true, mensagem: `${codigo} — ${msg}` })
+            buscarPedidosPodio()
         } catch (error) {
             const msg = error instanceof Error ? error.message : 'Erro ao bipar.'
             setFeed((atual) => [{ codigo, ok: false, mensagem: msg }, ...atual])
@@ -121,8 +163,6 @@ export default function ColetaCracha() {
                     Voltar ao Dashboard
                 </Link>
 
-                <div className='h-4 w-px bg-gray-base/30' />
-
                 <ThemeToggle />
 
                 <div className='h-4 w-px bg-gray-base/30' />
@@ -138,6 +178,10 @@ export default function ColetaCracha() {
 
             <div className='flex justify-center'>
                 <Logo />
+            </div>
+
+            <div className='w-full max-w-sm'>
+                <PodiumSection pedidos={pedidos} usuarios={usuarios} carregando={carregandoPedidos} />
             </div>
 
             {!sessao && (
