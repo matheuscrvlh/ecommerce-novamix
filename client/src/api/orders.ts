@@ -50,6 +50,20 @@ export async function getRanking({ dataInicial, dataFinal, token }: GetRankingPa
     })
 }
 
+type ConsultOrderParams = {
+    codigoPedido: string
+    token: string
+}
+
+export async function consultOrder({ codigoPedido, token }: ConsultOrderParams) {
+    return client({
+        url: '/pedidos/consulta',
+        token,
+        method: 'POST',
+        data: { codigoPedido }
+    })
+}
+
 type PostOrderAsParams = {
     codigo_pedido: string
     cracha: string

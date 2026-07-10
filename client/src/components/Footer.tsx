@@ -1,14 +1,18 @@
 type FooterProps = {
     stacked?: boolean
+    alwaysLight?: boolean
 }
 
-export default function Footer({ stacked = false }: FooterProps) {
+export default function Footer({ stacked = false, alwaysLight = false }: FooterProps) {
+    const linkClassName = `font-medium text-gray-text transition hover:text-orange-base ${alwaysLight ? '' : 'dark:text-dark-text dark:hover:text-orange-light'}`
+    const footerClassName = `text-center text-xs text-gray-dark ${alwaysLight ? '' : 'dark:text-dark-text-muted'}`
+
     const mthcode = (
         <a
             href='https://www.mthcode.com.br/'
             target='_blank'
             rel='noopener noreferrer'
-            className='font-medium text-gray-text transition hover:text-orange-base dark:text-dark-text dark:hover:text-orange-light'
+            className={linkClassName}
         >
             MTHCODE
         </a>
@@ -19,7 +23,7 @@ export default function Footer({ stacked = false }: FooterProps) {
             href='https://www.marlonalves.dev/'
             target='_blank'
             rel='noopener noreferrer'
-            className='font-medium text-gray-text transition hover:text-orange-base dark:text-dark-text dark:hover:text-orange-light'
+            className={linkClassName}
         >
             MarlonAlves
         </a>
@@ -27,7 +31,7 @@ export default function Footer({ stacked = false }: FooterProps) {
 
     if (stacked) {
         return (
-            <footer className='space-y-1 pt-4 text-center text-xs text-gray-dark dark:text-dark-text-muted'>
+            <footer className={`space-y-1 pt-4 ${footerClassName}`}>
                 <p>Desenvolvido por:</p>
                 <p>{mthcode} e {marlonAlves}</p>
             </footer>
@@ -35,7 +39,7 @@ export default function Footer({ stacked = false }: FooterProps) {
     }
 
     return (
-        <footer className='pt-4 text-center text-xs text-gray-dark dark:text-dark-text-muted'>
+        <footer className={`pt-4 ${footerClassName}`}>
             Desenvolvido por {mthcode} e {marlonAlves}
         </footer>
     )

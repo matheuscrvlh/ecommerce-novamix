@@ -12,10 +12,16 @@ async function login(req: FastifyRequest<{Body: LoginBody}>, res:FastifyReply) {
     const { login, senha } = req.body
 
     try {
+
+        const identificador = login.trim()
+        const ehNumerico = /^\d+$/.test(identificador)
+
         const searchPasswordUser = await db.query(
-            'SELECT id, senha, role FROM usuarios WHERE login = $1',
-            [login]
-        )
+            ehNumerico
+                ? 'SELECT id, senha, role FROM usuarios WHERE id = $1'
+                : 'SELECT id, senha, role FROM usuarios WHERE login = $1',
+            [ehNumerico ? Number(identificador) : identificador]
+        );
 
         if(searchPasswordUser.rows.length === 0) {
             return res.code(401).send({ error: 'Usuario não encontrado'})
