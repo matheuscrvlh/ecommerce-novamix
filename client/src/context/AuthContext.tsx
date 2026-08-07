@@ -1,36 +1,27 @@
-import { useState} from 'react'
-import { jwtDecode } from 'jwt-decode'
+import { useEffect, useState } from 'react'
 import { AuthContext } from './auth-context'
+import { getMeuUsuario, type Usuario } from '../api/users'
 
-function decodeRole(token: string) {
-    try {
-        return jwtDecode<{ role: string }>(token).role
-    } catch {
-        return null
-    }
-}
+const HUB_URL = 'https://hub.lojanovamix.com.br'
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
 
-    const storedToken = localStorage.getItem('token')
+    const [usuario, setUsuario] = useState<Usuario | null>(null)
+    const [loading, setLoading] = useState(true)
 
-    const [ token, setToken ] = useState<string | null>(storedToken);
-    const [ role, setRole ] = useState<string | null>(storedToken ? decodeRole(storedToken) : null);
-
-    function login(token: string) {
-        localStorage.setItem('token', token)
-        setToken(token);
-        setRole(decodeRole(token));
-    };
+    useEffect(() => {
+        getMeuUsuario()
+            .then(setUsuario)
+            .catch(() => setUsuario(null))
+            .finally(() => setLoading(false))
+    }, [])
 
     function logout() {
-        localStorage.removeItem('token')
-        setToken(null);
-        setRole(null);
-    };
+        window.location.href = HUB_URL
+    }
 
     return (
-        <AuthContext.Provider value={{ token, role, login, logout}}>
+        <AuthContext.Provider value={{ usuario, role: usuario?.role ?? null, loading, logout }}>
             {children}
         </AuthContext.Provider>
     )

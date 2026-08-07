@@ -7,11 +7,10 @@ import Alert from '../../components/Alert'
 export type UsuarioFormValues = {
     id?: number
     nome: string
-    login: string
-    senha?: string
     role: string
     cracha: string
     status: boolean
+    hub_user_id: number | null
 }
 
 type UserFormSectionProps = {
@@ -20,7 +19,7 @@ type UserFormSectionProps = {
     onSubmit: (values: UsuarioFormValues) => Promise<void>
 }
 
-const emptyForm: UsuarioFormValues = { nome: '', login: '', senha: '', role: 'OPERADOR', cracha: '', status: true }
+const emptyForm: UsuarioFormValues = { nome: '', role: 'OPERADOR', cracha: '', status: true, hub_user_id: null }
 
 export default function UserFormSection({ mode, initialValues, onSubmit }: UserFormSectionProps) {
     const [values, setValues] = useState<UsuarioFormValues>(initialValues ?? emptyForm)
@@ -50,20 +49,11 @@ export default function UserFormSection({ mode, initialValues, onSubmit }: UserF
                 required
             />
             <Input
-                placeholder='Login'
-                value={values.login}
-                onChange={(e) => setValues({ ...values, login: e.target.value })}
-                required
+                type='number'
+                placeholder='ID do usuário no Hub (opcional)'
+                value={values.hub_user_id ?? ''}
+                onChange={(e) => setValues({ ...values, hub_user_id: e.target.value ? Number(e.target.value) : null })}
             />
-            {mode === 'create' && (
-                <Input
-                    type='password'
-                    placeholder='Senha'
-                    value={values.senha ?? ''}
-                    onChange={(e) => setValues({ ...values, senha: e.target.value })}
-                    required
-                />
-            )}
             <Select
                 value={values.role}
                 onChange={(e) => setValues({ ...values, role: e.target.value })}

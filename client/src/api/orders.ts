@@ -2,13 +2,11 @@ import client from './client.ts'
 
 type PostOrderParams = {
     codigo_pedido: string
-    token: string
 }
 
-export async function postOrder({ codigo_pedido, token }: PostOrderParams) {
+export async function postOrder({ codigo_pedido }: PostOrderParams) {
     return client({
         url: '/pedidos',
-        token,
         method: 'POST',
         data: { codigo_pedido }
     })
@@ -17,13 +15,11 @@ export async function postOrder({ codigo_pedido, token }: PostOrderParams) {
 type GetOrdersParams = {
     dataInicial: string
     dataFinal: string
-    token: string
 }
 
-export async function getOrders({ dataInicial, dataFinal, token }: GetOrdersParams) {
+export async function getOrders({ dataInicial, dataFinal }: GetOrdersParams) {
     return client({
         url: '/pedidos/buscar',
-        token,
         method: 'POST',
         data: { dataInicial, dataFinal }
     })
@@ -32,7 +28,6 @@ export async function getOrders({ dataInicial, dataFinal, token }: GetOrdersPara
 type GetRankingParams = {
     dataInicial: string
     dataFinal: string
-    token: string
 }
 
 export type RankingUsuario = {
@@ -41,10 +36,9 @@ export type RankingUsuario = {
     count: string
 }
 
-export async function getRanking({ dataInicial, dataFinal, token }: GetRankingParams): Promise<RankingUsuario[]> {
+export async function getRanking({ dataInicial, dataFinal }: GetRankingParams): Promise<RankingUsuario[]> {
     return client({
         url: '/pedidos/resumo-usuarios',
-        token,
         method: 'POST',
         data: { dataInicial, dataFinal }
     })
@@ -52,13 +46,11 @@ export async function getRanking({ dataInicial, dataFinal, token }: GetRankingPa
 
 type ConsultOrderParams = {
     codigoPedido: string
-    token: string
 }
 
-export async function consultOrder({ codigoPedido, token }: ConsultOrderParams) {
+export async function consultOrder({ codigoPedido }: ConsultOrderParams) {
     return client({
         url: '/pedidos/consulta',
-        token,
         method: 'POST',
         data: { codigoPedido }
     })
@@ -67,13 +59,11 @@ export async function consultOrder({ codigoPedido, token }: ConsultOrderParams) 
 type EditOrderParams = {
     codigoPedido: string
     usuarioId: number
-    token: string
 }
 
-export async function editOrder({ codigoPedido, usuarioId, token }: EditOrderParams) {
+export async function editOrder({ codigoPedido, usuarioId }: EditOrderParams) {
     return client({
         url: `/pedidos/${codigoPedido}`,
-        token,
         method: 'PUT',
         data: { id: usuarioId }
     })
@@ -82,13 +72,11 @@ export async function editOrder({ codigoPedido, usuarioId, token }: EditOrderPar
 type PostOrderAsParams = {
     codigo_pedido: string
     cracha: string
-    token: string
 }
 
-export async function postOrderAs({ codigo_pedido, cracha, token }: PostOrderAsParams) {
+export async function postOrderAs({ codigo_pedido, cracha }: PostOrderAsParams) {
     return client({
         url: '/pedidos',
-        token,
         method: 'POST',
         data: { codigo_pedido, cracha }
     })

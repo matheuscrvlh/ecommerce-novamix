@@ -1,9 +1,9 @@
 import 'dotenv/config'
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
-import { db } from './database/database.ts' 
+import cookie from '@fastify/cookie'
+import { db } from './database/database.ts'
 import { usersRoutes } from './routes/users.routes.ts'
-import { authRoutes } from './routes/auth.routes.ts'
 import { ordersRoutes } from './routes/orders.routes.ts'
 import { eventsRoutes } from './routes/events.routes.ts'
 
@@ -22,11 +22,12 @@ if(!process.env.SERVER_PORT) {
 
 app.register(cors, {
     origin: [process.env.CLIENT_URL],
-    methods: ['GET','POST','PUT','DELETE']
+    methods: ['GET','POST','PUT','DELETE'],
+    credentials: true
 })
+app.register(cookie)
 
 app.register(usersRoutes)
-app.register(authRoutes)
 app.register(ordersRoutes)
 app.register(eventsRoutes)
 

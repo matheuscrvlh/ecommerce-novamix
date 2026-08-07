@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { createUsuario, deleteUsuario, updateUsuario, updatePassword, type Usuario } from '../../api/users'
-import { useAuth } from '../../hooks/useAuth'
+import { createUsuario, deleteUsuario, updateUsuario, type Usuario } from '../../api/users'
 import { useUsuarios } from '../../hooks/useUsuarios'
 import SidebarSection from '../../sections/SidebarSection'
 import PageHeaderSection from '../../sections/PageHeaderSection'
@@ -8,7 +7,6 @@ import UserFormSection, { type UsuarioFormValues } from '../../sections/users/Us
 import UsersTableSection from '../../sections/users/UsersTableSection'
 import UsersFilterSection, { type FiltroCargo, type FiltroStatus } from '../../sections/users/UsersFilterSection'
 import UserQrCodeModal from '../../sections/users/UserQrCodeModal'
-import UserPasswordModal from '../../sections/users/UserPasswordModal'
 import Button from '../../components/Button'
 import Alert from '../../components/Alert'
 import Modal from '../../components/Modal'
@@ -17,7 +15,6 @@ import ThemeToggle from '../../components/ThemeToggle'
 import { PlusIcon } from '../../components/icons'
 
 export default function Users() {
-    const { token } = useAuth()
     const { usuarios, carregando, recarregar } = useUsuarios()
     const [erro, setErro] = useState('')
 
@@ -26,7 +23,6 @@ export default function Users() {
     const [excluindo, setExcluindo] = useState<Usuario | null>(null)
     const [erroExclusao, setErroExclusao] = useState('')
     const [qrUsuario, setQrUsuario] = useState<Usuario | null>(null)
-    const [senhaUsuario, setSenhaUsuario] = useState<Usuario | null>(null)
     const [filtroCargo, setFiltroCargo] = useState<FiltroCargo>('TODOS')
     const [filtroStatus, setFiltroStatus] = useState<FiltroStatus>('ATIVOS')
 
@@ -43,11 +39,9 @@ export default function Users() {
     async function handleCreate(values: UsuarioFormValues) {
         await createUsuario({
             nome: values.nome,
-            login: values.login,
-            senha: values.senha!,
             role: values.role,
             cracha: values.cracha,
-            token: token!
+            hub_user_id: values.hub_user_id
         })
         setModalAberto(false)
         recarregar()
@@ -57,19 +51,14 @@ export default function Users() {
         await updateUsuario({
             id: editando!.id,
             nome: values.nome,
-            login: values.login,
             role: values.role,
             cracha: values.cracha,
             status: values.status,
-            token: token!
+            hub_user_id: values.hub_user_id
         })
         setModalAberto(false)
         setEditando(null)
         recarregar()
-    }
-
-    async function handleUpdatePassword(novaSenha: string) {
-        await updatePassword({ idUsuario: senhaUsuario!.id, novaSenha, token: token! })
     }
 
     const usuariosFiltrados = usuarios.filter((usuario) => {
@@ -85,7 +74,7 @@ export default function Users() {
         if (!excluindo) return
 
         try {
-            await deleteUsuario(excluindo.id, token!)
+            await deleteUsuario(excluindo.id)
             setExcluindo(null)
             setErroExclusao('')
             recarregar()
@@ -128,19 +117,12 @@ export default function Users() {
                     onEdit={abrirEdicao}
                     onDelete={setExcluindo}
                     onShowQrCode={setQrUsuario}
-                    onChangePassword={setSenhaUsuario}
                 />
 
                 <Footer />
             </main>
 
             <UserQrCodeModal usuario={qrUsuario} onClose={() => setQrUsuario(null)} />
-
-            <UserPasswordModal
-                usuario={senhaUsuario}
-                onClose={() => setSenhaUsuario(null)}
-                onSubmit={handleUpdatePassword}
-            />
 
             <Modal
                 open={modalAberto}

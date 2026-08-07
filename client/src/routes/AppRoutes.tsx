@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 
-import Login from '../pages/login/Login'
 import Dashboard from '../pages/dashboard/Dashboard'
 import Pedidos from '../pages/pedidos/Pedidos'
 import Users from '../pages/users/Users'
@@ -11,11 +10,10 @@ import ProtectedRoute from './ProtectedRoute'
 import { useAuth } from '../hooks/useAuth'
 
 function RootRedirect() {
-  const { token, role } = useAuth()
+  const { usuario, role, loading } = useAuth()
 
-  if (!token) {
-    return <Navigate to='/login' replace />
-  }
+  if (loading) return null
+  if (!usuario) return null
 
   return <Navigate to={role === 'ADMIN' ? '/dashboard' : '/collector'} replace />
 }
@@ -24,8 +22,6 @@ export default function AppRoutes() {
 
   return (
     <Routes>
-      <Route path='/login' element={ <Login /> }/>
-
       <Route element={ <ProtectedRoute allowedRoles={['ADMIN']} /> }>
         <Route path='/usuarios' element={ <Users /> }/>
         <Route path='/coleta-cracha' element={ <ColetaCracha /> }/>

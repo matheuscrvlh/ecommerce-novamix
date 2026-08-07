@@ -19,7 +19,7 @@ export default function Collector() {
     const [scannerAberto, setScannerAberto] = useState(false)
     const [rankingAberto, setRankingAberto] = useState(false)
     const [ultimoResultadoScanner, setUltimoResultadoScanner] = useState<{ ok: boolean; mensagem: string } | null>(null)
-    const { token, logout } = useAuth()
+    const { logout } = useAuth()
 
     async function biparPedido(codigo: string, viaScanner = false) {
         setErro('')
@@ -27,7 +27,7 @@ export default function Collector() {
         setEnviando(true)
 
         try {
-            const result = await postOrder({ codigo_pedido: codigo, token: token! })
+            const result = await postOrder({ codigo_pedido: codigo })
             const msg = result.success ?? 'Pedido bipado com sucesso.'
             setMensagem(msg)
             setCodigoPedido('')

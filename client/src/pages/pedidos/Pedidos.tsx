@@ -36,7 +36,7 @@ function hojeISO() {
 }
 
 export default function Pedidos() {
-    const { token } = useAuth()
+    const { loading: carregandoAuth } = useAuth()
     const { usuarios } = useUsuariosResumo()
 
     const [codigoPedido, setCodigoPedido] = useState('')
@@ -55,13 +55,14 @@ export default function Pedidos() {
     const [editandoPedido, setEditandoPedido] = useState<string | null>(null)
 
     function buscarPedidos(cancelado?: () => boolean) {
+        if (carregandoAuth) return Promise.resolve()
+
         setCarregando(true)
         setErroTabela('')
 
         return getOrders({
             dataInicial: `${filtro.dataInicial}T00:00:00`,
-            dataFinal: `${filtro.dataFinal}T23:59:59.999`,
-            token: token!
+            dataFinal: `${filtro.dataFinal}T23:59:59.999`
         })
             .then((resultado) => {
                 if (cancelado?.()) return
@@ -82,7 +83,7 @@ export default function Pedidos() {
         return () => {
             cancelado = true
         }
-    }, [token, filtro])
+    }, [carregandoAuth, filtro])
 
     function handleFiltrar(event: SubmitEvent) {
         event.preventDefault()
@@ -91,7 +92,7 @@ export default function Pedidos() {
 
     async function handleSalvarOperador(usuarioId: number) {
         const codigo = editandoPedido!
-        await editOrder({ codigoPedido: codigo, usuarioId, token: token! })
+        await editOrder({ codigoPedido: codigo, usuarioId })
         await buscarPedidos()
         if (resultado) {
             await consultarPedido(codigo)
@@ -104,7 +105,7 @@ export default function Pedidos() {
         setConsultando(true)
 
         try {
-            const result = await consultOrder({ codigoPedido: codigo, token: token! })
+            const result = await consultOrder({ codigoPedido: codigo })
             setResultado({ bipado: true, mensagem: result.success })
         } catch (error) {
             const msg = error instanceof Error ? error.message : 'Erro ao consultar pedido.'

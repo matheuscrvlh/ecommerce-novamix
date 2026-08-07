@@ -1,10 +1,9 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { getMeuUsuario, updateMe, updateMyPassword, type Usuario } from '../../api/users'
+import { getMeuUsuario, updateMe, type Usuario } from '../../api/users'
 import { getRanking } from '../../api/orders'
 import SidebarSection from '../../sections/SidebarSection'
 import PageHeaderSection from '../../sections/PageHeaderSection'
-import UserPasswordModal from '../../sections/users/UserPasswordModal'
 import UserQrCodeModal from '../../sections/users/UserQrCodeModal'
 import Button from '../../components/Button'
 import Input from '../../components/Input'
@@ -13,7 +12,7 @@ import Footer from '../../components/Footer'
 import Badge from '../../components/Badge'
 import Skeleton from '../../components/Skeleton'
 import ThemeToggle from '../../components/ThemeToggle'
-import { UserAvatarIcon, QrCodeIcon, LockIcon } from '../../components/icons'
+import { UserAvatarIcon, QrCodeIcon } from '../../components/icons'
 
 function hojeISO() {
     const hoje = new Date()
@@ -24,7 +23,7 @@ function hojeISO() {
 }
 
 export default function Conta() {
-    const { token } = useAuth()
+    const { loading: carregandoAuth } = useAuth()
 
     const [perfil, setPerfil] = useState<Usuario | null>(null)
     const [carregandoPerfil, setCarregandoPerfil] = useState(true)
@@ -34,25 +33,22 @@ export default function Conta() {
     const [totalHoje, setTotalHoje] = useState<number | null>(null)
 
     const [nome, setNome] = useState('')
-    const [login, setLogin] = useState('')
     const [erroSalvar, setErroSalvar] = useState('')
     const [sucessoSalvar, setSucessoSalvar] = useState('')
     const [salvando, setSalvando] = useState(false)
 
-    const [senhaModalAberto, setSenhaModalAberto] = useState(false)
     const [qrAberto, setQrAberto] = useState(false)
 
     useEffect(() => {
-        if (!token) return
+        if (carregandoAuth) return
 
         let cancelado = false
 
-        getMeuUsuario(token)
+        getMeuUsuario()
             .then((result) => {
                 if (cancelado) return
                 setPerfil(result)
                 setNome(result.nome)
-                setLogin(result.login)
                 setCarregandoPerfil(false)
             })
             .catch((error) => {
@@ -64,10 +60,10 @@ export default function Conta() {
         return () => {
             cancelado = true
         }
-    }, [token])
+    }, [carregandoAuth])
 
     useEffect(() => {
-        if (!token || !perfil) return
+        if (carregandoAuth || !perfil) return
 
         let cancelado = false
         const hoje = hojeISO()
@@ -75,13 +71,11 @@ export default function Conta() {
         Promise.all([
             getRanking({
                 dataInicial: '2000-01-01T00:00:00',
-                dataFinal: `${hoje}T23:59:59.999`,
-                token
+                dataFinal: `${hoje}T23:59:59.999`
             }),
             getRanking({
                 dataInicial: `${hoje}T00:00:00`,
-                dataFinal: `${hoje}T23:59:59.999`,
-                token
+                dataFinal: `${hoje}T23:59:59.999`
             })
         ])
             .then(([resultadoTotal, resultadoHoje]) => {
@@ -100,7 +94,7 @@ export default function Conta() {
         return () => {
             cancelado = true
         }
-    }, [token, perfil])
+    }, [carregandoAuth, perfil])
 
     async function handleSalvar(event: SubmitEvent) {
         event.preventDefault()
@@ -109,18 +103,14 @@ export default function Conta() {
         setSalvando(true)
 
         try {
-            await updateMe({ nome, login, token: token! })
+            await updateMe({ nome })
             setSucessoSalvar('Dados atualizados com sucesso.')
-            setPerfil((atual) => (atual ? { ...atual, nome, login } : atual))
+            setPerfil((atual) => (atual ? { ...atual, nome } : atual))
         } catch (error) {
             setErroSalvar(error instanceof Error ? error.message : 'Erro ao salvar dados.')
         } finally {
             setSalvando(false)
         }
-    }
-
-    async function handleTrocarSenha(novaSenha: string) {
-        await updateMyPassword({ novaSenha, token: token! })
     }
 
     return (
@@ -158,15 +148,9 @@ export default function Conta() {
                         </div>
 
                         <div className='mt-6 flex flex-col gap-2'>
-                            <Button
-                                variant='ghost'
-                                className='flex items-center justify-center gap-2'
-                                onClick={() => setSenhaModalAberto(true)}
-                                disabled={carregandoPerfil}
-                            >
-                                <LockIcon />
-                                Alterar senha
-                            </Button>
+                            <p className='text-center text-xs text-gray-dark dark:text-dark-text-muted'>
+                                Login e senha agora são gerenciados pelo Hub Novamix.
+                            </p>
                             <Button
                                 variant='ghost'
                                 className='flex items-center justify-center gap-2'
@@ -214,12 +198,10 @@ export default function Conta() {
                             {carregandoPerfil ? (
                                 <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                                     <Skeleton className='h-9 w-full' />
-                                    <Skeleton className='h-9 w-full' />
                                 </div>
                             ) : (
                                 <form onSubmit={handleSalvar} className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                                     <Input placeholder='Nome' value={nome} onChange={(e) => setNome(e.target.value)} required />
-                                    <Input placeholder='Login' value={login} onChange={(e) => setLogin(e.target.value)} required />
 
                                     {erroSalvar && (
                                         <div className='sm:col-span-2'>
@@ -245,12 +227,6 @@ export default function Conta() {
 
                 <Footer />
             </main>
-
-            <UserPasswordModal
-                usuario={senhaModalAberto ? perfil : null}
-                onClose={() => setSenhaModalAberto(false)}
-                onSubmit={handleTrocarSenha}
-            />
 
             <UserQrCodeModal usuario={qrAberto ? perfil : null} onClose={() => setQrAberto(false)} />
         </div>

@@ -1,6 +1,5 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
 import { getRanking, type RankingUsuario } from '../api/orders'
-import { useAuth } from '../hooks/useAuth'
 import Modal from '../components/Modal'
 import Alert from '../components/Alert'
 import Input from '../components/Input'
@@ -30,7 +29,6 @@ type RankingModalProps = {
 }
 
 export default function RankingModal({ open, onClose }: RankingModalProps) {
-    const { token } = useAuth()
     const [ranking, setRanking] = useState<RankingUsuario[]>([])
     const [erro, setErro] = useState('')
     const [carregando, setCarregando] = useState(true)
@@ -43,8 +41,7 @@ export default function RankingModal({ open, onClose }: RankingModalProps) {
     useEffect(() => {
         getRanking({
             dataInicial: `${filtro.dataInicial}T00:00:00`,
-            dataFinal: `${filtro.dataFinal}T23:59:59.999`,
-            token: token!
+            dataFinal: `${filtro.dataFinal}T23:59:59.999`
         })
             .then((result) => {
                 const ordenado = [...result].sort((a, b) => Number(b.count) - Number(a.count))
@@ -55,7 +52,7 @@ export default function RankingModal({ open, onClose }: RankingModalProps) {
                 setErro(error instanceof Error ? error.message : 'Erro ao buscar ranking.')
                 setCarregando(false)
             })
-    }, [token, filtro])
+    }, [filtro])
 
     function handleFiltrar(event: SubmitEvent) {
         event.preventDefault()

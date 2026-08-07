@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { UsuariosContext } from './usuarios-context'
 
 export function UsuariosProvider({ children }: { children: ReactNode }) {
-    const { token } = useAuth()
+    const { loading: carregandoAuth } = useAuth()
 
     const [usuarios, setUsuarios] = useState<Usuario[]>([])
     const [carregando, setCarregando] = useState(true)
@@ -16,11 +16,11 @@ export function UsuariosProvider({ children }: { children: ReactNode }) {
     }, [])
 
     useEffect(() => {
-        if (!token) return
+        if (carregandoAuth) return
 
         let cancelado = false
 
-        getUsuarios(token)
+        getUsuarios()
             .then((result) => {
                 if (cancelado) return
                 setUsuarios(result)
@@ -36,7 +36,7 @@ export function UsuariosProvider({ children }: { children: ReactNode }) {
         return () => {
             cancelado = true
         }
-    }, [token, versao])
+    }, [carregandoAuth, versao])
 
     return (
         <UsuariosContext.Provider value={{ usuarios, carregando, erro, recarregar }}>

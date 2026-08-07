@@ -37,7 +37,7 @@ type ItemFeed = {
 }
 
 export default function ColetaCracha() {
-    const { token, logout } = useAuth()
+    const { logout } = useAuth()
     const { usuarios, carregando: carregandoUsuarios } = useUsuarios()
 
     const [crachaInput, setCrachaInput] = useState('')
@@ -75,8 +75,7 @@ export default function ColetaCracha() {
 
         getOrders({
             dataInicial: `${hoje}T00:00:00`,
-            dataFinal: `${hoje}T23:59:59.999`,
-            token: token!
+            dataFinal: `${hoje}T23:59:59.999`
         })
             .then((resultado) => {
                 setPedidos(resultado)
@@ -91,7 +90,7 @@ export default function ColetaCracha() {
         buscarPedidosPodio()
         const intervalo = setInterval(buscarPedidosPodio, INTERVALO_PODIO_MS)
         return () => clearInterval(intervalo)
-    }, [token])
+    }, [])
 
     function verificarCracha(cracha: string) {
         setErroCracha('')
@@ -131,7 +130,7 @@ export default function ColetaCracha() {
         setPedidoInput('')
 
         try {
-            const result = await postOrderAs({ codigo_pedido: codigo, cracha: sessao.cracha!, token: token! })
+            const result = await postOrderAs({ codigo_pedido: codigo, cracha: sessao.cracha! })
             const msg = result.success ?? 'Bipado com sucesso.'
             setFeed((atual) => [{ codigo, ok: true, mensagem: msg }, ...atual])
             if (viaScanner) setUltimoResultadoScannerPedido({ ok: true, mensagem: `${codigo} — ${msg}` })
