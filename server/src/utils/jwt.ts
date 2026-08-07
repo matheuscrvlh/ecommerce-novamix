@@ -1,18 +1,12 @@
 import jwt from 'jsonwebtoken';
 
-export function generateToken(sub:number, role:string) {
-    const payload = {
-        sub: sub,
-        role: role
-    }
-
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: '8h'})
-    return token   
+export type HubPayload = {
+    sub: number
+    role: 'user' | 'admin'
+    permissions: { module: string, access: string }[]
+    branchs: { id: number, name: string }[]
 }
 
-export function verifyToken(token:string) {
-    const verifiedPayload = jwt.verify(token, process.env.JWT_SECRET)
-
-    return verifiedPayload
+export function verifyToken(token: string): HubPayload {
+    return jwt.verify(token, process.env.JWT_SECRET) as unknown as HubPayload
 }
-

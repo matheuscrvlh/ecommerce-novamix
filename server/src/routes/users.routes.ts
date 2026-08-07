@@ -1,37 +1,27 @@
 import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify'
 import { db } from '../database/database.ts'
-import { hashPassword } from '../utils/hash.ts'
 import { authenticate, checkAdmin } from '../middlewares/auth.middleware.ts'
 
 type CreateUserBody = {
     id: number
     nome: string
-    login: string
-    senha: string
     role: string
     cracha: string
     status: boolean
+    hub_user_id: number
 }
 
 type UpdateMeBody = {
     nome: string
-    login: string
-}
-
-type UpdatePasswordBody = {
-    idUsuario: number
-    novaSenha: string
 }
 
 async function createUser(req: FastifyRequest<{Body: CreateUserBody}>, res: FastifyReply) {
-    const { nome, login, senha, role, cracha } = req.body
+    const { nome, role, cracha, hub_user_id } = req.body
 
     try{
-        const passwordHashed = await hashPassword(senha);
-
         await db.query(
-            'INSERT INTO usuarios (nome, login, senha, role, cracha) VALUES ($1, $2, $3, $4, $5)',
-            [nome, login, passwordHashed, role, cracha]
+            'INSERT INTO usuarios (nome, role, cracha, hub_user_id) VALUES ($1, $2, $3, $4)',
+            [nome, role, cracha, hub_user_id]
         )
 
         return res.code(201).send({ success: `Usuario ${nome} criado com sucesso.`})
@@ -42,7 +32,7 @@ async function createUser(req: FastifyRequest<{Body: CreateUserBody}>, res: Fast
 
 async function getUsers(req:FastifyRequest, res:FastifyReply) {
     const result = await db.query(
-        'SELECT id, nome, login, role, cracha, status, criado_em FROM usuarios'
+        'SELECT id, nome, role, cracha, status, hub_user_id, criado_em FROM usuarios'
     );
 
     return res.code(200).send(result.rows)
@@ -53,17 +43,17 @@ async function getMeUser(req:FastifyRequest, res:FastifyReply) {
 
     try {
         const result = await db.query(`
-            SELECT id, nome, login, role, cracha, status, criado_em 
+            SELECT id, nome, role, cracha, status, hub_user_id, criado_em
             FROM usuarios
             WHERE id = $1
         `,[id]);
 
         return res.code(200).send(result.rows[0])
     } catch (error) {
-        console.log(error) 
+        console.log(error)
         res.code(401).send({ error: 'Erro ao buscar user'})
     }
-    
+
 }
 
 async function getResumeUsers(req:FastifyRequest, res:FastifyReply) {
@@ -75,11 +65,11 @@ async function getResumeUsers(req:FastifyRequest, res:FastifyReply) {
 }
 
 async function putUser(req:FastifyRequest<{Body: CreateUserBody}>, res:FastifyReply) {
-    const { id, nome, login, role, cracha, status } = req.body
+    const { id, nome, role, cracha, status, hub_user_id } = req.body
 
     const result = await db.query(
-        'UPDATE usuarios SET nome = $1, login = $2, role = $3, cracha = $4, status = $5 WHERE id = $6',
-        [nome, login, role, cracha, status, id]
+        'UPDATE usuarios SET nome = $1, role = $2, cracha = $3, status = $4, hub_user_id = $5 WHERE id = $6',
+        [nome, role, cracha, status, hub_user_id, id]
     );
 
     if(result.rowCount === 0) {
@@ -91,11 +81,11 @@ async function putUser(req:FastifyRequest<{Body: CreateUserBody}>, res:FastifyRe
 
 async function putMe(req:FastifyRequest<{Body: UpdateMeBody}>, res:FastifyReply) {
     const id = req.user.sub
-    const { nome, login } = req.body
+    const { nome } = req.body
 
     const result = await db.query(
-        'UPDATE usuarios SET nome = $1, login = $2 WHERE id = $3',
-        [nome, login, id]
+        'UPDATE usuarios SET nome = $1 WHERE id = $2',
+        [nome, id]
     );
 
     if(result.rowCount === 0) {
@@ -103,55 +93,6 @@ async function putMe(req:FastifyRequest<{Body: UpdateMeBody}>, res:FastifyReply)
     };
 
     return res.code(200).send({ success: 'Usuário editado com sucesso.'})
-}
-
-async function putPassword(req: FastifyRequest<{Body: UpdatePasswordBody}>, res: FastifyReply) {
-    const { idUsuario, novaSenha } = req.body
-
-    try {
-        const passwordHashed = await hashPassword(novaSenha)
-
-        const result = await db.query(`
-            UPDATE usuarios
-            SET senha = $1
-            WHERE id = $2
-        `, [passwordHashed, idUsuario])
-
-        if(result.rowCount === 0) {
-            res.code(401).send({ error: 'Erro ao editar senha'})
-            return
-        }
-
-        res.code(201).send({ success: 'Senha alterada com sucesso'})
-    } catch (error) {
-        console.log(error)
-        res.code(401).send({ error: 'Erro ao editar senha.'})
-    }
-}
-
-async function putMePassword(req: FastifyRequest<{Body: UpdatePasswordBody}>, res: FastifyReply) {
-    const id = req.user.sub
-    const { novaSenha } = req.body
-
-    try {
-        const passwordHashed = await hashPassword(novaSenha)
-
-        const result = await db.query(`
-            UPDATE usuarios
-            SET senha = $1
-            WHERE id = $2
-        `, [passwordHashed, id])
-
-        if(result.rowCount === 0) {
-            res.code(401).send({ error: 'Erro ao editar senha'})
-            return
-        }
-
-        res.code(201).send({ success: 'Senha alterada com sucesso'})
-    } catch (error) {
-        console.log(error)
-        res.code(401).send({ error: 'Erro ao editar senha.'})
-    }
 }
 
 async function deleteUser(req:FastifyRequest<{Body: CreateUserBody}>, res:FastifyReply) {
@@ -186,8 +127,5 @@ export async function usersRoutes(fastify: FastifyInstance) {
     fastify.get('/usuarios/resumo', { preHandler: [authenticate] }, getResumeUsers);
     fastify.put('/usuarios', { preHandler: [authenticate, checkAdmin] }, putUser);
     fastify.put('/usuarios/me', { preHandler: [authenticate] }, putMe);
-    fastify.patch('/usuarios', { preHandler: [authenticate, checkAdmin] }, putPassword);
-    fastify.patch('/usuarios/me/senha', { preHandler: [authenticate] }, putMePassword);
     fastify.delete('/usuarios', { preHandler: [authenticate, checkAdmin] }, deleteUser);
 }
-

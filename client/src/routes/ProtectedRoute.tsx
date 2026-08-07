@@ -6,10 +6,13 @@ type ProtectedRouteProps = {
 }
 
 export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
-    const { token, role } = useAuth()
+    const { usuario, role, loading } = useAuth()
 
-    if (!token) {
-        return <Navigate to='/login' replace />
+    if (loading) return null
+
+    if (!usuario) {
+        // 401 em /usuarios/me já disparou o redirect pro hub (client.ts)
+        return null
     }
 
     if (!role || !allowedRoles.includes(role)) {

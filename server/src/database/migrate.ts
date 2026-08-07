@@ -1,6 +1,5 @@
 import 'dotenv/config'
 import { db } from './database.ts'
-import { hashPassword } from '../utils/hash.ts'
 
 // Arquivo pra iniciar banco em novo projeto caso queira
 
@@ -15,11 +14,10 @@ async function createTables() {
             CREATE TABLE usuarios (
                 id SERIAL PRIMARY KEY,
                 nome VARCHAR(100) NOT NULL,
-                login VARCHAR(100) UNIQUE NOT NULL,
-                senha VARCHAR(100) NOT NULL,
                 role usuario_cargo NOT NULL,
                 cracha VARCHAR(50),
                 status BOOLEAN DEFAULT true,
+                hub_user_id INTEGER UNIQUE,
                 criado_em TIMESTAMPTZ DEFAULT NOW()
             )
         `)
@@ -31,7 +29,7 @@ async function createTables() {
                 usuario_id INTEGER REFERENCES usuarios(id),
                 canal VARCHAR (100),
                 bipado_em TIMESTAMPTZ
-                
+
             )
         `)
 
@@ -44,22 +42,3 @@ async function createTables() {
 }
 
 createTables()
-
-async function createSeedUser() {
-    const senhaHasheada = await hashPassword('Novamix123')
-    
-    try {
-        const result = await db.query(
-            'INSERT INTO usuarios (nome, login, senha, role) VALUES ($1, $2, $3, $4)',
-            ['Admin','admin',senhaHasheada,'ADMIN']
-        )
-        console.log(result)
-
-        return db.end()
-    } catch {
-        throw new Error('Erro ao cadastrar user seed.')
-    }
-    
-}
-
-createSeedUser()

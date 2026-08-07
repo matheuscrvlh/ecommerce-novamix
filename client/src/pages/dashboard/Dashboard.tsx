@@ -36,7 +36,7 @@ function hojeISO() {
 }
 
 export default function Dashboard() {
-    const { token } = useAuth()
+    const { loading: carregandoAuth } = useAuth()
     const { usuarios } = useUsuariosResumo()
     const [pedidos, setPedidos] = useState<Pedido[]>([])
     const [erro, setErro] = useState('')
@@ -64,12 +64,11 @@ export default function Dashboard() {
         let cancelado = false
 
         function buscar() {
-            if (document.hidden) return
+            if (document.hidden || carregandoAuth) return
 
             getOrders({
                 dataInicial: `${filtro.dataInicial}T00:00:00`,
-                dataFinal: `${filtro.dataFinal}T23:59:59.999`,
-                token: token!
+                dataFinal: `${filtro.dataFinal}T23:59:59.999`
             })
                 .then((pedidosResult) => {
                     if (cancelado) return
@@ -115,7 +114,7 @@ export default function Dashboard() {
             clearInterval(intervalo)
             document.removeEventListener('visibilitychange', handleVisibilidade)
         }
-    }, [token, filtro])
+    }, [carregandoAuth, filtro])
 
     function handleFiltrar(event: SubmitEvent) {
         event.preventDefault()

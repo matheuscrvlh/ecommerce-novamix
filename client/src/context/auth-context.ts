@@ -1,9 +1,10 @@
 import { createContext } from 'react'
+import type { Usuario } from '../api/users'
 
 export type AuthContextType = {
-    token: string | null
+    usuario: Usuario | null
     role: string | null
-    login: (token: string) => void
+    loading: boolean
     logout: () => void
 }
 
