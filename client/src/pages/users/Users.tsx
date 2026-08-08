@@ -1,65 +1,21 @@
 import { useState } from 'react'
-import { createUsuario, deleteUsuario, updateUsuario, type Usuario } from '../../api/users'
+import type { Usuario } from '../../api/users'
 import { useUsuarios } from '../../hooks/useUsuarios'
 import SidebarSection from '../../sections/SidebarSection'
 import PageHeaderSection from '../../sections/PageHeaderSection'
-import UserFormSection, { type UsuarioFormValues } from '../../sections/users/UserFormSection'
 import UsersTableSection from '../../sections/users/UsersTableSection'
 import UsersFilterSection, { type FiltroCargo, type FiltroStatus } from '../../sections/users/UsersFilterSection'
 import UserQrCodeModal from '../../sections/users/UserQrCodeModal'
-import Button from '../../components/Button'
 import Alert from '../../components/Alert'
-import Modal from '../../components/Modal'
 import Footer from '../../components/Footer'
 import ThemeToggle from '../../components/ThemeToggle'
-import { PlusIcon } from '../../components/icons'
 
 export default function Users() {
-    const { usuarios, carregando, recarregar } = useUsuarios()
-    const [erro, setErro] = useState('')
+    const { usuarios, carregando, erro } = useUsuarios()
 
-    const [editando, setEditando] = useState<Usuario | null>(null)
-    const [modalAberto, setModalAberto] = useState(false)
-    const [excluindo, setExcluindo] = useState<Usuario | null>(null)
-    const [erroExclusao, setErroExclusao] = useState('')
     const [qrUsuario, setQrUsuario] = useState<Usuario | null>(null)
     const [filtroCargo, setFiltroCargo] = useState<FiltroCargo>('TODOS')
     const [filtroStatus, setFiltroStatus] = useState<FiltroStatus>('ATIVOS')
-
-    function abrirCriacao() {
-        setEditando(null)
-        setModalAberto(true)
-    }
-
-    function abrirEdicao(usuario: Usuario) {
-        setEditando(usuario)
-        setModalAberto(true)
-    }
-
-    async function handleCreate(values: UsuarioFormValues) {
-        await createUsuario({
-            nome: values.nome,
-            role: values.role,
-            cracha: values.cracha,
-            hub_user_id: values.hub_user_id
-        })
-        setModalAberto(false)
-        recarregar()
-    }
-
-    async function handleUpdate(values: UsuarioFormValues) {
-        await updateUsuario({
-            id: editando!.id,
-            nome: values.nome,
-            role: values.role,
-            cracha: values.cracha,
-            status: values.status,
-            hub_user_id: values.hub_user_id
-        })
-        setModalAberto(false)
-        setEditando(null)
-        recarregar()
-    }
 
     const usuariosFiltrados = usuarios.filter((usuario) => {
         const passaCargo = filtroCargo === 'TODOS' || usuario.role === filtroCargo
@@ -70,24 +26,6 @@ export default function Users() {
         return passaCargo && passaStatus
     })
 
-    async function confirmarExclusao() {
-        if (!excluindo) return
-
-        try {
-            await deleteUsuario(excluindo.id)
-            setExcluindo(null)
-            setErroExclusao('')
-            recarregar()
-        } catch (error) {
-            setErroExclusao(error instanceof Error ? error.message : 'Erro ao excluir usuário.')
-        }
-    }
-
-    function fecharModalExclusao() {
-        setExcluindo(null)
-        setErroExclusao('')
-    }
-
     return (
         <div className='flex min-h-screen flex-col bg-gray md:flex-row dark:bg-dark-bg'>
             <SidebarSection />
@@ -95,12 +33,9 @@ export default function Users() {
             <main className='flex-1 space-y-6 p-4 sm:p-8'>
                 <PageHeaderSection title='Usuários' action={<ThemeToggle className='hidden md:block' />} />
 
-                <div className='flex justify-end'>
-                    <Button className='flex items-center gap-2' onClick={abrirCriacao}>
-                        <PlusIcon />
-                        Novo usuário
-                    </Button>
-                </div>
+                <p className='text-sm text-gray-dark dark:text-dark-text-muted'>
+                    Quem entra aqui e vira ADMIN ou OPERADOR é definido no hub-novamix (login, cargo e permissão do módulo "ecommerce"). Essa tela é só consulta.
+                </p>
 
                 {erro && <Alert>{erro}</Alert>}
 
@@ -114,8 +49,6 @@ export default function Users() {
                 <UsersTableSection
                     usuarios={usuariosFiltrados}
                     carregando={carregando}
-                    onEdit={abrirEdicao}
-                    onDelete={setExcluindo}
                     onShowQrCode={setQrUsuario}
                 />
 
@@ -123,35 +56,6 @@ export default function Users() {
             </main>
 
             <UserQrCodeModal usuario={qrUsuario} onClose={() => setQrUsuario(null)} />
-
-            <Modal
-                open={modalAberto}
-                onClose={() => setModalAberto(false)}
-                title={editando ? `Editar usuário — ${editando.nome}` : 'Novo usuário'}
-            >
-                <UserFormSection
-                    key={editando?.id ?? 'novo'}
-                    mode={editando ? 'edit' : 'create'}
-                    initialValues={editando ? { ...editando, cracha: editando.cracha ?? '' } : undefined}
-                    onSubmit={editando ? handleUpdate : handleCreate}
-                />
-            </Modal>
-
-            <Modal
-                open={excluindo !== null}
-                onClose={fecharModalExclusao}
-                title='Excluir usuário'
-            >
-                {erroExclusao && <div className='mb-4'><Alert>{erroExclusao}</Alert></div>}
-
-                <p className='mb-4 text-sm text-gray-text dark:text-dark-text'>
-                    Tem certeza que deseja excluir <strong>{excluindo?.nome}</strong>? Essa ação não pode ser desfeita.
-                </p>
-                <div className='flex justify-end gap-2'>
-                    <Button variant='ghost' onClick={fecharModalExclusao}>Cancelar</Button>
-                    <Button variant='danger' onClick={confirmarExclusao}>Excluir</Button>
-                </div>
-            </Modal>
         </div>
     )
 }

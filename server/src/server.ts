@@ -3,6 +3,7 @@ import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import cookie from '@fastify/cookie'
 import { db } from './database/database.ts'
+import { hubDb } from './database/hub.database.ts'
 import { usersRoutes } from './routes/users.routes.ts'
 import { ordersRoutes } from './routes/orders.routes.ts'
 import { eventsRoutes } from './routes/events.routes.ts'
@@ -16,6 +17,8 @@ if(!process.env.SERVER_PORT) {
     throw new Error('Erro ao achar CLIENT_URL no env.')
 } else if (!process.env.DATABASE_URL) {
     throw new Error('Erro ao achar DATABASE_URL no env.')
+} else if (!process.env.HUB_DATABASE_URL) {
+    throw new Error('Erro ao achar HUB_DATABASE_URL no env.')
 } else if (!process.env.JWT_SECRET) {
     throw new Error('Erro ao achar JWT_SECRET no env.')
 }
@@ -36,7 +39,10 @@ async function start() {
     console.log(`Servidor rodando na porta ${process.env.SERVER_PORT}`)
 
     await db.query('SELECT NOW()')
-    console.log('Supabase Conectado')
+    console.log('Supabase (ecommerce) Conectado')
+
+    await hubDb.query('SELECT NOW()')
+    console.log('Supabase (hub) Conectado')
 }
 
 start()

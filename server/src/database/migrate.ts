@@ -6,37 +6,21 @@ import { db } from './database.ts'
 async function createTables() {
 
     try {
-        const createType = await db.query(`
-            CREATE TYPE usuario_cargo AS ENUM ('ADMIN', 'OPERADOR')
-        `)
-
-        const createTableUsers = await db.query(`
-            CREATE TABLE usuarios (
-                id SERIAL PRIMARY KEY,
-                nome VARCHAR(100) NOT NULL,
-                role usuario_cargo NOT NULL,
-                cracha VARCHAR(50),
-                status BOOLEAN DEFAULT true,
-                hub_user_id INTEGER UNIQUE,
-                criado_em TIMESTAMPTZ DEFAULT NOW()
-            )
-        `)
-
         const createTableOrders = await db.query(`
-            CREATE TABLE pedidos (
+            CREATE TABLE IF NOT EXISTS pedidos (
                 id SERIAL PRIMARY KEY,
                 codigo_pedido VARCHAR (100) UNIQUE NOT NULL,
-                usuario_id INTEGER REFERENCES usuarios(id),
+                usuario_id INTEGER NOT NULL,
                 canal VARCHAR (100),
                 bipado_em TIMESTAMPTZ
-
             )
         `)
 
         console.log('Tabelas Criadas!')
 
         return
-    } catch {
+    } catch (error) {
+        console.error(error)
         throw new Error('Erro ao comunicar com Supabase')
     }
 }
