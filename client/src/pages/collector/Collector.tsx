@@ -9,7 +9,8 @@ import Alert from '../../components/Alert'
 import BarcodeScannerModal from '../../components/BarcodeScannerModal'
 import RankingModal from '../../sections/RankingModal'
 import ThemeToggle from '../../components/ThemeToggle'
-import { LogoutIcon, DashboardIcon, TrophyIcon, CameraIcon, QrCodeIcon, UserAvatarIcon } from '../../components/icons'
+import { LogoutIcon, DashboardIcon, TrophyIcon, CameraIcon, QrCodeIcon, UserAvatarIcon, ChevronLeftIcon } from '../../components/icons'
+import { HUB_URL } from '../../lib/hub'
 
 export default function Collector() {
     const [codigoPedido, setCodigoPedido] = useState('')
@@ -85,6 +86,16 @@ export default function Collector() {
                     <TrophyIcon className='h-4 w-4 origin-center animate-trophy-wiggle' />
                     Ranking
                 </button>
+
+                <div className='h-4 w-px bg-gray-base/30' />
+
+                <a
+                    href={HUB_URL}
+                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
+                >
+                    <ChevronLeftIcon className='h-4 w-4' />
+                    Voltar ao Hub
+                </a>
 
                 <div className='h-4 w-px bg-gray-base/30' />
 

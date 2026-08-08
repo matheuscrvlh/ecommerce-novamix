@@ -1,21 +1,15 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
 import SidebarLink from '../components/SidebarLink'
 import Button from '../components/Button'
 import ThemeToggle from '../components/ThemeToggle'
-import { DashboardIcon, UsersIcon, PackageIcon, BadgeIcon, LogoutIcon, MenuIcon, CloseIcon, QrCodeIcon, UserAvatarIcon } from '../components/icons'
+import { DashboardIcon, UsersIcon, PackageIcon, BadgeIcon, LogoutIcon, MenuIcon, CloseIcon, QrCodeIcon, UserAvatarIcon, ChevronLeftIcon } from '../components/icons'
 import { useAuth } from '../hooks/useAuth'
+import { HUB_URL } from '../lib/hub'
 
 export default function SidebarSection() {
     const { logout, role } = useAuth()
-    const navigate = useNavigate()
     const [open, setOpen] = useState(false)
-
-    function handleLogout() {
-        logout()
-        navigate('/login')
-    }
 
     return (
         <>
@@ -23,7 +17,7 @@ export default function SidebarSection() {
                 <Logo compact />
                 <div className='absolute top-1/2 right-4 flex -translate-y-1/2 items-center gap-3'>
                     <ThemeToggle />
-                    <button onClick={handleLogout} className='text-red-base transition hover:text-red-light' title='Sair'>
+                    <button onClick={logout} className='text-red-base transition hover:text-red-light' title='Sair'>
                         <LogoutIcon className='h-5 w-5' />
                     </button>
                     <button onClick={() => setOpen(true)} className='text-gray-dark dark:text-dark-text-muted'>
@@ -73,13 +67,21 @@ export default function SidebarSection() {
                     <SidebarLink to='/conta' icon={<UserAvatarIcon className='h-5 w-5' />}>
                         Minha Conta
                     </SidebarLink>
+
+                    <a
+                        href={HUB_URL}
+                        className='flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium text-gray-text transition hover:bg-gray dark:text-dark-text dark:hover:bg-dark-surface-2'
+                    >
+                        <ChevronLeftIcon className='h-5 w-5' />
+                        Voltar ao Hub
+                    </a>
                 </nav>
 
                 <div className='p-4'>
                     <Button
                         variant='danger'
                         className='flex w-full items-center justify-center gap-2'
-                        onClick={handleLogout}
+                        onClick={logout}
                     >
                         <LogoutIcon className='h-4 w-4' />
                         Sair

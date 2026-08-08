@@ -16,7 +16,7 @@ export default function UserQrCodeModal({ usuario, onClose }: UserQrCodeModalPro
     const [qrCodeUrl, setQrCodeUrl] = useState('')
 
     useEffect(() => {
-        if (!usuario?.cracha) return
+        if (!usuario) return
 
         let cancelado = false
 
@@ -33,13 +33,7 @@ export default function UserQrCodeModal({ usuario, onClose }: UserQrCodeModalPro
 
     return (
         <Modal open={usuario !== null} onClose={onClose} title={`Crachá — ${usuario?.nome ?? ''}`}>
-            {!usuario?.cracha && (
-                <p className='text-center text-sm text-gray-dark dark:text-dark-text-muted'>
-                    Esse usuário ainda não tem um crachá cadastrado.
-                </p>
-            )}
-
-            {usuario?.cracha && (
+            {usuario && (
                 <div id='qr-print-area' className='flex justify-center'>
                     <div className='w-72 overflow-hidden rounded-2xl border border-gray bg-white shadow-sm print:rounded-none print:border-2 print:border-dashed print:border-gray-text print:shadow-none'>
                         <div className='bg-linear-to-r from-orange-base to-gray-base p-3'>
@@ -71,7 +65,7 @@ export default function UserQrCodeModal({ usuario, onClose }: UserQrCodeModalPro
                 </div>
             )}
 
-            {usuario?.cracha && (
+            {usuario && (
                 <div className='mt-5 flex justify-end gap-2 print:hidden'>
                     <Button variant='ghost' onClick={onClose}>Fechar</Button>
                     <Button onClick={handlePrint}>Imprimir</Button>
