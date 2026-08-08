@@ -12,10 +12,6 @@ type UserQrCodeModalProps = {
     onClose: () => void
 }
 
-function formatarData(data: string) {
-    return new Date(data).toLocaleDateString('pt-BR')
-}
-
 export default function UserQrCodeModal({ usuario, onClose }: UserQrCodeModalProps) {
     const [qrCodeUrl, setQrCodeUrl] = useState('')
 
@@ -70,10 +66,6 @@ export default function UserQrCodeModal({ usuario, onClose }: UserQrCodeModalPro
                             )}
 
                             <p className='text-center text-sm font-semibold tracking-wide text-gray-text'>{usuario.cracha}</p>
-
-                            <div className='mt-2 w-full border-t border-gray pt-2 text-center'>
-                                <p className='text-[10px] text-gray-dark'>Crachá emitido em {formatarData(usuario.criado_em)}</p>
-                            </div>
                         </div>
                     </div>
                 </div>

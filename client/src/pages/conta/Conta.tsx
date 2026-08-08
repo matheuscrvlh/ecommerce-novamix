@@ -1,12 +1,11 @@
-import { useEffect, useState, type SubmitEvent } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { getMeuUsuario, updateMe, type Usuario } from '../../api/users'
+import { getMeuUsuario, type Usuario } from '../../api/users'
 import { getRanking } from '../../api/orders'
 import SidebarSection from '../../sections/SidebarSection'
 import PageHeaderSection from '../../sections/PageHeaderSection'
 import UserQrCodeModal from '../../sections/users/UserQrCodeModal'
 import Button from '../../components/Button'
-import Input from '../../components/Input'
 import Alert from '../../components/Alert'
 import Footer from '../../components/Footer'
 import Badge from '../../components/Badge'
@@ -32,11 +31,6 @@ export default function Conta() {
     const [totalColetados, setTotalColetados] = useState<number | null>(null)
     const [totalHoje, setTotalHoje] = useState<number | null>(null)
 
-    const [nome, setNome] = useState('')
-    const [erroSalvar, setErroSalvar] = useState('')
-    const [sucessoSalvar, setSucessoSalvar] = useState('')
-    const [salvando, setSalvando] = useState(false)
-
     const [qrAberto, setQrAberto] = useState(false)
 
     useEffect(() => {
@@ -48,7 +42,6 @@ export default function Conta() {
             .then((result) => {
                 if (cancelado) return
                 setPerfil(result)
-                setNome(result.nome)
                 setCarregandoPerfil(false)
             })
             .catch((error) => {
@@ -96,23 +89,6 @@ export default function Conta() {
         }
     }, [carregandoAuth, perfil])
 
-    async function handleSalvar(event: SubmitEvent) {
-        event.preventDefault()
-        setErroSalvar('')
-        setSucessoSalvar('')
-        setSalvando(true)
-
-        try {
-            await updateMe({ nome })
-            setSucessoSalvar('Dados atualizados com sucesso.')
-            setPerfil((atual) => (atual ? { ...atual, nome } : atual))
-        } catch (error) {
-            setErroSalvar(error instanceof Error ? error.message : 'Erro ao salvar dados.')
-        } finally {
-            setSalvando(false)
-        }
-    }
-
     return (
         <div className='flex min-h-screen flex-col bg-gray md:flex-row dark:bg-dark-bg'>
             <SidebarSection />
@@ -139,17 +115,11 @@ export default function Conta() {
                                     </Badge>
                                 </>
                             )}
-
-                            {perfil?.criado_em && (
-                                <p className='text-xs text-gray-dark dark:text-dark-text-muted'>
-                                    Membro desde {new Date(perfil.criado_em).toLocaleDateString('pt-BR')}
-                                </p>
-                            )}
                         </div>
 
                         <div className='mt-6 flex flex-col gap-2'>
                             <p className='text-center text-xs text-gray-dark dark:text-dark-text-muted'>
-                                Login e senha agora são gerenciados pelo Hub Novamix.
+                                Nome, cargo, login e senha agora são gerenciados pelo Hub Novamix.
                             </p>
                             <Button
                                 variant='ghost'
@@ -188,39 +158,6 @@ export default function Conta() {
                                 )}
                                 <p className='mt-1 text-xs text-gray-dark dark:text-dark-text-muted'>pedidos bipados no total</p>
                             </div>
-                        </div>
-
-                        <div className='mt-6 border-t border-gray pt-6 dark:border-dark-border'>
-                            <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>
-                                Editar meus dados
-                            </h2>
-
-                            {carregandoPerfil ? (
-                                <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-                                    <Skeleton className='h-9 w-full' />
-                                </div>
-                            ) : (
-                                <form onSubmit={handleSalvar} className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-                                    <Input placeholder='Nome' value={nome} onChange={(e) => setNome(e.target.value)} required />
-
-                                    {erroSalvar && (
-                                        <div className='sm:col-span-2'>
-                                            <Alert>{erroSalvar}</Alert>
-                                        </div>
-                                    )}
-                                    {sucessoSalvar && (
-                                        <p className='rounded-md bg-green-base/10 px-4 py-3 text-sm text-green-base sm:col-span-2'>
-                                            {sucessoSalvar}
-                                        </p>
-                                    )}
-
-                                    <div className='sm:col-span-2'>
-                                        <Button type='submit' disabled={salvando}>
-                                            {salvando ? 'Salvando...' : 'Salvar'}
-                                        </Button>
-                                    </div>
-                                </form>
-                            )}
                         </div>
                     </section>
                 </div>

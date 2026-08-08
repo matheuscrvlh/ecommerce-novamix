@@ -1,5 +1,7 @@
 import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify'
 import { db } from '../database/database.ts'
+import { findHubNomesPorId, findHubUsuarioEcommerce } from '../database/hub.database.ts'
+import { idDoCracha } from '../utils/cracha.ts'
 import { authenticate, checkAdmin } from '../middlewares/auth.middleware.ts'
 
 type CreateOrderBody = {
@@ -20,16 +22,14 @@ async function postOrder(req: FastifyRequest<{Body: CreateOrderBody}>, res: Fast
         let usuario_id = req.user.sub
 
         if(cracha) {
-            const operador = await db.query(
-                'SELECT id FROM usuarios WHERE cracha = $1 AND status = true',
-                [cracha]
-            )
+            const id = idDoCracha(cracha)
+            const operador = id ? await findHubUsuarioEcommerce(id) : null
 
-            if(operador.rows.length === 0) {
+            if(!operador || !operador.status) {
                 return res.code(400).send({ error: 'Crachá não encontrado.' })
             }
 
-            usuario_id = operador.rows[0].id
+            usuario_id = operador.id
         }
         // consulta se ja existe o pedido
         const search = await db.query(
@@ -41,12 +41,8 @@ async function postOrder(req: FastifyRequest<{Body: CreateOrderBody}>, res: Fast
             const date = search.rows[0].bipado_em
             const idUser = search.rows[0].usuario_id
 
-            const user = await db.query(
-                'SELECT nome FROM usuarios WHERE id = $1',
-                [idUser]
-            )
-
-            const nome = user.rows[0]?.nome ?? 'Desconhecido'
+            const nomes = await findHubNomesPorId([idUser])
+            const nome = nomes.get(idUser) ?? 'Desconhecido'
 
             return res.code(400).send({ error: `Pedido já bipado por ${nome} em ${date}` })
         };
@@ -66,7 +62,7 @@ async function postOrder(req: FastifyRequest<{Body: CreateOrderBody}>, res: Fast
 
 async function getOrders(req: FastifyRequest<{Body: GetOrderBody}>, res: FastifyReply) {
     const { dataInicial, dataFinal } = req.body
-    
+
     try {
         const result = await db.query(`
             SELECT * FROM pedidos
@@ -86,7 +82,7 @@ async function orderConsultation(req: FastifyRequest<{Body: GetOrderBody}>, res:
 
     try {
         const result = await db.query(`
-            SELECT * 
+            SELECT *
             FROM pedidos
             WHERE codigo_pedido = $1
         `, [codigoPedido])
@@ -99,13 +95,8 @@ async function orderConsultation(req: FastifyRequest<{Body: GetOrderBody}>, res:
         const idUser = result.rows[0]?.usuario_id
         const data = result.rows[0]?.bipado_em
 
-        const searchUser = await db.query(`
-            SELECT nome
-            FROM usuarios
-            WHERE id = $1
-        `, [idUser])
-
-        const nome = searchUser.rows[0]?.nome ?? 'Desconhecido'
+        const nomes = await findHubNomesPorId([idUser])
+        const nome = nomes.get(idUser) ?? 'Desconhecido'
 
         res.code(200).send({ success: `Pedido já coletado por ${nome} em ${data}`})
     } catch (error) {
@@ -119,15 +110,18 @@ async function getOrdersCountByUser(req:FastifyRequest<{Body: GetOrderBody}>, re
 
     try {
         const result = await db.query(`
-            SELECT u.id, u.nome, count(codigo_pedido)
-            FROM pedidos p
-            JOIN usuarios u
-            ON p.usuario_id = u.id
+            SELECT usuario_id AS id, count(codigo_pedido)
+            FROM pedidos
             WHERE bipado_em >= $1 AND bipado_em <= $2
-            GROUP BY u.id, u.nome
+            GROUP BY usuario_id
         `,[dataInicial, dataFinal])
 
-        return res.code(200).send(result.rows)
+        const nomes = await findHubNomesPorId(result.rows.map((row) => row.id))
+
+        return res.code(200).send(result.rows.map((row) => ({
+            ...row,
+            nome: nomes.get(row.id) ?? 'Desconhecido'
+        })))
     } catch (error) {
         console.error(error)
         res.code(500).send({ error: 'Erro ao buscar pedidos por usuários.'})

@@ -1,6 +1,6 @@
 import Badge from '../../components/Badge'
 import Skeleton from '../../components/Skeleton'
-import { EditIcon, TrashIcon, QrCodeIcon } from '../../components/icons'
+import { QrCodeIcon } from '../../components/icons'
 import type { Usuario } from '../../api/users'
 
 const LINHAS_SKELETON = [0, 1, 2, 3, 4]
@@ -8,15 +8,13 @@ const LINHAS_SKELETON = [0, 1, 2, 3, 4]
 type UsersTableSectionProps = {
     usuarios: Usuario[]
     carregando: boolean
-    onEdit: (usuario: Usuario) => void
-    onDelete: (usuario: Usuario) => void
     onShowQrCode: (usuario: Usuario) => void
 }
 
-export default function UsersTableSection({ usuarios, carregando, onEdit, onDelete, onShowQrCode }: UsersTableSectionProps) {
+export default function UsersTableSection({ usuarios, carregando, onShowQrCode }: UsersTableSectionProps) {
     return (
         <section className='rounded-lg bg-white p-6 shadow-sm dark:bg-dark-surface'>
-            <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>Usuários cadastrados</h2>
+            <h2 className='mb-4 text-xs font-semibold tracking-wide text-gray-dark uppercase dark:text-dark-text-muted'>Usuários com acesso ao ecommerce (via hub)</h2>
 
             <div className='space-y-3 sm:hidden'>
                 {carregando &&
@@ -38,9 +36,7 @@ export default function UsersTableSection({ usuarios, carregando, onEdit, onDele
                                     <p className='truncate font-semibold text-gray-text dark:text-dark-text'>
                                         {usuario.nome} <span className='font-normal text-gray-dark dark:text-dark-text-muted'>#{usuario.id}</span>
                                     </p>
-                                    <p className='truncate text-xs text-gray-dark dark:text-dark-text-muted'>
-                                    {usuario.hub_user_id ? `Hub #${usuario.hub_user_id}` : 'Não vinculado ao hub'}
-                                </p>
+                                    <p className='truncate text-xs text-gray-dark dark:text-dark-text-muted'>{usuario.cracha}</p>
                                 </div>
                                 <Badge color={usuario.role === 'ADMIN' ? 'teal' : 'orange'}>{usuario.role}</Badge>
                             </div>
@@ -50,35 +46,19 @@ export default function UsersTableSection({ usuarios, carregando, onEdit, onDele
                                     {usuario.status ? 'Ativo' : 'Inativo'}
                                 </Badge>
 
-                                <div className='flex gap-1'>
-                                    <button
-                                        onClick={() => onShowQrCode(usuario)}
-                                        className='rounded-md p-2 text-gray-dark transition hover:bg-gray hover:text-orange-base dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
-                                        title='Crachá (QR Code)'
-                                    >
-                                        <QrCodeIcon />
-                                    </button>
-                                    <button
-                                        onClick={() => onEdit(usuario)}
-                                        className='rounded-md p-2 text-gray-dark transition hover:bg-gray hover:text-orange-base dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
-                                        title='Editar'
-                                    >
-                                        <EditIcon />
-                                    </button>
-                                    <button
-                                        onClick={() => onDelete(usuario)}
-                                        className='rounded-md p-2 text-gray-dark transition hover:bg-red-base/10 hover:text-red-base dark:text-dark-text-muted'
-                                        title='Excluir'
-                                    >
-                                        <TrashIcon />
-                                    </button>
-                                </div>
+                                <button
+                                    onClick={() => onShowQrCode(usuario)}
+                                    className='rounded-md p-2 text-gray-dark transition hover:bg-gray hover:text-orange-base dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
+                                    title='Crachá (QR Code)'
+                                >
+                                    <QrCodeIcon />
+                                </button>
                             </div>
                         </div>
                     ))}
 
                 {!carregando && usuarios.length === 0 && (
-                    <p className='py-6 text-center text-sm text-gray-dark dark:text-dark-text-muted'>Nenhum usuário cadastrado.</p>
+                    <p className='py-6 text-center text-sm text-gray-dark dark:text-dark-text-muted'>Ninguém liberado ainda. Conceda acesso ao módulo "ecommerce" no hub.</p>
                 )}
             </div>
 
@@ -87,9 +67,9 @@ export default function UsersTableSection({ usuarios, carregando, onEdit, onDele
                     <table className='w-full min-w-140 border-collapse text-left text-sm'>
                         <thead>
                             <tr className='border-b border-gray bg-gray text-xs font-semibold tracking-wide text-gray-dark uppercase dark:border-dark-border dark:bg-dark-surface-2 dark:text-dark-text-muted'>
-                                <th className='px-4 py-3'>ID</th>
+                                <th className='px-4 py-3'>ID (hub)</th>
                                 <th className='px-4 py-3'>Nome</th>
-                                <th className='px-4 py-3'>Hub</th>
+                                <th className='px-4 py-3'>Crachá</th>
                                 <th className='px-4 py-3'>Cargo</th>
                                 <th className='px-4 py-3'>Status</th>
                                 <th className='px-4 py-3' />
@@ -125,9 +105,7 @@ export default function UsersTableSection({ usuarios, carregando, onEdit, onDele
                                     <tr key={usuario.id} className='border-b border-gray transition last:border-0 hover:bg-gray dark:border-dark-border dark:hover:bg-dark-surface-2'>
                                         <td className='px-4 py-3 whitespace-nowrap text-gray-dark dark:text-dark-text-muted'>{usuario.id}</td>
                                         <td className='px-4 py-3 whitespace-nowrap text-gray-text dark:text-dark-text'>{usuario.nome}</td>
-                                        <td className='px-4 py-3 whitespace-nowrap text-gray-text dark:text-dark-text'>
-                                            {usuario.hub_user_id ? `#${usuario.hub_user_id}` : '—'}
-                                        </td>
+                                        <td className='px-4 py-3 whitespace-nowrap text-gray-text dark:text-dark-text'>{usuario.cracha}</td>
                                         <td className='px-4 py-3 whitespace-nowrap'>
                                             <Badge color={usuario.role === 'ADMIN' ? 'teal' : 'orange'}>{usuario.role}</Badge>
                                         </td>
@@ -137,36 +115,20 @@ export default function UsersTableSection({ usuarios, carregando, onEdit, onDele
                                             </Badge>
                                         </td>
                                         <td className='px-4 py-3 whitespace-nowrap'>
-                                            <div className='flex gap-1'>
-                                                <button
-                                                    onClick={() => onShowQrCode(usuario)}
-                                                    className='rounded-md p-2 text-gray-dark transition hover:bg-gray hover:text-orange-base dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
-                                                    title='Crachá (QR Code)'
-                                                >
-                                                    <QrCodeIcon />
-                                                </button>
-                                                <button
-                                                    onClick={() => onEdit(usuario)}
-                                                    className='rounded-md p-2 text-gray-dark transition hover:bg-gray hover:text-orange-base dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
-                                                    title='Editar'
-                                                >
-                                                    <EditIcon />
-                                                </button>
-                                                <button
-                                                    onClick={() => onDelete(usuario)}
-                                                    className='rounded-md p-2 text-gray-dark transition hover:bg-red-base/10 hover:text-red-base dark:text-dark-text-muted'
-                                                    title='Excluir'
-                                                >
-                                                    <TrashIcon />
-                                                </button>
-                                            </div>
+                                            <button
+                                                onClick={() => onShowQrCode(usuario)}
+                                                className='rounded-md p-2 text-gray-dark transition hover:bg-gray hover:text-orange-base dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
+                                                title='Crachá (QR Code)'
+                                            >
+                                                <QrCodeIcon />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
 
                             {!carregando && usuarios.length === 0 && (
                                 <tr>
-                                    <td colSpan={6} className='py-6 text-center text-gray-dark dark:text-dark-text-muted'>Nenhum usuário cadastrado.</td>
+                                    <td colSpan={6} className='py-6 text-center text-gray-dark dark:text-dark-text-muted'>Ninguém liberado ainda. Conceda acesso ao módulo "ecommerce" no hub.</td>
                                 </tr>
                             )}
                         </tbody>
