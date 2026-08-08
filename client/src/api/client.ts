@@ -1,5 +1,6 @@
+import { HUB_URL } from '../lib/hub'
+
 const BASE_URL = import.meta.env.VITE_API_URL
-const HUB_URL = 'https://hub.lojanovamix.com.br'
 
 type ClientParams = {
     url: string,

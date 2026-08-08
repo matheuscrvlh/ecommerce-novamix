@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AuthContext } from './auth-context'
 import { getMeuUsuario, type Usuario } from '../api/users'
-
-const HUB_URL = 'https://hub.lojanovamix.com.br'
+import { HUB_URL } from '../lib/hub'
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
 

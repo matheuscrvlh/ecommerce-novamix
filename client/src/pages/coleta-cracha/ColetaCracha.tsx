@@ -11,7 +11,8 @@ import Alert from '../../components/Alert'
 import BarcodeScannerModal from '../../components/BarcodeScannerModal'
 import PodiumSection from '../../sections/dashboard/PodiumSection'
 import ThemeToggle from '../../components/ThemeToggle'
-import { DashboardIcon, LogoutIcon, CameraIcon } from '../../components/icons'
+import { DashboardIcon, LogoutIcon, CameraIcon, ChevronLeftIcon } from '../../components/icons'
+import { HUB_URL } from '../../lib/hub'
 
 const SEGUNDOS_SESSAO = 15
 const INTERVALO_PODIO_MS = 15000
@@ -130,7 +131,7 @@ export default function ColetaCracha() {
         setPedidoInput('')
 
         try {
-            const result = await postOrderAs({ codigo_pedido: codigo, cracha: sessao.cracha! })
+            const result = await postOrderAs({ codigo_pedido: codigo, cracha: sessao.cracha })
             const msg = result.success ?? 'Bipado com sucesso.'
             setFeed((atual) => [{ codigo, ok: true, mensagem: msg }, ...atual])
             if (viaScanner) setUltimoResultadoScannerPedido({ ok: true, mensagem: `${codigo} — ${msg}` })
@@ -161,6 +162,16 @@ export default function ColetaCracha() {
                     <DashboardIcon className='h-4 w-4' />
                     Voltar ao Dashboard
                 </Link>
+
+                <a
+                    href={HUB_URL}
+                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
+                >
+                    <ChevronLeftIcon className='h-4 w-4' />
+                    Voltar ao Hub
+                </a>
+
+                <div className='h-4 w-px bg-gray-base/30' />
 
                 <ThemeToggle />
 

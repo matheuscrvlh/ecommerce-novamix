@@ -125,7 +125,7 @@ export default function Conta() {
                                 variant='ghost'
                                 className='flex items-center justify-center gap-2'
                                 onClick={() => setQrAberto(true)}
-                                disabled={carregandoPerfil || !perfil?.cracha}
+                                disabled={carregandoPerfil}
                             >
                                 <QrCodeIcon />
                                 Imprimir meu crachá
