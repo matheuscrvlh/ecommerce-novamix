@@ -1,8 +1,4 @@
-import { Pool } from 'pg'
-
-export const hubDb = new Pool({
-    connectionString: process.env.HUB_DATABASE_URL
-})
+import { db } from './database.ts'
 
 export type HubUsuario = {
     id: number
@@ -12,7 +8,7 @@ export type HubUsuario = {
 }
 
 export async function findHubUsuarioEcommerce(id: number): Promise<HubUsuario | null> {
-    const result = await hubDb.query(`
+    const result = await db.query(`
         SELECT u.id, u.name AS nome, u.status, up.access
         FROM users u
         JOIN user_permissions up ON up.user_id = u.id
@@ -24,7 +20,7 @@ export async function findHubUsuarioEcommerce(id: number): Promise<HubUsuario | 
 }
 
 export async function listHubUsuariosEcommerce(): Promise<HubUsuario[]> {
-    const result = await hubDb.query(`
+    const result = await db.query(`
         SELECT u.id, u.name AS nome, u.status, up.access
         FROM users u
         JOIN user_permissions up ON up.user_id = u.id
@@ -39,7 +35,7 @@ export async function listHubUsuariosEcommerce(): Promise<HubUsuario[]> {
 export async function findHubNomesPorId(ids: number[]): Promise<Map<number, string>> {
     if (ids.length === 0) return new Map()
 
-    const result = await hubDb.query(
+    const result = await db.query(
         'SELECT id, name AS nome FROM users WHERE id = ANY($1)',
         [ids]
     )
