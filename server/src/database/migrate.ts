@@ -6,8 +6,10 @@ import { db } from './database.ts'
 async function createTables() {
 
     try {
+        await db.query(`CREATE SCHEMA IF NOT EXISTS ecommerce`)
+
         const createTableOrders = await db.query(`
-            CREATE TABLE IF NOT EXISTS pedidos (
+            CREATE TABLE IF NOT EXISTS ecommerce.pedidos (
                 id SERIAL PRIMARY KEY,
                 codigo_pedido VARCHAR (100) UNIQUE NOT NULL,
                 usuario_id INTEGER NOT NULL,

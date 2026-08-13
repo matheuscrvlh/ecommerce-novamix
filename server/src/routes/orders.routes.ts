@@ -33,7 +33,7 @@ async function postOrder(req: FastifyRequest<{Body: CreateOrderBody}>, res: Fast
         }
         // consulta se ja existe o pedido
         const search = await db.query(
-            'SELECT usuario_id, bipado_em FROM pedidos WHERE codigo_pedido = $1',
+            'SELECT usuario_id, bipado_em FROM ecommerce.pedidos WHERE codigo_pedido = $1',
             [codigo_pedido]
         );
 
@@ -49,7 +49,7 @@ async function postOrder(req: FastifyRequest<{Body: CreateOrderBody}>, res: Fast
 
         // caso nao exista
         await db.query(
-            'INSERT INTO pedidos (codigo_pedido, usuario_id, bipado_em) VALUES ($1, $2, NOW())',
+            'INSERT INTO ecommerce.pedidos (codigo_pedido, usuario_id, bipado_em) VALUES ($1, $2, NOW())',
             [codigo_pedido, usuario_id]
         );
 
@@ -65,7 +65,7 @@ async function getOrders(req: FastifyRequest<{Body: GetOrderBody}>, res: Fastify
 
     try {
         const result = await db.query(`
-            SELECT * FROM pedidos
+            SELECT * FROM ecommerce.pedidos
             WHERE bipado_em >= $1 AND bipado_em <= $2
             ORDER BY bipado_em DESC
         `,[dataInicial, dataFinal])
@@ -83,7 +83,7 @@ async function orderConsultation(req: FastifyRequest<{Body: GetOrderBody}>, res:
     try {
         const result = await db.query(`
             SELECT *
-            FROM pedidos
+            FROM ecommerce.pedidos
             WHERE codigo_pedido = $1
         `, [codigoPedido])
 
@@ -111,7 +111,7 @@ async function getOrdersCountByUser(req:FastifyRequest<{Body: GetOrderBody}>, re
     try {
         const result = await db.query(`
             SELECT usuario_id AS id, count(codigo_pedido)
-            FROM pedidos
+            FROM ecommerce.pedidos
             WHERE bipado_em >= $1 AND bipado_em <= $2
             GROUP BY usuario_id
         `,[dataInicial, dataFinal])
@@ -135,7 +135,7 @@ async function putOrder(req: FastifyRequest, res: FastifyReply) {
     try {
         const searchOrder = await db.query(`
             SELECT codigo_pedido
-            FROM pedidos
+            FROM ecommerce.pedidos
             WHERE codigo_pedido = $1
         `, [codigo_pedido]);
 
@@ -145,7 +145,7 @@ async function putOrder(req: FastifyRequest, res: FastifyReply) {
         }
 
         const result = await db.query(`
-            UPDATE pedidos
+            UPDATE ecommerce.pedidos
             SET usuario_id = $1, bipado_em = NOW()
             WHERE codigo_pedido = $2
         `, [id, codigo_pedido])
@@ -163,7 +163,7 @@ async function deleteOrder(req: FastifyRequest<{Params: {codigo_pedido: string}}
     try {
         // verifica se existe
         const search = await db.query(
-            'SELECT 1 FROM pedidos WHERE codigo_pedido = $1',
+            'SELECT 1 FROM ecommerce.pedidos WHERE codigo_pedido = $1',
             [codigo_pedido]
         )
 
@@ -173,7 +173,7 @@ async function deleteOrder(req: FastifyRequest<{Params: {codigo_pedido: string}}
 
         // caso exista
         await db.query(
-            'DELETE FROM pedidos WHERE codigo_pedido = $1',
+            'DELETE FROM ecommerce.pedidos WHERE codigo_pedido = $1',
             [codigo_pedido]
         )
 
