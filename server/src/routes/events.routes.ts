@@ -1,5 +1,6 @@
 import type { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
 import { addClient, removeClient } from "../events/sse-hub.ts";
+import { authenticate } from "../middlewares/auth.middleware.ts";
 
 async function getEvents(req: FastifyRequest, res: FastifyReply) {
     res.hijack()
@@ -18,5 +19,5 @@ async function getEvents(req: FastifyRequest, res: FastifyReply) {
 }
 
 export async function eventsRoutes(fastify: FastifyInstance) {
-    fastify.get('/eventos', getEvents)
+    fastify.get('/eventos', { preHandler: [authenticate] }, getEvents)
 }

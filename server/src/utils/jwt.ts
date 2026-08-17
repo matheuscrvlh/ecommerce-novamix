@@ -8,5 +8,5 @@ export type HubPayload = {
 }
 
 export function verifyToken(token: string): HubPayload {
-    return jwt.verify(token, process.env.JWT_SECRET) as unknown as HubPayload
+    return jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] }) as unknown as HubPayload
 }
