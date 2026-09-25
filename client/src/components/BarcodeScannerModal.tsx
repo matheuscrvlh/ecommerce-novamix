@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { Html5Qrcode } from 'html5-qrcode'
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode'
 import Alert from './Alert'
 import { CloseIcon } from './icons'
 
@@ -35,7 +35,10 @@ export default function BarcodeScannerModal({ onClose, onResult, ultimoResultado
     }, [onClose])
 
     useEffect(() => {
-        const scanner = new Html5Qrcode(scannerId)
+        const scanner = new Html5Qrcode(scannerId, {
+            formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+            verbose: false
+        })
         let processando = false
         let destruido = false
 
@@ -68,7 +71,7 @@ export default function BarcodeScannerModal({ onClose, onResult, ultimoResultado
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4'>
             <div className='w-full max-w-sm rounded-lg bg-white p-4 shadow-lg dark:bg-dark-surface'>
                 <div className='mb-3 flex items-center justify-between'>
-                    <h2 className='text-sm font-semibold text-gray-text dark:text-dark-text'>Aponte a câmera pro código</h2>
+                    <h2 className='text-sm font-semibold text-gray-text dark:text-dark-text'>Aponte a câmera pro QR code</h2>
                     <button onClick={onClose} className='text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'>
                         <CloseIcon className='h-5 w-5' />
                     </button>

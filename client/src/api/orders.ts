@@ -1,5 +1,10 @@
 import client from './client.ts'
 
+// Leitores podem mandar o mesmo código com espaços ou em minúsculas (ex.: Caps Lock ligado)
+function normalizarCodigo(codigo: string) {
+    return codigo.replace(/\s/g, '').toUpperCase()
+}
+
 type PostOrderParams = {
     codigo_pedido: string
 }
@@ -8,7 +13,7 @@ export async function postOrder({ codigo_pedido }: PostOrderParams) {
     return client({
         url: '/pedidos',
         method: 'POST',
-        data: { codigo_pedido }
+        data: { codigo_pedido: normalizarCodigo(codigo_pedido) }
     })
 }
 
@@ -52,7 +57,7 @@ export async function consultOrder({ codigoPedido }: ConsultOrderParams) {
     return client({
         url: '/pedidos/consulta',
         method: 'POST',
-        data: { codigoPedido }
+        data: { codigoPedido: normalizarCodigo(codigoPedido) }
     })
 }
 
@@ -78,6 +83,6 @@ export async function postOrderAs({ codigo_pedido, cracha }: PostOrderAsParams) 
     return client({
         url: '/pedidos',
         method: 'POST',
-        data: { codigo_pedido, cracha }
+        data: { codigo_pedido: normalizarCodigo(codigo_pedido), cracha }
     })
 }

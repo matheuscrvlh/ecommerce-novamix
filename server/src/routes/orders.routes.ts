@@ -2,6 +2,7 @@ import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fa
 import { db } from '../database/database.ts'
 import { findHubNomesPorId, findHubUsuarioEcommerce } from '../database/hub.database.ts'
 import { idDoCracha } from '../utils/cracha.ts'
+import { normalizarCodigoPedido } from '../utils/pedido.ts'
 import { authenticate, checkAdmin } from '../middlewares/auth.middleware.ts'
 
 type CreateOrderBody = {
@@ -16,7 +17,12 @@ type GetOrderBody = {
 }
 
 async function postOrder(req: FastifyRequest<{Body: CreateOrderBody}>, res: FastifyReply) {
-    const { codigo_pedido, cracha } = req.body
+    const { cracha } = req.body
+    const codigo_pedido = normalizarCodigoPedido(req.body.codigo_pedido ?? '')
+
+    if(!codigo_pedido) {
+        return res.code(400).send({ error: 'Código do pedido obrigatório.' })
+    }
 
     try {
         let usuario_id = req.user.sub
@@ -31,27 +37,30 @@ async function postOrder(req: FastifyRequest<{Body: CreateOrderBody}>, res: Fast
 
             usuario_id = operador.id
         }
-        // consulta se ja existe o pedido
-        const search = await db.query(
-            'SELECT usuario_id, bipado_em FROM ecommerce.pedidos WHERE codigo_pedido = $1',
-            [codigo_pedido]
+
+        // insere so se nao existir; o UNIQUE do banco garante mesmo com bipagens simultaneas
+        const insert = await db.query(
+            `INSERT INTO ecommerce.pedidos (codigo_pedido, usuario_id, bipado_em)
+             VALUES ($1, $2, NOW())
+             ON CONFLICT (codigo_pedido) DO NOTHING
+             RETURNING id`,
+            [codigo_pedido, usuario_id]
         );
 
-        if(search.rows.length > 0) {
-            const date = search.rows[0].bipado_em
-            const idUser = search.rows[0].usuario_id
+        if(insert.rowCount === 0) {
+            const search = await db.query(
+                'SELECT usuario_id, bipado_em FROM ecommerce.pedidos WHERE codigo_pedido = $1',
+                [codigo_pedido]
+            );
+
+            const date = search.rows[0]?.bipado_em
+            const idUser = search.rows[0]?.usuario_id
 
             const nomes = await findHubNomesPorId([idUser])
             const nome = nomes.get(idUser) ?? 'Desconhecido'
 
             return res.code(400).send({ error: `Pedido já bipado por ${nome} em ${date}` })
-        };
-
-        // caso nao exista
-        await db.query(
-            'INSERT INTO ecommerce.pedidos (codigo_pedido, usuario_id, bipado_em) VALUES ($1, $2, NOW())',
-            [codigo_pedido, usuario_id]
-        );
+        }
 
         return res.code(201).send({ success: 'Pedido adicionado.'})
     } catch (error) {
@@ -78,7 +87,7 @@ async function getOrders(req: FastifyRequest<{Body: GetOrderBody}>, res: Fastify
 }
 
 async function orderConsultation(req: FastifyRequest<{Body: GetOrderBody}>, res: FastifyReply) {
-    const { codigoPedido } = req.body
+    const codigoPedido = normalizarCodigoPedido(req.body.codigoPedido ?? '')
 
     try {
         const result = await db.query(`
