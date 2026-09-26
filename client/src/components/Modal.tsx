@@ -27,8 +27,9 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
             className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4'
             onClick={onClose}
         >
+            {/* max-h + scroll: em celular pequeno o conteúdo (ex.: ranking) passava da borda da tela */}
             <div
-                className='w-full max-w-lg rounded-lg bg-white p-6 shadow-lg dark:bg-dark-surface'
+                className='max-h-full w-full max-w-lg overflow-y-auto rounded-lg bg-white p-6 shadow-lg dark:bg-dark-surface'
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className='mb-4 flex items-center justify-between'>

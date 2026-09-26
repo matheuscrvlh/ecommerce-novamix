@@ -14,6 +14,8 @@ import SidebarSection from '../../sections/SidebarSection'
 import ThemeToggle from '../../components/ThemeToggle'
 import { DashboardIcon, LogoutIcon, CameraIcon, ChevronLeftIcon } from '../../components/icons'
 import { HUB_URL } from '../../lib/hub'
+import { liberarAudio, sinalizarBipagem } from '../../lib/notificationSound'
+import { PROPS_CAMPO_CODIGO } from '../../lib/campoCodigo'
 
 const SEGUNDOS_SESSAO = 15
 const INTERVALO_PODIO_MS = 15000
@@ -134,11 +136,13 @@ export default function ColetaCracha() {
         try {
             const result = await postOrderAs({ codigo_pedido: codigo, cracha: sessao.cracha })
             const msg = result.success ?? 'Bipado com sucesso.'
+            sinalizarBipagem(true)
             setFeed((atual) => [{ codigo, ok: true, mensagem: msg }, ...atual])
             if (viaScanner) setUltimoResultadoScannerPedido({ ok: true, mensagem: `${codigo} — ${msg}` })
             buscarPedidosPodio()
         } catch (error) {
             const msg = error instanceof Error ? error.message : 'Erro ao bipar.'
+            sinalizarBipagem(false)
             setFeed((atual) => [{ codigo, ok: false, mensagem: msg }, ...atual])
             if (viaScanner) setUltimoResultadoScannerPedido({ ok: false, mensagem: `${codigo} — ${msg}` })
         }
@@ -146,6 +150,7 @@ export default function ColetaCracha() {
 
     async function handlePedidoSubmit(event: SubmitEvent) {
         event.preventDefault()
+        liberarAudio()
         await biparPedido(pedidoInput)
     }
 
@@ -209,6 +214,8 @@ export default function ColetaCracha() {
                         <div className='flex gap-2'>
                             <Input
                                 autoFocus
+                                {...PROPS_CAMPO_CODIGO}
+                                enterKeyHint='go'
                                 placeholder='Crachá'
                                 value={crachaInput}
                                 onChange={(e) => setCrachaInput(e.target.value)}
@@ -217,7 +224,10 @@ export default function ColetaCracha() {
                             />
                             <button
                                 type='button'
-                                onClick={() => setScannerCrachaAberto(true)}
+                                onClick={() => {
+                                    liberarAudio()
+                                    setScannerCrachaAberto(true)
+                                }}
                                 className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
                                 title='Escanear com a câmera'
                             >
@@ -253,6 +263,8 @@ export default function ColetaCracha() {
                         <form onSubmit={handlePedidoSubmit} className='flex gap-2'>
                             <Input
                                 autoFocus
+                                {...PROPS_CAMPO_CODIGO}
+                                enterKeyHint='send'
                                 placeholder='Código do pedido'
                                 value={pedidoInput}
                                 onChange={(e) => setPedidoInput(e.target.value)}
@@ -262,6 +274,7 @@ export default function ColetaCracha() {
                             <button
                                 type='button'
                                 onClick={() => {
+                                    liberarAudio()
                                     setUltimoResultadoScannerPedido(null)
                                     setScannerPedidoAberto(true)
                                 }}

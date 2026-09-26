@@ -77,6 +77,15 @@ export function CheckCircleIcon({ className = 'h-5 w-5' }: IconProps) {
     )
 }
 
+export function XCircleIcon({ className = 'h-5 w-5' }: IconProps) {
+    return (
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>
+            <circle cx='12' cy='12' r='9' />
+            <path d='M9 9l6 6M15 9l-6 6' />
+        </svg>
+    )
+}
+
 export function MenuIcon({ className = 'h-5 w-5' }: IconProps) {
     return (
         <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={1.8} className={className}>

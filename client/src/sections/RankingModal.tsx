@@ -29,6 +29,15 @@ type RankingModalProps = {
 }
 
 export default function RankingModal({ open, onClose }: RankingModalProps) {
+    return (
+        <Modal open={open} onClose={onClose} title='Ranking de pedidos bipados'>
+            {/* só monta com o modal aberto: busca de novo a cada abertura, em vez de mostrar o ranking de quando a página carregou */}
+            <RankingConteudo />
+        </Modal>
+    )
+}
+
+function RankingConteudo() {
     const [ranking, setRanking] = useState<RankingUsuario[]>([])
     const [erro, setErro] = useState('')
     const [carregando, setCarregando] = useState(true)
@@ -54,11 +63,17 @@ export default function RankingModal({ open, onClose }: RankingModalProps) {
             })
     }, [filtro])
 
-    function handleFiltrar(event: SubmitEvent) {
-        event.preventDefault()
+    function aplicarPeriodo(dataInicial: string, dataFinal: string) {
+        setDataInicialInput(dataInicial)
+        setDataFinalInput(dataFinal)
         setCarregando(true)
         setErro('')
-        setFiltro({ dataInicial: dataInicialInput, dataFinal: dataFinalInput })
+        setFiltro({ dataInicial, dataFinal })
+    }
+
+    function handleFiltrar(event: SubmitEvent) {
+        event.preventDefault()
+        aplicarPeriodo(dataInicialInput, dataFinalInput)
     }
 
     const termo = busca.trim().toLowerCase()
@@ -69,13 +84,14 @@ export default function RankingModal({ open, onClose }: RankingModalProps) {
     const maiorContagem = Math.max(1, ...ranking.map((usuario) => Number(usuario.count)))
 
     return (
-        <Modal open={open} onClose={onClose} title='Ranking de pedidos bipados'>
+        <>
             <DateFilterSection
                 dataInicial={dataInicialInput}
                 dataFinal={dataFinalInput}
                 onDataInicialChange={setDataInicialInput}
                 onDataFinalChange={setDataFinalInput}
                 onSubmit={handleFiltrar}
+                onAplicarPeriodo={aplicarPeriodo}
             />
 
             <div className='relative mt-3'>
@@ -146,6 +162,6 @@ export default function RankingModal({ open, onClose }: RankingModalProps) {
                         )
                     })}
             </div>
-        </Modal>
+        </>
     )
 }

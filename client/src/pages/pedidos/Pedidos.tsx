@@ -14,6 +14,7 @@ import Footer from '../../components/Footer'
 import BarcodeScannerModal from '../../components/BarcodeScannerModal'
 import ThemeToggle from '../../components/ThemeToggle'
 import { CameraIcon } from '../../components/icons'
+import { PROPS_CAMPO_CODIGO } from '../../lib/campoCodigo'
 
 type Pedido = {
     id: number
@@ -87,9 +88,15 @@ export default function Pedidos() {
         }
     }, [carregandoAuth, filtro])
 
+    function aplicarPeriodo(dataInicial: string, dataFinal: string) {
+        setDataInicialInput(dataInicial)
+        setDataFinalInput(dataFinal)
+        setFiltro({ dataInicial, dataFinal })
+    }
+
     function handleFiltrar(event: SubmitEvent) {
         event.preventDefault()
-        setFiltro({ dataInicial: dataInicialInput, dataFinal: dataFinalInput })
+        aplicarPeriodo(dataInicialInput, dataFinalInput)
     }
 
     async function handleSalvarOperador(usuarioId: number) {
@@ -146,6 +153,8 @@ export default function Pedidos() {
 
                     <form onSubmit={handleSubmit} className='flex flex-wrap gap-2'>
                         <Input
+                            {...PROPS_CAMPO_CODIGO}
+                            enterKeyHint='search'
                             placeholder='Código do pedido'
                             value={codigoPedido}
                             onChange={(e) => setCodigoPedido(e.target.value)}
@@ -203,6 +212,7 @@ export default function Pedidos() {
                     onDataInicialChange={setDataInicialInput}
                     onDataFinalChange={setDataFinalInput}
                     onSubmit={handleFiltrar}
+                    onAplicarPeriodo={aplicarPeriodo}
                 />
 
                 <PedidosTableSection

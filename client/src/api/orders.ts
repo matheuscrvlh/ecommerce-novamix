@@ -1,7 +1,7 @@
 import client from './client.ts'
 
 // Leitores podem mandar o mesmo código com espaços ou em minúsculas (ex.: Caps Lock ligado)
-function normalizarCodigo(codigo: string) {
+export function normalizarCodigo(codigo: string) {
     return codigo.replace(/\s/g, '').toUpperCase()
 }
 

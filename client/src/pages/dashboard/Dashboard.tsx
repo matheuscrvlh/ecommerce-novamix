@@ -116,11 +116,17 @@ export default function Dashboard() {
         }
     }, [carregandoAuth, filtro])
 
-    function handleFiltrar(event: SubmitEvent) {
-        event.preventDefault()
+    function aplicarPeriodo(dataInicial: string, dataFinal: string) {
+        setDataInicialInput(dataInicial)
+        setDataFinalInput(dataFinal)
         setCarregando(true)
         setErro('')
-        setFiltro({ dataInicial: dataInicialInput, dataFinal: dataFinalInput })
+        setFiltro({ dataInicial, dataFinal })
+    }
+
+    function handleFiltrar(event: SubmitEvent) {
+        event.preventDefault()
+        aplicarPeriodo(dataInicialInput, dataFinalInput)
     }
 
     return (
@@ -137,6 +143,7 @@ export default function Dashboard() {
                     onDataInicialChange={setDataInicialInput}
                     onDataFinalChange={setDataFinalInput}
                     onSubmit={handleFiltrar}
+                    onAplicarPeriodo={aplicarPeriodo}
                 />
 
                 {erro && (
