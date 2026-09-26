@@ -7,7 +7,12 @@ import { DashboardIcon, UsersIcon, PackageIcon, BadgeIcon, LogoutIcon, MenuIcon,
 import { useAuth } from '../hooks/useAuth'
 import { HUB_URL } from '../lib/hub'
 
-export default function SidebarSection() {
+type SidebarSectionProps = {
+    // telas sem sidebar no desktop (bipar, coleta por crachá) usam só o cabeçalho + menu do celular
+    mobileOnly?: boolean
+}
+
+export default function SidebarSection({ mobileOnly = false }: SidebarSectionProps) {
     const { logout, role } = useAuth()
     const [open, setOpen] = useState(false)
 
@@ -31,9 +36,9 @@ export default function SidebarSection() {
             )}
 
             <aside
-                className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 flex-col border-r border-gray bg-white transition-transform md:sticky md:top-0 md:translate-x-0 dark:border-dark-border dark:bg-dark-surface ${
-                    open ? 'translate-x-0' : '-translate-x-full'
-                }`}
+                className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 flex-col border-r border-gray bg-white transition-transform dark:border-dark-border dark:bg-dark-surface ${
+                    mobileOnly ? 'md:hidden' : 'md:sticky md:top-0 md:translate-x-0'
+                } ${open ? 'translate-x-0' : '-translate-x-full'}`}
             >
                 <div className='relative flex items-center justify-center p-4'>
                     <Logo />

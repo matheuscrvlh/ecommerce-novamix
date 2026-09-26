@@ -10,6 +10,7 @@ import Logo from '../../components/Logo'
 import Alert from '../../components/Alert'
 import BarcodeScannerModal from '../../components/BarcodeScannerModal'
 import PodiumSection from '../../sections/dashboard/PodiumSection'
+import SidebarSection from '../../sections/SidebarSection'
 import ThemeToggle from '../../components/ThemeToggle'
 import { DashboardIcon, LogoutIcon, CameraIcon, ChevronLeftIcon } from '../../components/icons'
 import { HUB_URL } from '../../lib/hub'
@@ -153,134 +154,140 @@ export default function ColetaCracha() {
     }
 
     return (
-        <div className='relative flex min-h-screen flex-col items-center justify-center gap-6 bg-linear-to-br from-orange-base/10 via-white to-gray-base/10 p-4 dark:bg-dark-bg dark:from-dark-bg dark:via-dark-bg dark:to-dark-bg'>
-            <div className='absolute top-4 right-4 flex items-center gap-4'>
-                <Link
-                    to='/dashboard'
-                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
-                >
-                    <DashboardIcon className='h-4 w-4' />
-                    Voltar ao Dashboard
-                </Link>
+        <div className='flex min-h-screen flex-col bg-linear-to-br from-orange-base/10 via-white to-gray-base/10 dark:bg-dark-bg dark:from-dark-bg dark:via-dark-bg dark:to-dark-bg'>
+            {/* no celular os links cobriam o logo: usa o cabeçalho com menu das outras telas */}
+            <SidebarSection mobileOnly />
 
-                <a
-                    href={HUB_URL}
-                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
-                >
-                    <ChevronLeftIcon className='h-4 w-4' />
-                    Voltar ao Hub
-                </a>
+            <div className='relative flex flex-1 flex-col items-center justify-center gap-6 p-4'>
+                <div className='absolute top-4 right-4 hidden items-center gap-4 md:flex'>
+                    <Link
+                        to='/dashboard'
+                        className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
+                    >
+                        <DashboardIcon className='h-4 w-4' />
+                        Voltar ao Dashboard
+                    </Link>
 
-                <div className='h-4 w-px bg-gray-base/30' />
+                    <a
+                        href={HUB_URL}
+                        className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
+                    >
+                        <ChevronLeftIcon className='h-4 w-4' />
+                        Voltar ao Hub
+                    </a>
 
-                <ThemeToggle />
+                    <div className='h-4 w-px bg-gray-base/30' />
 
-                <div className='h-4 w-px bg-gray-base/30' />
+                    <ThemeToggle />
 
-                <button
-                    onClick={logout}
-                    className='flex items-center gap-1 text-sm font-medium text-red-base transition hover:text-red-light'
-                >
-                    <LogoutIcon className='h-4 w-4' />
-                    Sair
-                </button>
-            </div>
+                    <div className='h-4 w-px bg-gray-base/30' />
 
-            <div className='flex justify-center'>
-                <Logo />
-            </div>
-
-            <div className='w-full max-w-sm'>
-                <PodiumSection pedidos={pedidos} usuarios={usuarios} carregando={carregandoPedidos} />
-            </div>
-
-            {!sessao && (
-                <form onSubmit={handleCrachaSubmit} className='w-full max-w-sm space-y-4 rounded-lg bg-white p-8 shadow-sm dark:bg-dark-surface'>
-                    <h1 className='text-center text-lg font-semibold text-gray-text dark:text-dark-text'>Coleta por Crachá</h1>
-                    <p className='text-center text-sm text-gray-dark dark:text-dark-text-muted'>
-                        Bipe ou digite seu crachá pra começar a conferir pedidos
-                    </p>
-
-                    <div className='flex gap-2'>
-                        <Input
-                            autoFocus
-                            placeholder='Crachá'
-                            value={crachaInput}
-                            onChange={(e) => setCrachaInput(e.target.value)}
-                            className='flex-1'
-                            required
-                        />
-                        <button
-                            type='button'
-                            onClick={() => setScannerCrachaAberto(true)}
-                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
-                            title='Escanear com a câmera'
-                        >
-                            <CameraIcon />
-                        </button>
-                    </div>
-
-                    {erroCracha && <Alert>{erroCracha}</Alert>}
-
-                    <Button type='submit' className='w-full'>
-                        Entrar
-                    </Button>
-                </form>
-            )}
-
-            {sessao && (
-                <div className='w-full max-w-sm space-y-4 rounded-lg bg-white p-8 shadow-sm dark:bg-dark-surface'>
-                    <div className='text-center'>
-                        <h1 className='text-lg font-semibold text-gray-text dark:text-dark-text'>Olá, {sessao.nome}!</h1>
-                        <p className='text-sm text-gray-dark dark:text-dark-text-muted'>Bipe os pedidos que quiser conferir</p>
-                    </div>
-
-                    <div className='h-2 w-full overflow-hidden rounded-full bg-gray dark:bg-dark-surface-2'>
-                        <div
-                            className='h-2 rounded-full bg-orange-base transition-all duration-1000 ease-linear'
-                            style={{ width: `${(restante / SEGUNDOS_SESSAO) * 100}%` }}
-                        />
-                    </div>
-                    <p className='text-center text-xs text-gray-dark dark:text-dark-text-muted'>
-                        Sessão encerra em {restante}s de inatividade
-                    </p>
-
-                    <form onSubmit={handlePedidoSubmit} className='flex gap-2'>
-                        <Input
-                            autoFocus
-                            placeholder='Código do pedido'
-                            value={pedidoInput}
-                            onChange={(e) => setPedidoInput(e.target.value)}
-                            className='flex-1'
-                            required
-                        />
-                        <button
-                            type='button'
-                            onClick={() => {
-                                setUltimoResultadoScannerPedido(null)
-                                setScannerPedidoAberto(true)
-                            }}
-                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
-                            title='Escanear com a câmera'
-                        >
-                            <CameraIcon />
-                        </button>
-                    </form>
-
-                    {feed.length > 0 && (
-                        <ul className='max-h-48 space-y-1 overflow-y-auto text-sm'>
-                            {feed.map((item, index) => (
-                                <li
-                                    key={`${item.codigo}-${index}`}
-                                    className={item.ok ? 'text-green-base' : 'text-red-base'}
-                                >
-                                    {item.codigo} — {item.mensagem}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+                    <button
+                        onClick={logout}
+                        className='flex items-center gap-1 text-sm font-medium text-red-base transition hover:text-red-light'
+                    >
+                        <LogoutIcon className='h-4 w-4' />
+                        Sair
+                    </button>
                 </div>
-            )}
+
+                <div className='hidden justify-center md:flex'>
+                    <Logo />
+                </div>
+
+                <div className='w-full max-w-sm'>
+                    <PodiumSection pedidos={pedidos} usuarios={usuarios} carregando={carregandoPedidos} />
+                </div>
+
+                {!sessao && (
+                    <form onSubmit={handleCrachaSubmit} className='w-full max-w-sm space-y-4 rounded-lg bg-white p-8 shadow-sm dark:bg-dark-surface'>
+                        <h1 className='text-center text-lg font-semibold text-gray-text dark:text-dark-text'>Coleta por Crachá</h1>
+                        <p className='text-center text-sm text-gray-dark dark:text-dark-text-muted'>
+                            Bipe ou digite seu crachá pra começar a conferir pedidos
+                        </p>
+
+                        <div className='flex gap-2'>
+                            <Input
+                                autoFocus
+                                placeholder='Crachá'
+                                value={crachaInput}
+                                onChange={(e) => setCrachaInput(e.target.value)}
+                                className='flex-1'
+                                required
+                            />
+                            <button
+                                type='button'
+                                onClick={() => setScannerCrachaAberto(true)}
+                                className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
+                                title='Escanear com a câmera'
+                            >
+                                <CameraIcon />
+                            </button>
+                        </div>
+
+                        {erroCracha && <Alert>{erroCracha}</Alert>}
+
+                        <Button type='submit' className='w-full'>
+                            Entrar
+                        </Button>
+                    </form>
+                )}
+
+                {sessao && (
+                    <div className='w-full max-w-sm space-y-4 rounded-lg bg-white p-8 shadow-sm dark:bg-dark-surface'>
+                        <div className='text-center'>
+                            <h1 className='text-lg font-semibold text-gray-text dark:text-dark-text'>Olá, {sessao.nome}!</h1>
+                            <p className='text-sm text-gray-dark dark:text-dark-text-muted'>Bipe os pedidos que quiser conferir</p>
+                        </div>
+
+                        <div className='h-2 w-full overflow-hidden rounded-full bg-gray dark:bg-dark-surface-2'>
+                            <div
+                                className='h-2 rounded-full bg-orange-base transition-all duration-1000 ease-linear'
+                                style={{ width: `${(restante / SEGUNDOS_SESSAO) * 100}%` }}
+                            />
+                        </div>
+                        <p className='text-center text-xs text-gray-dark dark:text-dark-text-muted'>
+                            Sessão encerra em {restante}s de inatividade
+                        </p>
+
+                        <form onSubmit={handlePedidoSubmit} className='flex gap-2'>
+                            <Input
+                                autoFocus
+                                placeholder='Código do pedido'
+                                value={pedidoInput}
+                                onChange={(e) => setPedidoInput(e.target.value)}
+                                className='flex-1'
+                                required
+                            />
+                            <button
+                                type='button'
+                                onClick={() => {
+                                    setUltimoResultadoScannerPedido(null)
+                                    setScannerPedidoAberto(true)
+                                }}
+                                className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
+                                title='Escanear com a câmera'
+                            >
+                                <CameraIcon />
+                            </button>
+                        </form>
+
+                        {feed.length > 0 && (
+                            <ul className='max-h-48 space-y-1 overflow-y-auto text-sm'>
+                                {feed.map((item, index) => (
+                                    <li
+                                        key={`${item.codigo}-${index}`}
+                                        className={item.ok ? 'text-green-base' : 'text-red-base'}
+                                    >
+                                        {item.codigo} — {item.mensagem}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                )}
+
+            </div>
 
             {scannerCrachaAberto && (
                 <BarcodeScannerModal

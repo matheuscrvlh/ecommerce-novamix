@@ -3,6 +3,7 @@ import { db } from '../database/database.ts'
 import { findHubNomesPorId, findHubUsuarioEcommerce } from '../database/hub.database.ts'
 import { idDoCracha } from '../utils/cracha.ts'
 import { normalizarCodigoPedido } from '../utils/pedido.ts'
+import { formatarDataHora } from '../utils/data.ts'
 import { authenticate, checkAdmin } from '../middlewares/auth.middleware.ts'
 
 type CreateOrderBody = {
@@ -59,7 +60,7 @@ async function postOrder(req: FastifyRequest<{Body: CreateOrderBody}>, res: Fast
             const nomes = await findHubNomesPorId([idUser])
             const nome = nomes.get(idUser) ?? 'Desconhecido'
 
-            return res.code(400).send({ error: `Pedido já bipado por ${nome} em ${date}` })
+            return res.code(400).send({ error: `Pedido já bipado por ${nome} em ${formatarDataHora(date)}` })
         }
 
         return res.code(201).send({ success: 'Pedido adicionado.'})
@@ -107,7 +108,7 @@ async function orderConsultation(req: FastifyRequest<{Body: GetOrderBody}>, res:
         const nomes = await findHubNomesPorId([idUser])
         const nome = nomes.get(idUser) ?? 'Desconhecido'
 
-        res.code(200).send({ success: `Pedido já coletado por ${nome} em ${data}`})
+        res.code(200).send({ success: `Pedido já coletado por ${nome} em ${formatarDataHora(data)}`})
     } catch (error) {
         console.log(error)
         res.code(500).send({ error: 'Erro ao buscar pedidos.'})
@@ -137,9 +138,9 @@ async function getOrdersCountByUser(req:FastifyRequest<{Body: GetOrderBody}>, re
     }
 }
 
-async function putOrder(req: FastifyRequest, res: FastifyReply) {
+async function putOrder(req: FastifyRequest<{Params: {codigo_pedido: string}, Body: {id: number}}>, res: FastifyReply) {
     const { id } = req.body
-    const codigo_pedido = req.params.codigo_pedido
+    const codigo_pedido = normalizarCodigoPedido(req.params.codigo_pedido)
 
     try {
         const searchOrder = await db.query(`
@@ -148,8 +149,9 @@ async function putOrder(req: FastifyRequest, res: FastifyReply) {
             WHERE codigo_pedido = $1
         `, [codigo_pedido]);
 
+        // 401 aqui fazia o client achar que a sessão expirou e mandar o usuário pro hub
         if(searchOrder.rows.length === 0) {
-            res.code(401).send({ error: 'Erro ao achar pedido'});
+            res.code(404).send({ error: 'Pedido não encontrado.'});
             return
         }
 
@@ -162,12 +164,12 @@ async function putOrder(req: FastifyRequest, res: FastifyReply) {
         res.code(200).send({ success: 'Sucesso ao editar pedido.'})
     } catch (error) {
         console.log(error);
-        res.code(401).send({ error: 'Erro ao editar pedido.'})
+        res.code(500).send({ error: 'Erro ao editar pedido.'})
     }
 }
 
 async function deleteOrder(req: FastifyRequest<{Params: {codigo_pedido: string}}>, res: FastifyReply) {
-    const codigo_pedido = req.params.codigo_pedido
+    const codigo_pedido = normalizarCodigoPedido(req.params.codigo_pedido)
 
     try {
         // verifica se existe

@@ -27,13 +27,21 @@ const PADDING_TOPO = 16
 const PADDING_BASE = 4
 const ALTURA_PLOTAVEL = ALTURA - PADDING_TOPO - PADDING_BASE
 
+// dia no horário local (YYYY-MM-DD) — toISOString() daria o dia em UTC e jogaria bipagens da noite pro dia seguinte
+function diaLocal(data: Date) {
+    const ano = data.getFullYear()
+    const mes = String(data.getMonth() + 1).padStart(2, '0')
+    const dia = String(data.getDate()).padStart(2, '0')
+    return `${ano}-${mes}-${dia}`
+}
+
 function listarDias(dataInicial: string, dataFinal: string) {
     const dias: string[] = []
     const cursor = new Date(`${dataInicial}T00:00:00`)
     const fim = new Date(`${dataFinal}T00:00:00`)
 
     while (cursor <= fim) {
-        dias.push(cursor.toISOString().slice(0, 10))
+        dias.push(diaLocal(cursor))
         cursor.setDate(cursor.getDate() + 1)
     }
 
@@ -62,7 +70,7 @@ export default function ProducaoSection({ pedidos, carregando, dataInicial, data
 
         pedidos.forEach((pedido) => {
             if (!pedido.bipado_em) return
-            const dia = pedido.bipado_em.slice(0, 10)
+            const dia = diaLocal(new Date(pedido.bipado_em))
             if (contagemPorDia.has(dia)) {
                 contagemPorDia.set(dia, (contagemPorDia.get(dia) ?? 0) + 1)
             }

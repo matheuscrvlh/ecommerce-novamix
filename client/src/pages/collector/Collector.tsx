@@ -8,6 +8,7 @@ import Logo from '../../components/Logo'
 import Alert from '../../components/Alert'
 import BarcodeScannerModal from '../../components/BarcodeScannerModal'
 import RankingModal from '../../sections/RankingModal'
+import SidebarSection from '../../sections/SidebarSection'
 import ThemeToggle from '../../components/ThemeToggle'
 import { LogoutIcon, DashboardIcon, TrophyIcon, CameraIcon, QrCodeIcon, UserAvatarIcon, ChevronLeftIcon } from '../../components/icons'
 import { HUB_URL } from '../../lib/hub'
@@ -53,104 +54,117 @@ export default function Collector() {
     }
 
     return (
-        <div className='relative flex min-h-screen flex-col items-center justify-center gap-4 bg-linear-to-br from-orange-base/10 via-white to-gray-base/10 p-4 dark:bg-dark-bg dark:from-dark-bg dark:via-dark-bg dark:to-dark-bg'>
-            <div className='absolute top-4 right-4 flex items-center gap-4'>
-                <Link
-                    to='/dashboard'
-                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
-                >
-                    <DashboardIcon className='h-4 w-4' />
-                    Dashboard
-                </Link>
+        <div className='flex min-h-screen flex-col bg-linear-to-br from-orange-base/10 via-white to-gray-base/10 dark:bg-dark-bg dark:from-dark-bg dark:via-dark-bg dark:to-dark-bg'>
+            {/* no celular os links não cabem numa linha: usa o cabeçalho com menu das outras telas */}
+            <SidebarSection mobileOnly />
 
-                <Link
-                    to='/pedidos'
-                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
-                >
-                    <QrCodeIcon className='h-4 w-4' />
-                    Pedidos
-                </Link>
+            <div className='relative flex flex-1 flex-col items-center justify-center gap-4 p-4'>
+                <div className='absolute top-4 right-4 hidden items-center gap-4 md:flex'>
+                    <Link
+                        to='/dashboard'
+                        className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
+                    >
+                        <DashboardIcon className='h-4 w-4' />
+                        Dashboard
+                    </Link>
 
-                <Link
-                    to='/conta'
-                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
-                >
-                    <UserAvatarIcon className='h-4 w-4' />
-                    Minha Conta
-                </Link>
+                    <Link
+                        to='/pedidos'
+                        className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
+                    >
+                        <QrCodeIcon className='h-4 w-4' />
+                        Pedidos
+                    </Link>
+
+                    <Link
+                        to='/conta'
+                        className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
+                    >
+                        <UserAvatarIcon className='h-4 w-4' />
+                        Minha Conta
+                    </Link>
+
+                    <button
+                        onClick={() => setRankingAberto(true)}
+                        className='flex items-center gap-1 text-sm text-orange-base transition hover:text-orange-light'
+                    >
+                        <TrophyIcon className='h-4 w-4 origin-center animate-trophy-wiggle' />
+                        Ranking
+                    </button>
+
+                    <div className='h-4 w-px bg-gray-base/30' />
+
+                    <a
+                        href={HUB_URL}
+                        className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
+                    >
+                        <ChevronLeftIcon className='h-4 w-4' />
+                        Voltar ao Hub
+                    </a>
+
+                    <div className='h-4 w-px bg-gray-base/30' />
+
+                    <ThemeToggle />
+
+                    <div className='h-4 w-px bg-gray-base/30' />
+
+                    <button
+                        onClick={logout}
+                        className='flex items-center gap-1 text-sm font-medium text-red-base transition hover:text-red-light'
+                    >
+                        <LogoutIcon className='h-4 w-4' />
+                        Sair
+                    </button>
+                </div>
+
+                <div className='w-full max-w-sm space-y-5 rounded-lg bg-white p-8 shadow-sm dark:bg-dark-surface'>
+                    <div className='hidden justify-center md:flex'>
+                        <Logo />
+                    </div>
+
+                    <h1 className='text-center text-lg font-semibold text-gray-text dark:text-dark-text'>Bipar pedido</h1>
+
+                    <form onSubmit={handleSubmit} className='space-y-3'>
+                        <div className='flex gap-2'>
+                            <Input
+                                autoFocus
+                                placeholder='Código do pedido'
+                                value={codigoPedido}
+                                onChange={(e) => setCodigoPedido(e.target.value)}
+                                className='flex-1'
+                                required
+                            />
+                            <button
+                                type='button'
+                                onClick={() => {
+                                    setUltimoResultadoScanner(null)
+                                    setScannerAberto(true)
+                                }}
+                                className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
+                                title='Escanear com a câmera'
+                            >
+                                <CameraIcon />
+                            </button>
+                        </div>
+
+                        <Button type='submit' className='w-full' disabled={enviando}>
+                            {enviando ? 'Enviando...' : 'Bipar'}
+                        </Button>
+                    </form>
+
+                    {mensagem && (
+                        <p className='rounded-md bg-green-base/10 px-4 py-3 text-sm text-green-base'>{mensagem}</p>
+                    )}
+                    {erro && <Alert>{erro}</Alert>}
+                </div>
 
                 <button
                     onClick={() => setRankingAberto(true)}
-                    className='flex items-center gap-1 text-sm text-orange-base transition hover:text-orange-light'
+                    className='flex items-center gap-1 text-sm text-orange-base transition hover:text-orange-light md:hidden'
                 >
                     <TrophyIcon className='h-4 w-4 origin-center animate-trophy-wiggle' />
-                    Ranking
+                    Ver ranking
                 </button>
-
-                <div className='h-4 w-px bg-gray-base/30' />
-
-                <a
-                    href={HUB_URL}
-                    className='flex items-center gap-1 text-sm text-gray-dark transition hover:text-gray-text dark:text-dark-text-muted dark:hover:text-dark-text'
-                >
-                    <ChevronLeftIcon className='h-4 w-4' />
-                    Voltar ao Hub
-                </a>
-
-                <div className='h-4 w-px bg-gray-base/30' />
-
-                <ThemeToggle />
-
-                <div className='h-4 w-px bg-gray-base/30' />
-
-                <button
-                    onClick={logout}
-                    className='flex items-center gap-1 text-sm font-medium text-red-base transition hover:text-red-light'
-                >
-                    <LogoutIcon className='h-4 w-4' />
-                    Sair
-                </button>
-            </div>
-
-            <div className='w-full max-w-sm space-y-5 rounded-lg bg-white p-8 shadow-sm dark:bg-dark-surface'>
-                <div className='flex justify-center'>
-                    <Logo />
-                </div>
-
-                <h1 className='text-center text-lg font-semibold text-gray-text dark:text-dark-text'>Bipar pedido</h1>
-
-                <form onSubmit={handleSubmit} className='space-y-3'>
-                    <div className='flex gap-2'>
-                        <Input
-                            autoFocus
-                            placeholder='Código do pedido'
-                            value={codigoPedido}
-                            onChange={(e) => setCodigoPedido(e.target.value)}
-                            className='flex-1'
-                            required
-                        />
-                        <button
-                            type='button'
-                            onClick={() => {
-                                setUltimoResultadoScanner(null)
-                                setScannerAberto(true)
-                            }}
-                            className='rounded-md border border-gray-base px-3 text-gray-dark transition hover:bg-gray hover:text-orange-base sm:hidden dark:text-dark-text-muted dark:hover:bg-dark-surface-2'
-                            title='Escanear com a câmera'
-                        >
-                            <CameraIcon />
-                        </button>
-                    </div>
-
-                    <Button type='submit' className='w-full' disabled={enviando}>
-                        {enviando ? 'Enviando...' : 'Bipar'}
-                    </Button>
-                </form>
-
-                {mensagem && (
-                    <p className='rounded-md bg-green-base/10 px-4 py-3 text-sm text-green-base'>{mensagem}</p>
-                )}
-                {erro && <Alert>{erro}</Alert>}
             </div>
 
             {scannerAberto && (

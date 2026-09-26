@@ -36,8 +36,10 @@ function hojeISO() {
 }
 
 export default function Pedidos() {
-    const { loading: carregandoAuth } = useAuth()
+    const { loading: carregandoAuth, role } = useAuth()
     const { usuarios } = useUsuariosResumo()
+    // só admin pode trocar o operador (o server recusa pros outros)
+    const podeEditar = role === 'ADMIN'
 
     const [codigoPedido, setCodigoPedido] = useState('')
     const [resultado, setResultado] = useState<ResultadoConsulta | null>(null)
@@ -174,7 +176,7 @@ export default function Pedidos() {
                             }`}
                         >
                             <span>{resultado.mensagem}</span>
-                            {resultado.bipado && (
+                            {resultado.bipado && podeEditar && (
                                 <Button variant='ghost' className='shrink-0' onClick={() => setEditandoPedido(codigoPedido)}>
                                     Alterar operador
                                 </Button>
@@ -207,7 +209,7 @@ export default function Pedidos() {
                     pedidos={pedidos}
                     usuarios={usuarios}
                     carregando={carregando}
-                    onEditarOperador={(pedido) => setEditandoPedido(pedido.codigo_pedido)}
+                    onEditarOperador={podeEditar ? (pedido) => setEditandoPedido(pedido.codigo_pedido) : undefined}
                 />
 
                 <Footer />

@@ -5,6 +5,12 @@ function normalizarCodigo(codigo: string) {
     return codigo.replace(/\s/g, '').toUpperCase()
 }
 
+// As telas mandam o período no horário local ("2026-09-25T00:00:00"); o banco compara em UTC,
+// então sem converter o "hoje" ia das 21h de ontem às 20:59 de hoje
+function paraUTC(dataHoraLocal: string) {
+    return new Date(dataHoraLocal).toISOString()
+}
+
 type PostOrderParams = {
     codigo_pedido: string
 }
@@ -26,7 +32,7 @@ export async function getOrders({ dataInicial, dataFinal }: GetOrdersParams) {
     return client({
         url: '/pedidos/buscar',
         method: 'POST',
-        data: { dataInicial, dataFinal }
+        data: { dataInicial: paraUTC(dataInicial), dataFinal: paraUTC(dataFinal) }
     })
 }
 
@@ -45,7 +51,7 @@ export async function getRanking({ dataInicial, dataFinal }: GetRankingParams): 
     return client({
         url: '/pedidos/resumo-usuarios',
         method: 'POST',
-        data: { dataInicial, dataFinal }
+        data: { dataInicial: paraUTC(dataInicial), dataFinal: paraUTC(dataFinal) }
     })
 }
 
@@ -68,7 +74,7 @@ type EditOrderParams = {
 
 export async function editOrder({ codigoPedido, usuarioId }: EditOrderParams) {
     return client({
-        url: `/pedidos/${codigoPedido}`,
+        url: `/pedidos/${encodeURIComponent(normalizarCodigo(codigoPedido))}`,
         method: 'PUT',
         data: { id: usuarioId }
     })
