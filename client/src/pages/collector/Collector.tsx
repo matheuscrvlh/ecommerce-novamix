@@ -27,7 +27,8 @@ type Leitura = {
 export default function Collector() {
     const [codigoPedido, setCodigoPedido] = useState('')
     const [leituras, setLeituras] = useState<Leitura[]>([])
-    const [enviando, setEnviando] = useState(false)
+    // contador (e não true/false): com a pistola, várias leituras podem estar sendo enviadas ao mesmo tempo
+    const [enviando, setEnviando] = useState(0)
     const [scannerAberto, setScannerAberto] = useState(false)
     const [rankingAberto, setRankingAberto] = useState(false)
     const [ultimoResultadoScanner, setUltimoResultadoScanner] = useState<{ ok: boolean; mensagem: string } | null>(null)
@@ -41,7 +42,7 @@ export default function Collector() {
         const codigoExibido = normalizarCodigo(codigo)
         // limpa antes da resposta: se a pistola ler o próximo pedido, ele não gruda no código anterior
         setCodigoPedido('')
-        setEnviando(true)
+        setEnviando((atual) => atual + 1)
 
         let ok = false
         let mensagem: string
@@ -53,7 +54,7 @@ export default function Collector() {
         } catch (error) {
             mensagem = error instanceof Error ? error.message : 'Erro ao bipar pedido.'
         } finally {
-            setEnviando(false)
+            setEnviando((atual) => atual - 1)
         }
 
         sinalizarBipagem(ok)
@@ -176,8 +177,10 @@ export default function Collector() {
                             </button>
                         </div>
 
-                        <Button type='submit' className='w-full' disabled={enviando}>
-                            {enviando ? 'Enviando...' : 'Bipar'}
+                        {/* nunca desativar: com o botão de envio desativado o navegador ignora o Enter da
+                            pistola USB, o código fica no campo e a leitura seguinte gruda nele */}
+                        <Button type='submit' className='w-full'>
+                            {enviando > 0 ? 'Enviando...' : 'Bipar'}
                         </Button>
                     </form>
 
